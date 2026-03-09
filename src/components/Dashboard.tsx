@@ -5,7 +5,7 @@ import { ZenithLogo } from './ZenithLogo';
 import { RoutineSystem } from './RoutineSystem';
 import { DailyMissions } from './DailyMissions';
 import { FocusTimer } from './FocusTimer';
-import { motion } from 'motion/react';
+import { import { motion } from 'framer-motion';
 import { Zap, Target, TrendingUp, Wallet, User, ChevronRight, MessageSquare, Sparkles, Quote, Gamepad2, Brain, Activity, ArrowUpRight } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 
