@@ -1,7 +1,7 @@
 export default function App() {
   return (
-    <div style={{color:"white",padding:"40px"}}>
-      Zenith carregou
+    <div style={{padding:40,color:"white",fontSize:24}}>
+      Zenith está funcionando 🚀
     </div>
   )
 }
