@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-zenith-black: #020617;
+  --color-zenith-dark: #0f172a;
+  --color-zenith-deep-blue: #1e293b;
+  --color-zenith-electric-blue: #3b82f6;
+  --color-zenith-cyan: #06b6d4;
+  --color-zenith-neon-blue: #00f0ff;
+  --color-zenith-gray: #334155;
+  
+  /* Remove purple references and replace with blue shades */
+  --color-zenith-neon-purple: #3b82f6; 
+}
+
+@layer base {
+  body {
+    @apply bg-zenith-black text-white font-sans antialiased overflow-x-hidden selection:bg-zenith-electric-blue/30;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-zenith-dark/40 backdrop-blur-3xl border border-white/[0.05] rounded-[1.5rem] shadow-2xl relative overflow-hidden;
+  }
+
+  .glass-card-hover {
+    @apply transition-all duration-300 hover:bg-zenith-deep-blue/50 hover:border-white/[0.1] hover:shadow-zenith-electric-blue/10;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-zenith-electric-blue to-zenith-cyan text-white font-bold py-4 px-8 rounded-xl transition-all active:scale-95 disabled:opacity-50 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)];
+  }
+
+  .btn-secondary {
+    @apply bg-white/[0.05] border border-white/[0.1] text-white font-medium py-4 px-8 rounded-xl hover:bg-white/[0.08] transition-all active:scale-95;
+  }
+
+  .nav-blur {
+    @apply bg-zenith-black/80 backdrop-blur-2xl border-t border-white/[0.05];
+  }
+
+  .neon-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-zenith-cyan via-zenith-electric-blue to-zenith-neon-blue;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Animations */
+@keyframes infinity-flow {
+  0% { stroke-dashoffset: 1000; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.infinity-path {
+  stroke-dasharray: 1000;
+  animation: infinity-flow 10s linear infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s infinite ease-in-out;
+}
+

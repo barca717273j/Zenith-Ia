@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isRequestOwner() {
+      return isAuthenticated() && request.auth.uid == request.resource.data.userId;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    
+    function isValidUser(data) {
+      return data.email is string && isValidEmail(data.email) &&
+             data.subscriptionTier in ['free', 'pro', 'elite', 'master'] &&
+             (data.energyLevel == null || (data.energyLevel is number && data.energyLevel >= 0 && data.energyLevel <= 100));
+    }
+
+    function isValidHabit(data) {
+      return data.userId is string && data.name is string && data.name.size() > 0 &&
+             data.frequency in ['daily', 'weekly'];
+    }
+
+    function isValidGoal(data) {
+      return data.userId is string && data.title is string && 
+             data.category in ['health', 'wealth', 'knowledge', 'relationships', 'growth', 'career', 'creativity', 'spiritual'];
+    }
+
+    function isValidRoutine(data) {
+      return data.userId is string && data.name is string && data.tasks is list;
+    }
+
+    function isValidGameScore(data) {
+      return data.userId is string && data.score is number && data.date is string;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+    }
+
+    match /habits/{habitId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner() && isValidHabit(request.resource.data);
+      allow update: if isDocOwner() && isRequestOwner() && isValidHabit(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /routines/{routineId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner() && isValidRoutine(request.resource.data);
+      allow update: if isDocOwner() && isRequestOwner() && isValidRoutine(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /game_scores/{scoreId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner() && isValidGameScore(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /habit_logs/{logId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner();
+      allow update: if isDocOwner() && isRequestOwner();
+      allow delete: if isDocOwner();
+    }
+
+    match /goals/{goalId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner() && isValidGoal(request.resource.data);
+      allow update: if isDocOwner() && isRequestOwner() && isValidGoal(request.resource.data);
+      allow delete: if isDocOwner();
+    }
+
+    match /finances/{recordId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner();
+      allow update: if isDocOwner() && isRequestOwner();
+      allow delete: if isDocOwner();
+    }
+  }
+}

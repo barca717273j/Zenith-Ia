@@ -1,0 +1,5 @@
+{
+  "name": "Zenith",
+  "description": "Zenith: A premium mobile Life Operating System. Features include AI-powered life strategy, habit tracking with plan-based limits, cosmic life mapping, finance management, and mental focus games.",
+  "requestFramePermissions": ["notifications", "geolocation"]
+}

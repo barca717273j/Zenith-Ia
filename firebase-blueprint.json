@@ -1,0 +1,137 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user profile information and app settings.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "photoURL": { "type": "string" },
+        "energyLevel": { "type": "number", "description": "Current energy level 0-100" },
+        "subscriptionTier": { "type": "string", "enum": ["free", "pro", "elite", "master"] },
+        "language": { "type": "string", "enum": ["en", "pt", "es"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "subscriptionTier"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "A habit the user wants to track.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "frequency": { "type": "string", "enum": ["daily", "weekly"] },
+        "streak": { "type": "number" },
+        "isPremium": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "frequency"]
+    },
+    "Routine": {
+      "title": "Routine",
+      "description": "A daily routine.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "tasks": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "time": { "type": "string" },
+              "task": { "type": "string" },
+              "category": { "type": "string" }
+            }
+          }
+        },
+        "isPremium": { "type": "boolean" }
+      },
+      "required": ["userId", "name"]
+    },
+    "GameScore": {
+      "title": "Game Score",
+      "description": "Scores from the focus break game.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "score": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "score", "date"]
+    },
+    "HabitLog": {
+      "title": "Habit Log",
+      "description": "A record of a habit completion.",
+      "type": "object",
+      "properties": {
+        "habitId": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "completed": { "type": "boolean" }
+      },
+      "required": ["habitId", "userId", "date", "completed"]
+    },
+    "Goal": {
+      "title": "Life Goal",
+      "description": "A long-term life goal.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string", "enum": ["health", "wealth", "knowledge", "relationships", "growth", "career", "creativity", "spiritual"] },
+        "progress": { "type": "number" },
+        "deadline": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["active", "completed", "archived"] }
+      },
+      "required": ["userId", "title", "category"]
+    },
+    "FinanceRecord": {
+      "title": "Finance Record",
+      "description": "An income or expense record.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "type", "date"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/habits/{habitId}": {
+      "schema": "Habit",
+      "description": "Habit definitions."
+    },
+    "/habit_logs/{logId}": {
+      "schema": "HabitLog",
+      "description": "Habit completion logs."
+    },
+    "/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "Life goal documents."
+    },
+    "/routines/{routineId}": {
+      "schema": "Routine",
+      "description": "User routines."
+    },
+    "/game_scores/{scoreId}": {
+      "schema": "GameScore",
+      "description": "Game high scores."
+    },
+    "/finances/{recordId}": {
+      "schema": "FinanceRecord",
+      "description": "Financial transaction records."
+    }
+  }
+}
