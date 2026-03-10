@@ -1,63 +1,54 @@
-import express from "express";
+import express from 'express';
 import Stripe from 'stripe';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-// Stripe Setup
+// Lazy load Stripe to prevent crash if key is missing
 let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-}
+const getStripe = () => {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+  return stripe;
+};
 
-// API Routes
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", stripeEnabled: !!stripe });
-});
-
-app.post("/api/create-checkout-session", async (req, res) => {
-  if (!stripe) {
-    return res.status(500).json({ error: "Stripe is not configured" });
+app.post('/api/create-checkout-session', async (req, res) => {
+  const { priceId, userId } = req.body;
+  const s = getStripe();
+  
+  if (!s) {
+    return res.status(500).json({ error: 'Stripe not configured' });
   }
 
-  const { priceId: planId, userId } = req.body;
-
-  // Map plan names to price IDs (placeholders)
-  const planMap: Record<string, string> = {
-    'pro': 'price_pro_placeholder',
-    'elite': 'price_elite_placeholder',
-    'master': 'price_master_placeholder'
+  // Map plan names to actual Stripe Price IDs (placeholders for now)
+  const priceMap: Record<string, string> = {
+    'pro': 'price_pro_id',
+    'elite': 'price_elite_id',
+    'master': 'price_master_id'
   };
 
-  const priceId = planMap[planId];
-
-  if (!priceId) {
-    return res.status(400).json({ error: "Invalid plan ID" });
-  }
-
   try {
-    const session = await stripe.checkout.sessions.create({
+    const session = await s.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{
+        price: priceMap[priceId] || 'price_default',
+        quantity: 1,
+      }],
       mode: 'subscription',
-      success_url: `${process.env.APP_URL}/?success=true`,
-      cancel_url: `${process.env.APP_URL}/?canceled=true`,
+      success_url: `${process.env.APP_URL || 'http://localhost:3000'}/profile?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.APP_URL || 'http://localhost:3000'}/profile`,
       client_reference_id: userId,
     });
-
     res.json({ url: session.url });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Export the app for Vercel
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 export default app;

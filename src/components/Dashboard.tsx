@@ -6,7 +6,7 @@ import { RoutineSystem } from './RoutineSystem';
 import { DailyMissions } from './DailyMissions';
 import { FocusTimer } from './FocusTimer';
 import { motion } from 'motion/react';
-import { Zap, Target, TrendingUp, Wallet, User, ChevronRight, MessageSquare, Sparkles, Quote, Gamepad2, Brain, Activity, ArrowUpRight } from 'lucide-react';
+import { Zap, Target, TrendingUp, Wallet, User, ChevronRight, MessageSquare, Sparkles, Quote, Gamepad2, Brain, Activity, ArrowUpRight, Timer, Dumbbell } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 
 interface DashboardProps {
@@ -61,134 +61,116 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab 
         </motion.button>
       </header>
 
-      {/* AI Mentor Panel - The "Infinity Core" */}
+      {/* AI Mentor Mini Card */}
       <section 
-        className="glass-card p-12 flex flex-col items-center justify-center space-y-12 relative group cursor-pointer overflow-hidden border-white/5 bg-white/[0.01]" 
+        className="glass-card p-6 flex items-center justify-between relative group cursor-pointer overflow-hidden border-white/5 bg-white/[0.01]" 
         onClick={() => setIsAIOpen(true)}
       >
-        {/* Animated Borders */}
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zenith-electric-blue/50 to-transparent" />
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zenith-cyan/50 to-transparent" />
-        
-        {/* Background Glows */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-zenith-electric-blue/5 blur-[120px] rounded-full pointer-events-none" />
-        
-        <InfinityAI isResponding={false} />
-        
-        <div className="text-center space-y-6 relative z-10">
-          <div className="flex items-center justify-center space-x-3 text-zenith-electric-blue">
-            <div className="h-px w-6 bg-zenith-electric-blue/30" />
-            <Brain size={18} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.6em] drop-shadow-[0_0_8px_#3b82f6]">Infinity Core v4.0</span>
-            <div className="h-px w-6 bg-zenith-electric-blue/30" />
+        <div className="flex items-center space-x-4 relative z-10">
+          <div className="w-12 h-12 relative">
+            <InfinityAI isResponding={false} />
           </div>
-          <h2 className="text-5xl font-display font-bold text-white tracking-tighter uppercase leading-none">
-            Pronto para o <span className="text-zenith-electric-blue drop-shadow-[0_0_15px_#3b82f6]">Ápice?</span>
-          </h2>
-          <p className="text-white/30 text-xs font-medium max-w-[320px] mx-auto leading-relaxed italic uppercase tracking-widest">
-            "Sua biologia é o hardware, sua rotina é o software. Otimize o sistema agora."
-          </p>
+          <div className="space-y-0.5">
+            <div className="flex items-center space-x-2 text-zenith-cyan">
+              <Brain size={12} />
+              <span className="text-[8px] font-bold uppercase tracking-[0.3em]">{t.dashboard.infinityMentor}</span>
+            </div>
+            <h2 className="text-lg font-display font-bold text-white tracking-tight uppercase">
+              {t.dashboard.aiGreeting.split('.')[0]}
+            </h2>
+          </div>
         </div>
-
-        <div className="flex space-x-6 w-full pt-8 relative z-10">
-          <motion.button 
-            whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.05)' }}
-            className="flex-1 bg-white/[0.02] border border-white/10 py-5 rounded-[24px] text-[10px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center space-x-3 group"
-          >
-            <MessageSquare size={18} className="text-white/20 group-hover:text-zenith-electric-blue transition-colors" />
-            <span className="text-white/60 group-hover:text-white transition-colors">Neural Chat</span>
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.05)' }}
-            className="flex-1 bg-white/[0.02] border border-white/10 py-5 rounded-[24px] text-[10px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center space-x-3 group"
-          >
-            <Zap size={18} className="text-white/20 group-hover:text-zenith-cyan transition-colors" />
-            <span className="text-white/60 group-hover:text-white transition-colors">Otimizar</span>
-          </motion.button>
+        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-white/10 transition-all">
+          <MessageSquare size={18} className="text-zenith-cyan" />
         </div>
+        
+        {/* Subtle Glow */}
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-32 h-32 bg-zenith-cyan/5 blur-[40px] rounded-full pointer-events-none" />
       </section>
-
 
       <AIAssistant isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} t={t} />
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="space-y-12">
-          <RoutineSystem t={t} />
-          <FocusTimer t={t} />
-          
-          {/* Break Game Card */}
-          <section className="space-y-6">
-            <div className="flex items-center justify-between px-2">
-              <h3 className="text-sm font-display font-bold uppercase tracking-[0.3em] flex items-center space-x-3 text-white/80">
-                <Gamepad2 size={18} className="text-zenith-cyan" />
-                <span>Mental Gym</span>
-              </h3>
-              <ArrowUpRight size={16} className="text-white/20" />
+      <div className="grid grid-cols-1 gap-6">
+        {/* Energy & Focus Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="glass-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Activity size={14} className="text-zenith-cyan" />
+              <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest">{t.dashboard.energyLevel}</span>
             </div>
-            <motion.div 
-              whileHover={{ scale: 1.01, y: -4 }}
-              onClick={() => setActiveTab('break')}
-              className="glass-card p-8 flex items-center justify-between border-zenith-cyan/10 bg-zenith-cyan/[0.02] group cursor-pointer hover:border-zenith-cyan/30 transition-all relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-zenith-cyan/5 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-              
-              <div className="space-y-3 relative z-10">
-                <p className="text-lg font-bold text-white/90">Pausa Cognitiva</p>
-                <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold">Sessão de 3 minutos ativa</p>
-                <div className="flex items-center space-x-2 text-zenith-cyan pt-2">
-                  <Sparkles size={14} className="animate-pulse" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em]">+100 XP Disponível</span>
-                </div>
-              </div>
-              <div className="w-16 h-16 rounded-[24px] bg-zenith-cyan/10 flex items-center justify-center border border-zenith-cyan/20 group-hover:bg-zenith-cyan/20 group-hover:scale-110 transition-all duration-500">
-                <ChevronRight size={28} className="text-zenith-cyan" />
-              </div>
-            </motion.div>
-          </section>
-        </div>
-        
-        <div className="space-y-12">
-          <DailyMissions t={t} />
-          
-          {/* Motivation Feed */}
-          <section className="space-y-6">
-            <h3 className="text-sm font-display font-bold uppercase tracking-[0.3em] flex items-center space-x-3 text-white/80 px-2">
-              <Quote size={18} className="text-zenith-electric-blue" />
-              <span>Neural Feed</span>
-            </h3>
-            <div className="glass-card p-10 border-l-4 border-l-zenith-electric-blue relative overflow-hidden bg-white/[0.01] border-white/5">
-              <div className="absolute top-0 right-0 p-6 opacity-[0.03] text-zenith-electric-blue">
-                <Quote size={96} />
-              </div>
-              <p className="text-base text-white/70 leading-relaxed font-medium italic relative z-10">
-                "A excelência não é um ato, mas um hábito. Nós somos o que fazemos repetidamente."
-              </p>
-              <div className="flex items-center space-x-4 mt-8">
-                <div className="w-8 h-px bg-zenith-electric-blue/40" />
-                <p className="text-[10px] text-white/20 uppercase tracking-[0.4em] font-bold">Aristóteles</p>
+            <div className="space-y-1">
+              <p className="text-xl font-display font-bold">94%</p>
+              <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-zenith-cyan w-[94%] shadow-[0_0_8px_#00d2ff]" />
               </div>
             </div>
-          </section>
-
-          {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 gap-8">
-            <StatCard
-              icon={<Activity size={20} className="text-zenith-electric-blue" />}
-              label="Foco Neural"
-              value="4.2h"
-              trend="+12%"
-              color="purple"
-            />
-            <StatCard
-              icon={<Target size={20} className="text-zenith-cyan" />}
-              label="Sincronia"
-              value="85%"
-              trend="+5%"
-              color="cyan"
-            />
+          </div>
+          <div className="glass-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Brain size={14} className="text-zenith-electric-blue" />
+              <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest">{t.dashboard.mentalFocus}</span>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xl font-display font-bold">82%</p>
+              <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-zenith-electric-blue w-[82%] shadow-[0_0_8px_#0066ff]" />
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Today's Routines */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center space-x-2">
+              <Zap size={14} className="text-zenith-cyan" />
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">{t.nav.routine}</h3>
+            </div>
+            <button onClick={() => setActiveTab('tasks')} className="text-[9px] font-bold uppercase tracking-widest text-zenith-cyan flex items-center space-x-1">
+              <span>Ver Tudo</span>
+              <ArrowUpRight size={10} />
+            </button>
+          </div>
+          <div onClick={() => setActiveTab('tasks')} className="glass-card p-5 cursor-pointer hover:bg-white/[0.02] transition-all">
+            <RoutineSystem t={t} />
+          </div>
+        </section>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-4">
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('exercises')}
+            className="glass-card p-5 flex flex-col items-center justify-center space-y-3 border-zenith-cyan/10 bg-zenith-cyan/[0.02]"
+          >
+            <div className="w-10 h-10 rounded-xl bg-zenith-cyan/10 flex items-center justify-center text-zenith-cyan">
+              <Dumbbell size={20} />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-widest">{t.nav.exercises}</span>
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('finance')}
+            className="glass-card p-5 flex flex-col items-center justify-center space-y-3 border-zenith-electric-blue/10 bg-zenith-electric-blue/[0.02]"
+          >
+            <div className="w-10 h-10 rounded-xl bg-zenith-electric-blue/10 flex items-center justify-center text-zenith-electric-blue">
+              <Wallet size={20} />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-widest">{t.nav.finance}</span>
+          </motion.button>
+        </div>
+
+        {/* Focus Timer Mini */}
+        <section className="space-y-3">
+          <div className="flex items-center space-x-2 px-1">
+            <Timer size={14} className="text-zenith-electric-blue" />
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">Sessão de Foco</h3>
+          </div>
+          <div onClick={() => setActiveTab('focus')} className="glass-card p-5 cursor-pointer hover:bg-white/[0.02] transition-all">
+            <FocusTimer t={t} />
+          </div>
+        </section>
       </div>
     </div>
   );

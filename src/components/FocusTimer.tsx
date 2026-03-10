@@ -3,10 +3,15 @@ import { motion } from 'motion/react';
 import { Play, Pause, RotateCcw, Zap, Sparkles, Timer, Brain } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 
-export const FocusTimer: React.FC<{ t: any }> = ({ t }) => {
+export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFullPage = false }) => {
+  const [mode, setMode] = useState<'focus' | 'break'>('focus');
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
+  const [sessions, setSessions] = useState(0);
   const { addXP } = useGamification();
+
+  const FOCUS_TIME = 25 * 60;
+  const BREAK_TIME = 5 * 60;
 
   useEffect(() => {
     let interval: any = null;
@@ -16,18 +21,30 @@ export const FocusTimer: React.FC<{ t: any }> = ({ t }) => {
       }, 1000);
     } else if (timeLeft === 0) {
       setIsActive(false);
-      addXP(50);
-      if (Notification.permission === 'granted') {
-        new Notification('Zenith Focus', { body: 'Sessão de foco concluída! Hora de uma pausa.' });
+      if (mode === 'focus') {
+        addXP(100);
+        setSessions(s => s + 1);
+        setMode('break');
+        setTimeLeft(BREAK_TIME);
+        if (Notification.permission === 'granted') {
+          new Notification('Zenith Focus', { body: 'Focus session complete! Time for a break.' });
+        }
+      } else {
+        setMode('focus');
+        setTimeLeft(FOCUS_TIME);
+        if (Notification.permission === 'granted') {
+          new Notification('Zenith Focus', { body: 'Break over! Ready to focus?' });
+        }
       }
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, addXP]);
+  }, [isActive, timeLeft, mode, addXP]);
 
   const toggleTimer = () => setIsActive(!isActive);
   const resetTimer = () => {
     setIsActive(false);
-    setTimeLeft(25 * 60);
+    setMode('focus');
+    setTimeLeft(FOCUS_TIME);
   };
 
   const formatTime = (seconds: number) => {
@@ -36,50 +53,55 @@ export const FocusTimer: React.FC<{ t: any }> = ({ t }) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = ((25 * 60 - timeLeft) / (25 * 60)) * 100;
+  const totalTime = mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
+  const progress = ((totalTime - timeLeft) / totalTime) * 100;
 
   return (
-    <div className="glass-card p-10 space-y-10 relative overflow-hidden group border-white/5 bg-white/[0.01]">
+    <div className={`${isFullPage ? 'min-h-screen p-8 flex flex-col items-center justify-center' : 'glass-card p-10 space-y-10'} relative overflow-hidden group border-white/5 bg-white/[0.01]`}>
       {/* Background Glows */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-zenith-electric-blue/10 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-zenith-cyan/10 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-zenith-electric-blue/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-zenith-cyan/10 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
       
-      <div className="flex justify-between items-center relative z-10">
+      <div className="flex justify-between items-center w-full relative z-10 max-w-md">
         <div className="space-y-1.5">
           <div className="flex items-center space-x-2">
-            <div className="w-1.5 h-1.5 bg-zenith-electric-blue rounded-full animate-pulse" />
-            <h3 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-white/90">Foco Neural</h3>
+            <div className={`w-2 h-2 rounded-full animate-pulse ${mode === 'focus' ? 'bg-zenith-electric-blue' : 'bg-emerald-400'}`} />
+            <h3 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-white/90">
+              {mode === 'focus' ? 'Focus Protocol' : 'Recovery Phase'}
+            </h3>
           </div>
-          <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold">Protocolo Pomodoro v4.0</p>
+          <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold">Session #{sessions + 1}</p>
         </div>
         <div className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 flex items-center space-x-2">
-          <Brain size={14} className="text-zenith-electric-blue" />
-          <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">25:00</span>
+          <Brain size={14} className={mode === 'focus' ? 'text-zenith-electric-blue' : 'text-emerald-400'} />
+          <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">
+            {mode === 'focus' ? 'Deep Work' : 'Rest'}
+          </span>
         </div>
       </div>
 
       <div className="relative flex items-center justify-center py-10">
         {/* Progress Ring */}
-        <svg className="w-64 h-64 transform -rotate-90">
+        <svg className={`${isFullPage ? 'w-80 h-80' : 'w-64 h-64'} transform -rotate-90`}>
           <circle
-            cx="128"
-            cy="128"
-            r="120"
+            cx={isFullPage ? "160" : "128"}
+            cy={isFullPage ? "160" : "128"}
+            r={isFullPage ? "150" : "120"}
             stroke="currentColor"
             strokeWidth="1"
             fill="transparent"
             className="text-white/5"
           />
           <motion.circle
-            cx="128"
-            cy="128"
-            r="120"
+            cx={isFullPage ? "160" : "128"}
+            cy={isFullPage ? "160" : "128"}
+            r={isFullPage ? "150" : "120"}
             stroke="currentColor"
             strokeWidth="4"
             fill="transparent"
-            strokeDasharray="754"
-            animate={{ strokeDashoffset: 754 - (754 * progress) / 100 }}
-            className="text-zenith-electric-blue drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+            strokeDasharray={isFullPage ? "942" : "754"}
+            animate={{ strokeDashoffset: (isFullPage ? 942 : 754) - ((isFullPage ? 942 : 754) * progress) / 100 }}
+            className={`${mode === 'focus' ? 'text-zenith-electric-blue' : 'text-emerald-400'} drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]`}
             transition={{ duration: 1, ease: "linear" }}
             strokeLinecap="round"
           />
@@ -90,19 +112,20 @@ export const FocusTimer: React.FC<{ t: any }> = ({ t }) => {
             key={timeLeft}
             initial={{ opacity: 0.5, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-6xl font-mono font-bold tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+            className={`${isFullPage ? 'text-8xl' : 'text-6xl'} font-mono font-bold tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]`}
           >
             {formatTime(timeLeft)}
           </motion.span>
           <div className="flex items-center space-x-2 text-zenith-cyan bg-zenith-cyan/10 px-3 py-1 rounded-xl border border-zenith-cyan/10">
             <Sparkles size={12} className="animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">+50 XP</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">
+              {mode === 'focus' ? '+100 XP' : 'Recovery'}
+            </span>
           </div>
         </div>
       </div>
 
-
-      <div className="flex justify-center items-center space-x-8 relative z-10">
+      <div className="flex justify-center items-center space-x-8 w-full relative z-10 max-w-md">
         <motion.button
           whileHover={{ scale: 1.1, rotate: -90 }}
           whileTap={{ scale: 0.9 }}
@@ -137,7 +160,7 @@ export const FocusTimer: React.FC<{ t: any }> = ({ t }) => {
           )}
         </motion.button>
 
-        <div className="w-14 h-14" /> {/* Spacer for symmetry */}
+        <div className="w-14 h-14" />
       </div>
     </div>
   );

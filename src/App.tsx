@@ -7,6 +7,9 @@ import { FinanceTracker } from './components/FinanceTracker';
 import { Profile } from './components/Profile';
 import { Auth } from './components/Auth';
 import { TetrisGame } from './components/TetrisGame';
+import { Exercises } from './components/Exercises';
+import { FocusTimer } from './components/FocusTimer';
+import { Onboarding } from './components/Onboarding';
 import { supabase } from './supabase';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -18,8 +21,9 @@ export default function App() {
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  const lang: Language = userData?.language || 'pt';
+  const lang: Language = userData?.language || 'pt-BR';
   const t = translations[lang];
 
   useEffect(() => {
@@ -60,10 +64,39 @@ export default function App() {
       }
       
       setUserData(data || null);
+      
+      // If user has no display name or goal, show onboarding
+      if (data && (!data.displayName || !data.onboardingCompleted)) {
+        setShowOnboarding(true);
+      }
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOnboardingComplete = async (data: any) => {
+    if (!session?.user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          onboardingCompleted: true,
+          primaryGoal: data.goal,
+          focusStyle: data.focusStyle,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', session.user.id);
+        
+      if (error) throw error;
+      
+      setShowOnboarding(false);
+      fetchUserData(session.user.id);
+    } catch (err) {
+      console.error('Error saving onboarding:', err);
+      setShowOnboarding(false);
     }
   };
 
@@ -86,16 +119,22 @@ export default function App() {
     return <Auth onSuccess={() => {}} />;
   }
 
+  if (showOnboarding) {
+    return <Onboarding onComplete={handleOnboardingComplete} />;
+  }
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
         return <Dashboard key="home" userData={userData} t={t} setActiveTab={setActiveTab} />;
-      case 'habits':
-        return <HabitTracker key="habits" userData={userData} t={t} />;
-      case 'map':
-        return <LifeMap key="map" userData={userData} t={t} />;
+      case 'tasks':
+        return <HabitTracker key="tasks" userData={userData} t={t} />;
+      case 'exercises':
+        return <Exercises key="exercises" t={t} />;
+      case 'focus':
+        return <FocusTimer key="focus" t={t} isFullPage />;
       case 'finance':
-        return <FinanceTracker key="finance" userData={userData} t={t} />;
+        return <FinanceTracker key="finance" userData={userData} t={t} language={lang} />;
       case 'profile':
         return <Profile key="profile" userData={userData} t={t} />;
       case 'break':

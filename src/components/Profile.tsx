@@ -96,12 +96,6 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
               </div>
               
               <MenuButton 
-                icon={<CreditCard size={20} />} 
-                label="Assinatura" 
-                sublabel="Gerenciar seu plano e pagamentos" 
-                onClick={() => setView('subscription')} 
-              />
-              <MenuButton 
                 icon={<Brain size={20} />} 
                 label="Academia Mental" 
                 sublabel="Treinamento cognitivo e foco" 
@@ -113,10 +107,35 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
                 sublabel="Reflexões diárias e progresso" 
                 onClick={() => setView('journal')} 
               />
+
+              <div className="flex items-center space-x-3 my-8 ml-2">
+                <div className="h-px flex-1 bg-white/5" />
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/20">Configurações</h3>
+                <div className="h-px flex-1 bg-white/5" />
+              </div>
+
+              <MenuButton 
+                icon={<User size={20} />} 
+                label="Conta" 
+                sublabel="Editar perfil e dados pessoais" 
+                onClick={() => {}} 
+              />
+              <MenuButton 
+                icon={<CreditCard size={20} />} 
+                label="Assinatura" 
+                sublabel="Gerenciar seu plano e pagamentos" 
+                onClick={() => setView('subscription')} 
+              />
               <MenuButton 
                 icon={<Settings size={20} />} 
                 label="Preferências" 
-                sublabel="Ajustes de interface e notificações" 
+                sublabel="Ajustes de interface e tema" 
+                onClick={() => {}} 
+              />
+              <MenuButton 
+                icon={<Shield size={20} />} 
+                label="Segurança" 
+                sublabel="Senha e autenticação" 
                 onClick={() => {}} 
               />
               <MenuButton 

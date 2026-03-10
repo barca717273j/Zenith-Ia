@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, X, Bot, User, Sparkles, Zap, Brain, Terminal } from 'lucide-react';
+import { Send, X, Bot, User, Sparkles, Zap, Brain, Terminal, TrendingUp, Target } from 'lucide-react';
 import { generateLifeStrategy } from '../services/gemini';
 import ReactMarkdown from 'react-markdown';
 
@@ -36,6 +36,12 @@ export const AIAssistant: React.FC<{ isOpen: boolean; onClose: () => void; t: an
     }
   };
 
+  const suggestions = [
+    { label: 'Create routine', icon: <Zap size={14} /> },
+    { label: 'Analyze productivity', icon: <TrendingUp size={14} /> },
+    { label: 'Suggest goals', icon: <Target size={14} /> },
+  ];
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -47,13 +53,13 @@ export const AIAssistant: React.FC<{ isOpen: boolean; onClose: () => void; t: an
           className="fixed inset-0 z-[100] bg-zenith-black flex flex-col"
         >
           {/* Header */}
-          <header className="p-8 border-b border-white/5 flex justify-between items-center bg-zenith-black/90 backdrop-blur-3xl relative">
+          <header className="p-6 border-b border-white/5 flex justify-between items-center bg-zenith-black/90 backdrop-blur-3xl relative">
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zenith-electric-blue to-transparent opacity-50" />
             
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-16 h-16 rounded-[24px] bg-white/5 border border-white/10 flex items-center justify-center text-zenith-electric-blue shadow-[0_0_25px_rgba(59,130,246,0.3)] relative z-10">
-                  <Brain size={32} />
+                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-zenith-electric-blue shadow-[0_0_20px_rgba(0,102,255,0.3)] relative z-10">
+                  <Brain size={24} />
                 </div>
                 <motion.div 
                   animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
@@ -62,17 +68,10 @@ export const AIAssistant: React.FC<{ isOpen: boolean; onClose: () => void; t: an
                 />
               </div>
               <div>
-                <h2 className="font-display font-bold text-2xl tracking-tighter uppercase text-white">Infinity Mentor</h2>
-                <div className="flex items-center space-x-3 mt-1.5">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-zenith-electric-blue animate-pulse shadow-[0_0_10px_#3b82f6]" />
-                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-[0.3em]">Núcleo Ativo</span>
-                  </div>
-                  <div className="h-3 w-px bg-white/10" />
-                  <div className="flex items-center space-x-2">
-                    <Terminal size={10} className="text-zenith-cyan" />
-                    <span className="text-[10px] text-zenith-cyan/60 font-bold uppercase tracking-[0.3em]">v4.0.2</span>
-                  </div>
+                <h2 className="font-display font-bold text-xl tracking-tighter uppercase text-white">AI Mentor Strategist</h2>
+                <div className="flex items-center space-x-2 mt-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zenith-electric-blue animate-pulse shadow-[0_0_8px_#0066ff]" />
+                  <span className="text-[8px] text-white/40 font-bold uppercase tracking-widest">Neural Link Active</span>
                 </div>
               </div>
             </div>
@@ -80,38 +79,35 @@ export const AIAssistant: React.FC<{ isOpen: boolean; onClose: () => void; t: an
               whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
               onClick={onClose} 
-              className="w-14 h-14 flex items-center justify-center bg-white/5 rounded-[20px] border border-white/10 hover:bg-white/10 transition-all"
+              className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
             >
-              <X size={28} className="text-white/40" />
+              <X size={20} className="text-white/40" />
             </motion.button>
           </header>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-10 space-y-10 scrollbar-hide bg-white/[0.01]">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-hide bg-white/[0.01]">
             {messages.map((msg, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`max-w-[85%] flex space-x-5 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                  <div className={`w-12 h-12 rounded-[18px] flex-shrink-0 flex items-center justify-center border shadow-lg ${
+                <div className={`max-w-[85%] flex space-x-3 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                  <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center border ${
                     msg.role === 'user' 
                       ? 'bg-white/5 border-white/10 text-white/30' 
                       : 'bg-zenith-electric-blue/10 border-zenith-electric-blue/20 text-zenith-electric-blue'
                   }`}>
-                    {msg.role === 'user' ? <User size={20} /> : <Sparkles size={20} />}
+                    {msg.role === 'user' ? <User size={14} /> : <Sparkles size={14} />}
                   </div>
-                  <div className={`p-8 rounded-[32px] text-sm leading-relaxed font-medium relative overflow-hidden ${
+                  <div className={`p-4 rounded-2xl text-sm leading-relaxed font-medium ${
                     msg.role === 'user' 
-                      ? 'bg-white/5 text-white rounded-tr-none border border-white/10' 
-                      : 'bg-white/[0.02] text-white/90 rounded-tl-none border border-white/5 backdrop-blur-xl'
+                      ? 'bg-zenith-electric-blue text-white rounded-tr-none' 
+                      : 'bg-white/[0.03] text-white/90 rounded-tl-none border border-white/5'
                   }`}>
-                    {msg.role === 'assistant' && (
-                      <div className="absolute top-0 left-0 w-1 h-full bg-zenith-electric-blue/30" />
-                    )}
-                    <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-strong:text-zenith-electric-blue prose-headings:text-white prose-headings:font-display prose-headings:uppercase prose-headings:tracking-tighter">
+                    <div className="prose prose-invert prose-sm max-w-none">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   </div>
@@ -120,38 +116,51 @@ export const AIAssistant: React.FC<{ isOpen: boolean; onClose: () => void; t: an
             ))}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-white/[0.02] p-6 rounded-[24px] rounded-tl-none border border-white/5 flex space-x-2.5 backdrop-blur-xl">
-                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2.5 h-2.5 bg-zenith-electric-blue rounded-full" />
-                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2.5 h-2.5 bg-zenith-electric-blue rounded-full" />
-                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2.5 h-2.5 bg-zenith-electric-blue rounded-full" />
+                <div className="bg-white/[0.02] p-4 rounded-2xl rounded-tl-none border border-white/5 flex space-x-2">
+                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2 h-2 bg-zenith-electric-blue rounded-full" />
+                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2 h-2 bg-zenith-electric-blue rounded-full" />
+                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2 h-2 bg-zenith-electric-blue rounded-full" />
                 </div>
               </div>
             )}
           </div>
 
-          {/* Input */}
-          <footer className="p-10 border-t border-white/5 bg-zenith-black/90 backdrop-blur-3xl">
-            <div className="relative flex items-center max-w-3xl mx-auto w-full group">
+          {/* Footer */}
+          <footer className="p-6 border-t border-white/5 bg-zenith-black/90 backdrop-blur-3xl space-y-4">
+            {/* Suggestions */}
+            <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setInput(s.label); handleSend(); }}
+                  className="flex-shrink-0 flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-white/60 hover:bg-white/10 hover:text-white transition-all"
+                >
+                  {s.icon}
+                  <span>{s.label}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="relative flex items-center w-full group">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Pergunte ao núcleo neural..."
-                className="w-full bg-white/5 border border-white/10 rounded-[28px] py-6 pl-10 pr-24 focus:outline-none focus:border-zenith-electric-blue/40 focus:bg-white/[0.07] transition-all font-medium text-white placeholder:text-white/20"
+                placeholder="Ask the neural core..."
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-16 focus:outline-none focus:border-zenith-electric-blue/40 transition-all font-medium text-white placeholder:text-white/20"
               />
               <motion.button
-                whileHover={{ scale: 1.05, x: -4 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSend}
                 disabled={!input.trim() || isTyping}
-                className="absolute right-3 p-5 bg-zenith-electric-blue text-white rounded-[22px] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all disabled:opacity-50 disabled:hover:scale-100 shadow-lg flex items-center justify-center"
+                className="absolute right-2 p-3 bg-zenith-electric-blue text-white rounded-xl shadow-lg disabled:opacity-50"
               >
-                <Send size={24} />
+                <Send size={18} />
               </motion.button>
             </div>
           </footer>
-
         </motion.div>
       )}
     </AnimatePresence>
