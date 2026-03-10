@@ -47,7 +47,7 @@ export const Stats: React.FC = () => {
               />
               <YAxis hide />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#1A0B2E', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: '#050505', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                 itemStyle={{ color: '#00F0FF' }}
               />
               <Area 
@@ -77,11 +77,11 @@ export const Stats: React.FC = () => {
               <YAxis hide />
               <Tooltip 
                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                contentStyle={{ backgroundColor: '#1A0B2E', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: '#050505', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
               />
               <Bar 
                 dataKey="value" 
-                fill="#8B5CF6" 
+                fill="#3b82f6" 
                 radius={[4, 4, 0, 0]}
                 barSize={30}
               />
