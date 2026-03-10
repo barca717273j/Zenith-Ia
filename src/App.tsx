@@ -1,9 +1,7 @@
-import { Dashboard } from "./Dashboard";
-
-export default function App() {
+export const Dashboard = () => {
   return (
-    <div style={{padding:40}}>
-      <Dashboard />
+    <div style={{padding:40, color:"white"}}>
+      <h1>Dashboard carregou</h1>
     </div>
   );
-}
+};
