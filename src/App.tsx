@@ -1,5 +1,11 @@
-import { Dashboard } from "./Dashboard"
+import { Dashboard } from "./Dashboard";
 
 export default function App() {
-  return <Dashboard />
+  return (
+    <Dashboard
+      userData={null}
+      t={{}}
+      setActiveTab={() => {}}
+    />
+  );
 }
