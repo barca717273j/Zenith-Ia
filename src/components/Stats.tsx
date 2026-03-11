@@ -34,8 +34,8 @@ export const Stats: React.FC = () => {
             <AreaChart data={productivityData}>
               <defs>
                 <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00F0FF" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#00F0FF" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#ff2400" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#ff2400" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -48,12 +48,12 @@ export const Stats: React.FC = () => {
               <YAxis hide />
               <Tooltip 
                 contentStyle={{ backgroundColor: '#050505', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: '#00F0FF' }}
+                itemStyle={{ color: '#ff2400' }}
               />
               <Area 
                 type="monotone" 
                 dataKey="score" 
-                stroke="#00F0FF" 
+                stroke="#ff2400" 
                 fillOpacity={1} 
                 fill="url(#colorScore)" 
                 strokeWidth={2}
@@ -81,7 +81,7 @@ export const Stats: React.FC = () => {
               />
               <Bar 
                 dataKey="value" 
-                fill="#3b82f6" 
+                fill="#8b0000" 
                 radius={[4, 4, 0, 0]}
                 barSize={30}
               />

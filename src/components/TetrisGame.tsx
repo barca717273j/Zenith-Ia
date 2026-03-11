@@ -9,13 +9,13 @@ const SESSION_TIME = 180; // 3 minutes in seconds
 const INITIAL_DROP_TIME = 700;
 
 const TETROMINOS = {
-  I: { shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], color: '#00f0ff', glow: 'rgba(0, 240, 255, 0.5)' },
-  J: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], color: '#3b82f6', glow: 'rgba(59, 130, 246, 0.5)' },
-  L: { shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], color: '#60a5fa', glow: 'rgba(96, 165, 250, 0.5)' },
-  O: { shape: [[1, 1], [1, 1]], color: '#93c5fd', glow: 'rgba(147, 197, 253, 0.5)' },
-  S: { shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], color: '#2dd4bf', glow: 'rgba(45, 212, 191, 0.5)' },
-  T: { shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], color: '#818cf8', glow: 'rgba(129, 140, 248, 0.5)' },
-  Z: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], color: '#ef4444', glow: 'rgba(239, 68, 68, 0.5)' },
+  I: { shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], color: '#ff2400', glow: 'rgba(255, 36, 0, 0.5)' },
+  J: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], color: '#8b0000', glow: 'rgba(139, 0, 0, 0.5)' },
+  L: { shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], color: '#ff0000', glow: 'rgba(255, 0, 0, 0.5)' },
+  O: { shape: [[1, 1], [1, 1]], color: '#ff2400', glow: 'rgba(255, 36, 0, 0.5)' },
+  S: { shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], color: '#8b0000', glow: 'rgba(139, 0, 0, 0.5)' },
+  T: { shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], color: '#ff2400', glow: 'rgba(255, 36, 0, 0.5)' },
+  Z: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], color: '#8b0000', glow: 'rgba(139, 0, 0, 0.5)' },
 };
 
 const RANDOM_TETROMINO = () => {
@@ -280,14 +280,14 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
       <header className="w-full flex justify-between items-center">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <Brain size={20} className="text-zenith-electric-blue" />
+            <Brain size={20} className="text-zenith-scarlet" />
             <h1 className="text-xl font-display font-bold uppercase tracking-[0.2em]">{t.gym.title}</h1>
           </div>
           <p className="text-white/30 text-[10px] uppercase tracking-widest">{t.gym.subtitle}</p>
         </div>
         <div className="flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/10">
-          <Clock size={14} className="text-zenith-cyan" />
-          <span className="text-sm font-mono font-bold text-zenith-cyan">{formatTime(timeLeft)}</span>
+          <Clock size={14} className="text-zenith-scarlet" />
+          <span className="text-sm font-mono font-bold text-zenith-scarlet">{formatTime(timeLeft)}</span>
         </div>
       </header>
 
@@ -306,13 +306,13 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
 
           {!isPlaying && !gameOver && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md p-8 text-center">
-              <div className="w-20 h-20 rounded-full bg-zenith-electric-blue/20 flex items-center justify-center mb-6 relative">
+              <div className="w-20 h-20 rounded-full bg-zenith-scarlet/20 flex items-center justify-center mb-6 relative">
                 <motion.div
                   animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 rounded-full border border-zenith-electric-blue/30"
+                  className="absolute inset-0 rounded-full border border-zenith-scarlet/30"
                 />
-                <Gamepad2 size={32} className="text-zenith-electric-blue" />
+                <Gamepad2 size={32} className="text-zenith-scarlet" />
               </div>
               <h2 className="text-xl font-display font-bold uppercase tracking-tighter mb-2">{t.gym.pauseTitle}</h2>
               <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-8 leading-relaxed">
@@ -329,8 +329,8 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
 
           {gameOver && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/95 backdrop-blur-xl text-center p-8">
-              <div className="w-16 h-16 rounded-full bg-zenith-cyan/20 flex items-center justify-center mb-6">
-                <Trophy size={32} className="text-zenith-cyan" />
+              <div className="w-16 h-16 rounded-full bg-zenith-scarlet/20 flex items-center justify-center mb-6">
+                <Trophy size={32} className="text-zenith-scarlet" />
               </div>
               <h2 className="text-2xl font-display font-bold uppercase tracking-tighter">{t.gym.gameOver}</h2>
               <div className="mt-6 space-y-4 w-full">
@@ -341,7 +341,7 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
                 <motion.div 
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="flex items-center justify-center space-x-2 text-zenith-electric-blue bg-zenith-electric-blue/10 py-3 rounded-2xl border border-zenith-electric-blue/20"
+                  className="flex items-center justify-center space-x-2 text-zenith-scarlet bg-zenith-scarlet/10 py-3 rounded-2xl border border-zenith-scarlet/20"
                 >
                   <Sparkles size={14} />
                   <span className="text-[10px] font-bold uppercase tracking-widest">+{Math.floor(score / 10) + 100} {t.gym.xpReward}</span>
@@ -426,35 +426,35 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
         {/* Mobile Instructions */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-electric-blue/10 flex items-center justify-center">
-              <ArrowLeft size={12} className="text-zenith-electric-blue" />
+            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
+              <ArrowLeft size={12} className="text-zenith-scarlet" />
             </div>
             <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlLeft}</span>
           </div>
           <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-electric-blue/10 flex items-center justify-center">
-              <ArrowRight size={12} className="text-zenith-electric-blue" />
+            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
+              <ArrowRight size={12} className="text-zenith-scarlet" />
             </div>
             <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlRight}</span>
           </div>
           <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-cyan/10 flex items-center justify-center">
-              <ArrowUp size={12} className="text-zenith-cyan" />
+            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
+              <ArrowUp size={12} className="text-zenith-scarlet" />
             </div>
             <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlRotate}</span>
           </div>
           <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-cyan/10 flex items-center justify-center">
-              <ArrowDown size={12} className="text-zenith-cyan" />
+            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
+              <ArrowDown size={12} className="text-zenith-scarlet" />
             </div>
             <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlDrop}</span>
           </div>
         </div>
 
         <div className="glass-card p-6 border-white/5 bg-white/[0.02] relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full bg-zenith-electric-blue/30" />
+          <div className="absolute top-0 left-0 w-1 h-full bg-zenith-scarlet/30" />
           <div className="flex items-center space-x-3 mb-2">
-            <Zap size={14} className="text-zenith-electric-blue" />
+            <Zap size={14} className="text-zenith-scarlet" />
             <p className="text-[10px] text-white/60 uppercase tracking-[0.2em] font-bold">{t.gym.tipTitle}</p>
           </div>
           <p className="text-[10px] text-white/30 uppercase tracking-[0.15em] leading-relaxed italic">

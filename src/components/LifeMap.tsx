@@ -56,8 +56,8 @@ export const LifeMap: React.FC<LifeMapProps> = ({ userData, t }) => {
               </feMerge>
             </filter>
             <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#00F0FF" stopOpacity="0.2" />
+              <stop offset="0%" stopColor="#8b0000" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#ff2400" stopOpacity="0.2" />
             </linearGradient>
           </defs>
 
@@ -91,7 +91,7 @@ export const LifeMap: React.FC<LifeMapProps> = ({ userData, t }) => {
                 cy={cat.y}
                 r={24}
                 fill="none"
-                stroke={cat.id === 'health' ? '#3b82f6' : '#00F0FF'}
+                stroke={cat.id === 'health' ? '#8b0000' : '#ff2400'}
                 strokeWidth="0.5"
                 strokeOpacity="0.1"
                 animate={{ r: [20, 28, 20], opacity: [0.1, 0.2, 0.1] }}
@@ -112,7 +112,7 @@ export const LifeMap: React.FC<LifeMapProps> = ({ userData, t }) => {
                 cy={cat.y}
                 r={16}
                 fill="none"
-                stroke={cat.id === 'health' ? '#3b82f6' : '#00F0FF'}
+                stroke={cat.id === 'health' ? '#8b0000' : '#ff2400'}
                 strokeWidth="3"
                 strokeDasharray="100.53"
                 initial={{ strokeDashoffset: 100.53 }}
@@ -143,7 +143,7 @@ export const LifeMap: React.FC<LifeMapProps> = ({ userData, t }) => {
                 x={cat.x}
                 y={cat.y + 52}
                 textAnchor="middle"
-                fill={cat.id === 'health' ? '#3b82f6' : '#00F0FF'}
+                fill={cat.id === 'health' ? '#8b0000' : '#ff2400'}
                 fontSize="8"
                 className="font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity"
               >

@@ -6,21 +6,29 @@
   --font-display: "Outfit", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-zenith-black: #000814;
-  --color-zenith-dark: #051125;
-  --color-zenith-deep-blue: #0a1931;
-  --color-zenith-electric-blue: #0066ff;
-  --color-zenith-cyan: #00d2ff;
-  --color-zenith-neon-blue: #00f0ff;
-  --color-zenith-gray: #1e293b;
+  --color-zenith-black: #050000;
+  --color-zenith-dark: #0a0000;
+  --color-zenith-deep-red: #1a0000;
+  --color-zenith-crimson: #8b0000;
+  --color-zenith-scarlet: #ff2400;
+  --color-zenith-neon-red: #ff0000;
+  --color-zenith-gray: #1a1a1a;
   
-  /* Remove purple references and replace with blue shades */
-  --color-zenith-neon-purple: #0066ff; 
+  /* Red Theme Colors */
+  --color-zenith-electric-red: #8b0000;
+  --color-zenith-cyan-red: #ff2400;
+  --color-zenith-neon-red-glow: #ff0000;
+
+  /* Compatibility with old blue names - now Red */
+  --color-zenith-electric-blue: #8b0000;
+  --color-zenith-cyan: #ff2400;
+  --color-zenith-neon-blue: #ff0000;
+  --color-zenith-neon-purple: #8b0000;
 }
 
 @layer base {
   body {
-    @apply bg-zenith-black text-white font-sans antialiased overflow-x-hidden selection:bg-zenith-electric-blue/30;
+    @apply bg-zenith-black text-white font-sans antialiased overflow-x-hidden selection:bg-zenith-crimson/30;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -34,11 +42,11 @@
   }
 
   .glass-card-hover {
-    @apply transition-all duration-300 hover:bg-zenith-deep-blue/50 hover:border-white/[0.1] hover:shadow-zenith-electric-blue/10;
+    @apply transition-all duration-300 hover:bg-zenith-deep-red/50 hover:border-white/[0.1] hover:shadow-zenith-crimson/10;
   }
   
   .btn-primary {
-    @apply bg-gradient-to-r from-zenith-electric-blue to-zenith-cyan text-white font-bold py-4 px-8 rounded-xl transition-all active:scale-95 disabled:opacity-50 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)];
+    @apply bg-gradient-to-r from-zenith-crimson to-zenith-scarlet text-white font-bold py-4 px-8 rounded-xl transition-all active:scale-95 disabled:opacity-50 hover:shadow-[0_0_20px_rgba(139,0,0,0.4)];
   }
 
   .btn-secondary {
@@ -50,7 +58,7 @@
   }
 
   .neon-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-zenith-cyan via-zenith-electric-blue to-zenith-neon-blue;
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-zenith-scarlet via-zenith-crimson to-zenith-neon-red;
   }
 }
 

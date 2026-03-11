@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, Bell, CheckCircle2, Circle, Plus, Trash2, Calendar, Sparkles, Zap, AlertCircle } from 'lucide-react';
+import { Clock, Bell, CheckCircle2, Circle, Plus, Trash2, Calendar, Sparkles, Zap, AlertCircle, Target, Brain, Dumbbell, Wind, Activity } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useGamification } from './GamificationContext';
 
@@ -10,6 +10,8 @@ interface Routine {
   task: string;
   completed: boolean;
   notified: boolean;
+  category: string;
+  icon: string;
 }
 
 export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
@@ -17,7 +19,18 @@ export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTask, setNewTask] = useState('');
   const [newTime, setNewTime] = useState('08:00');
+  const [newCategory, setNewCategory] = useState('focus');
+  const [newIcon, setNewIcon] = useState('Zap');
   const { addXP } = useGamification();
+
+  const categories = [
+    { id: 'focus', label: 'Foco', icon: 'Brain' },
+    { id: 'body', label: 'Corpo', icon: 'Dumbbell' },
+    { id: 'mind', label: 'Mente', icon: 'Wind' },
+    { id: 'work', label: 'Trabalho', icon: 'Briefcase' },
+  ];
+
+  const icons = ['Zap', 'Brain', 'Dumbbell', 'Wind', 'Briefcase', 'Coffee', 'Book', 'Moon'];
 
   useEffect(() => {
     const fetchRoutines = async () => {
@@ -66,7 +79,15 @@ export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
     if (user) {
       const { data, error } = await supabase
         .from('routines')
-        .insert([{ user_id: user.id, task: newTask, time: newTime, completed: false, notified: false }])
+        .insert([{ 
+          user_id: user.id, 
+          task: newTask, 
+          time: newTime, 
+          category: newCategory,
+          icon: newIcon,
+          completed: false, 
+          notified: false 
+        }])
         .select()
         .single();
       
@@ -147,17 +168,35 @@ export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-sm focus:outline-none focus:border-zenith-electric-blue transition-all placeholder:text-white/10"
                 />
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2 ml-1">
-                  <Clock size={12} className="text-zenith-cyan" />
-                  <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Janela Temporal</label>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Clock size={12} className="text-zenith-cyan" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Janela Temporal</label>
+                  </div>
+                  <input
+                    type="time"
+                    value={newTime}
+                    onChange={(e) => setNewTime(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-sm focus:outline-none focus:border-zenith-electric-blue transition-all text-white/60"
+                  />
                 </div>
-                <input
-                  type="time"
-                  value={newTime}
-                  onChange={(e) => setNewTime(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-sm focus:outline-none focus:border-zenith-electric-blue transition-all text-white/60"
-                />
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Target size={12} className="text-zenith-electric-blue" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Categoria</label>
+                  </div>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-sm focus:outline-none focus:border-zenith-electric-blue transition-all text-white/60 appearance-none"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
             <button

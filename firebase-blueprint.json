@@ -9,11 +9,30 @@
         "email": { "type": "string", "format": "email" },
         "photoURL": { "type": "string" },
         "energyLevel": { "type": "number", "description": "Current energy level 0-100" },
-        "subscriptionTier": { "type": "string", "enum": ["free", "pro", "elite", "master"] },
+        "subscriptionTier": { "type": "string", "enum": ["basic", "pro", "elite", "master"] },
+        "aiMessagesCount": { "type": "number", "default": 0 },
+        "lastMessageDate": { "type": "string", "format": "date" },
+        "isAdmin": { "type": "boolean", "default": false },
         "language": { "type": "string", "enum": ["en", "pt", "es"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["email", "subscriptionTier"]
+    },
+    "Exercise": {
+      "title": "Exercise",
+      "description": "An exercise video and details.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string", "enum": ["strength", "yoga", "relaxation", "mind-body"] },
+        "videoUrl": { "type": "string" },
+        "duration": { "type": "string" },
+        "difficulty": { "type": "string", "enum": ["beginner", "intermediate", "advanced"] },
+        "isPremium": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "videoUrl"]
     },
     "Habit": {
       "title": "Habit",
@@ -132,6 +151,10 @@
     "/finances/{recordId}": {
       "schema": "FinanceRecord",
       "description": "Financial transaction records."
+    },
+    "/exercises/{exerciseId}": {
+      "schema": "Exercise",
+      "description": "Exercise video library."
     }
   }
 }

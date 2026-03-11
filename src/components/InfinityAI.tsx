@@ -25,9 +25,9 @@ export const InfinityAI: React.FC<InfinityAIProps> = ({ isResponding = false }) 
       >
         <defs>
           <linearGradient id="inf-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#00f0ff" />
-            <stop offset="50%" stopColor="#3b82f6" />
-            <stop offset="100%" stopColor="#00f0ff" />
+            <stop offset="0%" stopColor="#ff2400" />
+            <stop offset="50%" stopColor="#8b0000" />
+            <stop offset="100%" stopColor="#ff2400" />
           </linearGradient>
           <filter id="inf-glow">
             <feGaussianBlur stdDeviation="3.5" result="blur" />

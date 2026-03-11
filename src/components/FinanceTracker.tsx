@@ -141,7 +141,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
         <div className="space-y-1">
           <h1 className="text-3xl font-bold font-display tracking-tighter uppercase leading-none">{t.finance.title}</h1>
           <div className="flex items-center space-x-2">
-            <div className="h-1 w-12 bg-zenith-cyan rounded-full" />
+            <div className="h-1 w-12 bg-zenith-scarlet rounded-full" />
             <p className="text-white/30 text-[10px] font-bold uppercase tracking-[0.2em]">{t.finance.summary}</p>
           </div>
         </div>
@@ -150,7 +150,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAIChat(true)}
-            className="w-12 h-12 rounded-2xl bg-zenith-cyan/10 border border-zenith-cyan/20 flex items-center justify-center text-zenith-cyan hover:bg-zenith-cyan/20 transition-all"
+            className="w-12 h-12 rounded-2xl bg-zenith-scarlet/10 border border-zenith-scarlet/20 flex items-center justify-center text-zenith-scarlet hover:bg-zenith-scarlet/20 transition-all"
           >
             <Bot size={24} />
           </motion.button>
@@ -158,9 +158,9 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
             whileHover={{ scale: 1.05, rotate: 90 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAddModal(true)}
-            className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-zenith-cyan transition-all group"
+            className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-zenith-scarlet transition-all group"
           >
-            <Plus size={24} className="text-white/60 group-hover:text-zenith-cyan transition-colors" />
+            <Plus size={24} className="text-white/60 group-hover:text-zenith-scarlet transition-colors" />
           </motion.button>
         </div>
       </header>
@@ -170,12 +170,12 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
           <Wallet size={100} />
         </div>
-        <div className="absolute -top-24 -left-24 w-64 h-64 bg-zenith-cyan/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute -top-24 -left-24 w-64 h-64 bg-zenith-scarlet/10 blur-[100px] rounded-full pointer-events-none" />
         
         <div className="relative z-10 space-y-6">
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <Zap size={12} className="text-zenith-cyan" />
+              <Zap size={12} className="text-zenith-scarlet" />
               <p className="text-white/30 text-[10px] uppercase tracking-[0.3em] font-bold">{t.finance.balance}</p>
             </div>
             <h2 className="text-4xl font-display font-bold tracking-tighter text-white">
@@ -186,7 +186,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
           <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">
             <div className="space-y-1">
               <p className="text-[9px] text-white/30 uppercase tracking-widest font-bold">{t.finance.income}</p>
-              <p className="text-lg font-bold text-zenith-cyan tracking-tight">
+              <p className="text-lg font-bold text-zenith-scarlet tracking-tight">
                 {formatCurrency(totalIncome)}
               </p>
             </div>
@@ -216,10 +216,43 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
         </button>
       </div>
 
+      {/* Savings Goals */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center space-x-2">
+            <PiggyBank size={14} className="text-zenith-scarlet" />
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">Metas de Reserva</h3>
+          </div>
+        </div>
+        <div className="flex space-x-4 overflow-x-auto pb-4 no-scrollbar">
+          <GoalCard 
+            icon={<TrendingUp size={20} />} 
+            label="Reserva de Emergência" 
+            current={2500} 
+            target={10000} 
+            color="scarlet" 
+          />
+          <GoalCard 
+            icon={<CreditCard size={20} />} 
+            label="Viagem Japão" 
+            current={1200} 
+            target={15000} 
+            color="scarlet" 
+          />
+          <GoalCard 
+            icon={<Zap size={20} />} 
+            label="Novo Setup" 
+            current={4500} 
+            target={5000} 
+            color="scarlet" 
+          />
+        </div>
+      </section>
+
       {/* Main Content */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-2 border-zenith-cyan border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-zenith-scarlet border-t-transparent rounded-full animate-spin" />
         </div>
       ) : activeTab === 'flow' ? (
         transactions.length === 0 ? (
@@ -453,11 +486,11 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
   );
 };
 
-const GoalCard: React.FC<{ icon: React.ReactNode; label: string; current: number; target: number; color: 'cyan' | 'purple' }> = ({ icon, label, current, target, color }) => {
+const GoalCard: React.FC<{ icon: React.ReactNode; label: string; current: number; target: number; color: 'cyan' | 'purple' | 'scarlet' }> = ({ icon, label, current, target, color }) => {
   const progress = (current / target) * 100;
-  const accentColor = color === 'cyan' ? 'text-zenith-cyan' : 'text-zenith-electric-blue';
-  const barColor = color === 'cyan' ? 'bg-zenith-cyan' : 'bg-zenith-electric-blue';
-  const glowColor = color === 'cyan' ? 'shadow-[0_0_15px_rgba(0,240,255,0.3)]' : 'shadow-[0_0_15px_rgba(59,130,246,0.3)]';
+  const accentColor = color === 'cyan' ? 'text-zenith-cyan' : color === 'purple' ? 'text-zenith-electric-blue' : 'text-zenith-scarlet';
+  const barColor = color === 'cyan' ? 'bg-zenith-cyan' : color === 'purple' ? 'bg-zenith-electric-blue' : 'bg-zenith-scarlet';
+  const glowColor = color === 'cyan' ? 'shadow-[0_0_15px_rgba(0,240,255,0.3)]' : color === 'purple' ? 'shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'shadow-[0_0_15px_rgba(255,36,0,0.3)]';
 
   return (
     <motion.div 

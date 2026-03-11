@@ -1,8 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not defined in the environment.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+};
 
 export const generateLifeStrategy = async (userData: any, prompt: string) => {
+  const ai = getAI();
   const model = ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: [
@@ -24,6 +36,7 @@ export const generateLifeStrategy = async (userData: any, prompt: string) => {
 };
 
 export const generateRoutine = async (preferences: any) => {
+  const ai = getAI();
   const model = ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: [

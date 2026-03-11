@@ -1,24 +1,106 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield } from 'lucide-react';
+import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield, Camera, Mail, Lock, Globe, Save, AlertCircle } from 'lucide-react';
 import { Subscription } from './Subscription';
 import { TetrisGame } from './TetrisGame';
 import { Journal } from './Journal';
 import { useGamification } from './GamificationContext';
-
 import { supabase } from '../supabase';
 
 interface ProfileProps {
   userData: any;
   t: any;
+  onUpdate: () => Promise<void> | void;
 }
 
-export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
-  const [view, setView] = useState<'main' | 'subscription' | 'gym' | 'journal'>('main');
+type ProfileView = 'main' | 'subscription' | 'gym' | 'journal' | 'edit-profile' | 'security' | 'preferences';
+
+export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
+  const [view, setView] = useState<ProfileView>('main');
+  const [clickCount, setClickCount] = useState(0);
   const { level, levelName, xp, streak } = useGamification();
+
+  // Edit Profile State
+  const [editName, setEditName] = useState(userData?.displayName || '');
+  const [editEmail, setEditEmail] = useState(userData?.email || '');
+  const [editPhoto, setEditPhoto] = useState(userData?.photoURL || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Security State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
+  const handleVersionClick = async () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    if (newCount === 5) {
+      const { error } = await supabase
+        .from('users')
+        .update({ isAdmin: !userData?.isAdmin })
+        .eq('id', userData?.id);
+      
+      if (!error) {
+        await onUpdate();
+        setClickCount(0);
+      }
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+  };
+
+  const handleUpdateProfile = async () => {
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          displayName: editName,
+          photoURL: editPhoto
+        })
+        .eq('id', userData.id);
+
+      if (error) throw error;
+      
+      await onUpdate();
+      setMessage({ type: 'success', text: t.profile.saveChanges });
+      setTimeout(() => setView('main'), 1500);
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (newPassword !== confirmNewPassword) {
+      setMessage({ type: 'error', text: t.common.passwordMismatch || 'Passwords do not match' });
+      return;
+    }
+
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      setMessage({ type: 'success', text: t.profile.saveChanges });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setTimeout(() => setView('main'), 1500);
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const renderView = () => {
@@ -29,13 +111,194 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
         return <TetrisGame t={t} />;
       case 'journal':
         return <Journal userData={userData} t={t} />;
+      case 'edit-profile':
+        return (
+          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
+            <header className="space-y-2">
+              <h2 className="text-3xl font-display font-bold uppercase tracking-tighter">{t.profile.editProfile}</h2>
+              <p className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-bold">Atualize sua identidade neural</p>
+            </header>
+
+            <div className="space-y-8">
+              <div className="flex flex-col items-center space-y-6">
+                <div className="relative group">
+                  <div className="w-32 h-32 rounded-full border-2 border-white/5 p-1 bg-white/[0.02] backdrop-blur-xl overflow-hidden">
+                    <img src={editPhoto || 'https://picsum.photos/seed/user/200'} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                  </div>
+                  <button className="absolute bottom-0 right-0 w-10 h-10 rounded-xl bg-zenith-scarlet flex items-center justify-center border border-white/20 shadow-lg">
+                    <Camera size={18} />
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  value={editPhoto}
+                  onChange={(e) => setEditPhoto(e.target.value)}
+                  placeholder="URL da Imagem de Perfil"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all placeholder:text-white/10"
+                />
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <User size={12} className="text-zenith-scarlet" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">{t.common.fullName}</label>
+                  </div>
+                  <input 
+                    type="text" 
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
+                  />
+                </div>
+
+                <div className="space-y-3 opacity-50 cursor-not-allowed">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Mail size={12} className="text-white/40" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">{t.common.email}</label>
+                  </div>
+                  <input 
+                    type="email" 
+                    value={editEmail}
+                    disabled
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm"
+                  />
+                </div>
+              </div>
+
+              {message && (
+                <div className={`p-4 rounded-2xl flex items-center space-x-3 ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                  <AlertCircle size={18} />
+                  <span className="text-xs font-bold uppercase tracking-widest">{message.text}</span>
+                </div>
+              )}
+
+              <button 
+                onClick={handleUpdateProfile}
+                disabled={isSaving}
+                className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] flex items-center justify-center space-x-3"
+              >
+                {isSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Save size={16} />
+                    <span>{t.profile.saveChanges}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        );
+      case 'security':
+        return (
+          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
+            <header className="space-y-2">
+              <h2 className="text-3xl font-display font-bold uppercase tracking-tighter">{t.profile.security}</h2>
+              <p className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-bold">Proteja sua conexão neural</p>
+            </header>
+
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Lock size={12} className="text-zenith-scarlet" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">{t.profile.newPassword}</label>
+                  </div>
+                  <input 
+                    type="password" 
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Shield size={12} className="text-zenith-scarlet" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">{t.profile.confirmNewPassword}</label>
+                  </div>
+                  <input 
+                    type="password" 
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
+                  />
+                </div>
+              </div>
+
+              {message && (
+                <div className={`p-4 rounded-2xl flex items-center space-x-3 ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                  <AlertCircle size={18} />
+                  <span className="text-xs font-bold uppercase tracking-widest">{message.text}</span>
+                </div>
+              )}
+
+              <button 
+                onClick={handleUpdatePassword}
+                disabled={isSaving}
+                className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] flex items-center justify-center space-x-3"
+              >
+                {isSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Lock size={16} />
+                    <span>{t.profile.saveChanges}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        );
+      case 'preferences':
+        return (
+          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
+            <header className="space-y-2">
+              <h2 className="text-3xl font-display font-bold uppercase tracking-tighter">{t.profile.preferences}</h2>
+              <p className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-bold">Personalize sua interface</p>
+            </header>
+
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Globe size={12} className="text-zenith-scarlet" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">{t.common.language}</label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {['pt-BR', 'en', 'es', 'fr'].map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={async () => {
+                          const { error } = await supabase
+                            .from('users')
+                            .update({ language: lang })
+                            .eq('id', userData.id);
+                          if (!error) await onUpdate();
+                        }}
+                        className={`p-4 rounded-2xl border transition-all text-[10px] font-bold uppercase tracking-widest ${
+                          userData?.language === lang 
+                            ? 'bg-zenith-scarlet border-zenith-scarlet text-white shadow-lg' 
+                            : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'
+                        }`}
+                      >
+                        {lang === 'pt-BR' ? 'Português' : lang === 'en' ? 'English' : lang === 'es' ? 'Español' : 'Français'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto min-h-screen">
             <header className="flex flex-col items-center text-center space-y-8">
               <div className="relative group">
                 {/* Outer Glow Ring */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-zenith-electric-blue via-zenith-cyan to-zenith-electric-blue rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-zenith-scarlet via-zenith-crimson to-zenith-scarlet rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
                 
                 <div className="relative w-40 h-40 rounded-full border-2 border-white/5 p-1.5 bg-white/[0.02] backdrop-blur-xl">
                   <div className="w-full h-full rounded-full bg-zenith-black flex items-center justify-center overflow-hidden border border-white/10">
@@ -52,7 +315,7 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
                   <motion.div 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -bottom-2 right-2 bg-zenith-electric-blue text-white text-[10px] font-bold px-4 py-1.5 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.6)] border border-white/20 flex items-center space-x-1.5"
+                    className="absolute -bottom-2 right-2 bg-zenith-scarlet text-white text-[10px] font-bold px-4 py-1.5 rounded-xl shadow-[0_0_20px_rgba(255,36,0,0.6)] border border-white/20 flex items-center space-x-1.5"
                   >
                     <Award size={12} />
                     <span>LVL {level}</span>
@@ -65,9 +328,9 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
                   {userData?.displayName || 'Zenith User'}
                 </h1>
                 <div className="flex items-center justify-center space-x-4">
-                  <div className="flex items-center space-x-2 bg-zenith-electric-blue/10 px-3 py-1 rounded-lg border border-zenith-electric-blue/20">
-                    <Sparkles size={12} className="text-zenith-electric-blue" />
-                    <span className="text-zenith-electric-blue text-[10px] font-bold uppercase tracking-[0.2em]">
+                  <div className="flex items-center space-x-2 bg-zenith-scarlet/10 px-3 py-1 rounded-lg border border-zenith-scarlet/20">
+                    <Sparkles size={12} className="text-zenith-scarlet" />
+                    <span className="text-zenith-scarlet text-[10px] font-bold uppercase tracking-[0.2em]">
                       {levelName}
                     </span>
                   </div>
@@ -83,9 +346,9 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-5">
-              <StatItem icon={<Zap size={18} />} label="XP Total" value={xp.toString()} color="text-zenith-cyan" />
+              <StatItem icon={<Zap size={18} />} label="XP Total" value={xp.toString()} color="text-zenith-scarlet" />
               <StatItem icon={<Flame size={18} />} label="Streak" value={`${streak}d`} color="text-orange-500" />
-              <StatItem icon={<Award size={18} />} label="Rank" value={`#${level}`} color="text-zenith-electric-blue" />
+              <StatItem icon={<Award size={18} />} label="Rank" value={`#${level}`} color="text-zenith-scarlet" />
             </div>
 
             <div className="space-y-4">
@@ -97,14 +360,14 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
               
               <MenuButton 
                 icon={<Brain size={20} />} 
-                label="Academia Mental" 
-                sublabel="Treinamento cognitivo e foco" 
+                label={t.profile.mentalGym} 
+                sublabel={t.profile.cognitiveTraining} 
                 onClick={() => setView('gym')} 
               />
               <MenuButton 
                 icon={<Book size={20} />} 
-                label="Diário Neural" 
-                sublabel="Reflexões diárias e progresso" 
+                label={t.profile.journal} 
+                sublabel={t.profile.dailyReflections} 
                 onClick={() => setView('journal')} 
               />
 
@@ -116,35 +379,44 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
 
               <MenuButton 
                 icon={<User size={20} />} 
-                label="Conta" 
+                label={t.profile.editProfile} 
                 sublabel="Editar perfil e dados pessoais" 
-                onClick={() => {}} 
+                onClick={() => setView('edit-profile')} 
               />
               <MenuButton 
                 icon={<CreditCard size={20} />} 
-                label="Assinatura" 
-                sublabel="Gerenciar seu plano e pagamentos" 
+                label={t.profile.subscription} 
+                sublabel={t.profile.managePlan} 
                 onClick={() => setView('subscription')} 
               />
               <MenuButton 
                 icon={<Settings size={20} />} 
-                label="Preferências" 
-                sublabel="Ajustes de interface e tema" 
-                onClick={() => {}} 
+                label={t.profile.preferences} 
+                sublabel={t.profile.appPreferences} 
+                onClick={() => setView('preferences')} 
               />
               <MenuButton 
                 icon={<Shield size={20} />} 
-                label="Segurança" 
+                label={t.profile.security} 
                 sublabel="Senha e autenticação" 
-                onClick={() => {}} 
+                onClick={() => setView('security')} 
               />
               <MenuButton 
                 icon={<LogOut size={20} />} 
-                label="Sair do Sistema" 
+                label={t.profile.signOut} 
                 sublabel="Encerrar sessão com segurança" 
                 onClick={handleLogout} 
                 danger
               />
+            </div>
+
+            <div className="pt-12 pb-8 text-center">
+              <button 
+                onClick={handleVersionClick}
+                className="text-[8px] font-bold uppercase tracking-[0.5em] text-white/10 hover:text-white/20 transition-colors outline-none"
+              >
+                Zenith OS v2.4.1 Build 2026
+              </button>
             </div>
           </div>
         );
@@ -157,7 +429,10 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t }) => {
         <motion.button 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          onClick={() => setView('main')}
+          onClick={() => {
+            setView('main');
+            setMessage(null);
+          }}
           className="fixed top-8 left-8 z-[60] p-4 bg-white/5 rounded-[20px] border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all group"
         >
           <ChevronRight size={20} className="rotate-180 text-white/40 group-hover:text-white transition-colors" />

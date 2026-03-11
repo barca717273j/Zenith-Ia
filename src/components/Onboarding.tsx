@@ -161,7 +161,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-zenith-black flex items-center justify-center p-8">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#0a1931,0%,#000814,100%)]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#1a0000,0%,#050000,100%)]" />
       </div>
       
       <div className="w-full max-w-md relative z-10">

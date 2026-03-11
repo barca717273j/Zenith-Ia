@@ -11,6 +11,9 @@ interface Habit {
   completed_today: boolean;
   user_id: string;
   last_completed?: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  target: number;
+  current_progress: number;
 }
 
 interface HabitTrackerProps {
@@ -24,6 +27,8 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
   const [activeView, setActiveView] = useState<'habits' | 'tasks'>('habits');
   const [isAdding, setIsAdding] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
+  const [newFrequency, setNewFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [newTarget, setNewTarget] = useState(1);
   const { addXP } = useGamification();
 
   useEffect(() => {
@@ -78,7 +83,10 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
         name: newHabitName,
         streak: 0,
         completed_today: false,
-        user_id: user.id
+        user_id: user.id,
+        frequency: newFrequency,
+        target: newTarget,
+        current_progress: 0
       };
 
       const { data, error } = await supabase
@@ -258,7 +266,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
                   <X size={20} />
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="relative">
                   <input
                     type="text"
@@ -269,6 +277,34 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
                   />
                   <Zap size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-white/10" />
                 </div>
+
+                {activeView === 'habits' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Frequência</label>
+                      <select
+                        value={newFrequency}
+                        onChange={(e) => setNewFrequency(e.target.value as any)}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-zenith-electric-blue transition-all appearance-none"
+                      >
+                        <option value="daily">Diário</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="monthly">Mensal</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Meta (Vezes)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={newTarget}
+                        onChange={(e) => setNewTarget(parseInt(e.target.value) || 1)}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-zenith-electric-blue transition-all"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <button 
                   onClick={addHabit}
                   className="btn-primary w-full py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(59,130,246,0.2)]"

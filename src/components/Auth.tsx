@@ -14,6 +14,10 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [language, setLanguage] = useState<Language>('pt-BR');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,6 +37,20 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!isLogin) {
+      if (password !== confirmPassword) {
+        setError('As senhas não coincidem');
+        setLoading(false);
+        return;
+      }
+      if (!acceptTerms) {
+        setError('Você deve aceitar os termos e condições');
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
@@ -44,6 +62,11 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
         const { data: { user }, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              full_name: fullName,
+            }
+          }
         });
         if (error) throw error;
         
@@ -57,7 +80,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                 language, 
                 subscriptionTier: 'free',
                 energyLevel: 100,
-                displayName: user.user_metadata?.full_name || '',
+                displayName: fullName,
                 photoURL: user.user_metadata?.avatar_url || ''
               }
             ]);
@@ -89,146 +112,235 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
     }
   };
 
+  const getPasswordStrength = (pass: string) => {
+    if (pass.length === 0) return { label: '', color: 'bg-white/10', text: '' };
+    if (pass.length < 6) return { label: t.common.weak, color: 'bg-red-500 shadow-[0_0_8px_#ef4444]', text: 'text-red-400' };
+    if (pass.length < 10) return { label: t.common.medium, color: 'bg-orange-500 shadow-[0_0_8px_#f97316]', text: 'text-orange-400' };
+    return { label: t.common.strong, color: 'bg-green-500 shadow-[0_0_8px_#22c55e]', text: 'text-green-400' };
+  };
+
+  const strength = getPasswordStrength(password);
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-zenith-black relative overflow-hidden">
       {/* Background Ambience */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#111,0%,#000,100%)]" />
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-zenith-electric-blue/10 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-zenith-cyan/10 blur-[120px] rounded-full" />
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-zenith-crimson/10 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-zenith-scarlet/10 blur-[120px] rounded-full" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md p-10 space-y-10 relative z-10 glass-card border-white/5 bg-black/40 backdrop-blur-3xl rounded-3xl"
+        className="w-full max-w-md p-10 space-y-8 relative z-10 glass-card border-white/5 bg-black/40 backdrop-blur-3xl rounded-3xl"
       >
-        <div className="text-center space-y-6">
+        <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <ZenithLogo size={80} className="text-white" />
+            <ZenithLogo size={60} className="text-white" />
           </div>
-          <div className="space-y-3">
-            <h1 className="text-5xl font-display font-bold tracking-tighter uppercase leading-none">Zenith</h1>
-            <div className="flex items-center justify-center space-x-2 text-zenith-electric-blue">
-              <Sparkles size={14} />
-              <span className="text-[10px] font-bold uppercase tracking-[0.4em]">Life Operating System</span>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-display font-bold tracking-tighter uppercase leading-none">Zenith</h1>
+            <div className="flex items-center justify-center space-x-2 text-zenith-neon-red">
+              <Sparkles size={12} />
+              <span className="text-[9px] font-bold uppercase tracking-[0.4em]">Life Operating System</span>
             </div>
           </div>
         </div>
 
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
-          <button
-            onClick={() => setIsLogin(true)}
-            className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all ${isLogin ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white/60'}`}
-          >
-            {t.common.login}
-          </button>
-          <button
-            onClick={() => setIsLogin(false)}
-            className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all ${!isLogin ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white/60'}`}
-          >
-            {t.common.register}
-          </button>
-        </div>
-
-        <form onSubmit={handleAuth} className="space-y-6">
-          <div className="space-y-3">
-            <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-electric-blue transition-colors">
-                <Mail size={18} />
-              </div>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-electric-blue transition-all text-sm font-medium"
-                placeholder="seu@email.com"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-electric-blue transition-colors">
-                <Lock size={18} />
-              </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-electric-blue transition-all text-sm font-medium"
-                placeholder="••••••••"
-              />
-            </div>
-            
-            {!isLogin && password.length > 0 && (
-              <div className="space-y-2 px-1">
-                <div className="flex justify-between items-center text-[8px] uppercase tracking-widest font-bold">
-                  <span className="text-white/40">Força da Senha</span>
-                  <span className={
-                    password.length < 6 ? 'text-red-400' : 
-                    password.length < 10 ? 'text-orange-400' : 
-                    'text-green-400'
-                  }>
-                    {password.length < 6 ? 'Fraca' : password.length < 10 ? 'Média' : 'Forte'}
-                  </span>
-                </div>
-                <div className="flex space-x-1 h-1">
-                  <div className={`flex-1 rounded-full transition-all duration-500 ${password.length > 0 ? (password.length < 6 ? 'bg-red-500 shadow-[0_0_8px_#ef4444]' : password.length < 10 ? 'bg-orange-500 shadow-[0_0_8px_#f97316]' : 'bg-green-500 shadow-[0_0_8px_#22c55e]') : 'bg-white/10'}`} />
-                  <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 6 ? (password.length < 10 ? 'bg-orange-500 shadow-[0_0_8px_#f97316]' : 'bg-green-500 shadow-[0_0_8px_#22c55e]') : 'bg-white/10'}`} />
-                  <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 10 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-white/10'}`} />
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.language}</label>
-            <div className="grid grid-cols-2 gap-2">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => setLanguage(lang.code)}
-                  className={`flex items-center space-x-2 p-3 rounded-xl border transition-all ${
-                    language === lang.code 
-                      ? 'bg-zenith-cyan/10 border-zenith-cyan text-white' 
-                      : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'
-                  }`}
-                >
-                  <span className="text-lg">{lang.flag}</span>
-                  <span className="text-[9px] font-bold uppercase tracking-tighter truncate">{lang.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center space-x-3 text-red-400 text-[10px] uppercase tracking-wider font-bold bg-red-400/10 p-4 rounded-2xl border border-red-400/20"
+        <AnimatePresence mode="wait">
+          {isLogin ? (
+            <motion.div
+              key="login"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-6"
             >
-              <AlertTriangle size={16} />
-              <span>{error}</span>
+              <form onSubmit={handleAuth} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-neon-red transition-colors">
+                      <Mail size={18} />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      placeholder="seu@email.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
+                    <button type="button" className="text-[9px] text-zenith-neon-red hover:underline uppercase tracking-widest font-bold">
+                      {t.common.forgotPassword}
+                    </button>
+                  </div>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-neon-red transition-colors">
+                      <Lock size={18} />
+                    </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-4 flex items-center text-white/20 hover:text-white/40 transition-colors"
+                    >
+                      {showPassword ? <Shield size={18} /> : <Sparkles size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                  ) : (
+                    <span>{t.common.enterZenith}</span>
+                  )}
+                </button>
+              </form>
+
+              <div className="text-center">
+                <button
+                  onClick={() => setIsLogin(false)}
+                  className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                >
+                  {t.common.dontHaveAccount}
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="register"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <form onSubmit={handleAuth} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.fullName}</label>
+                  <input
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                    placeholder="Seu nome completo"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                    placeholder="seu@email.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
+                  <div className="relative group">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 pr-12 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-4 flex items-center text-white/20 hover:text-white/40 transition-colors"
+                    >
+                      {showPassword ? <Shield size={18} /> : <Sparkles size={18} />}
+                    </button>
+                  </div>
+                  
+                  {password.length > 0 && (
+                    <div className="space-y-2 px-1">
+                      <div className="flex justify-between items-center text-[8px] uppercase tracking-widest font-bold">
+                        <span className="text-white/40">{t.common.passwordStrength}</span>
+                        <span className={strength.text}>{strength.label}</span>
+                      </div>
+                      <div className="flex space-x-1 h-1">
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length > 0 ? strength.color : 'bg-white/10'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 6 ? strength.color : 'bg-white/10'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 10 ? strength.color : 'bg-white/10'}`} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.confirmPassword}</label>
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-3 py-2">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
+                  />
+                  <label htmlFor="terms" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors">
+                    {t.common.termsAccepted}
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                  ) : (
+                    <span>{t.common.createAccount}</span>
+                  )}
+                </button>
+              </form>
+
+              <div className="text-center">
+                <button
+                  onClick={() => setIsLogin(true)}
+                  className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                >
+                  {t.common.alreadyHaveAccount}
+                </button>
+              </div>
             </motion.div>
           )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl hover:shadow-zenith-electric-blue/20"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
-            ) : (
-              <span>{isLogin ? t.common.initializeOS : t.common.register}</span>
-            )}
-          </button>
-        </form>
-
+        </AnimatePresence>
 
         <div className="relative py-2">
           <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
