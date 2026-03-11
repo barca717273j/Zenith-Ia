@@ -1,11 +1,7 @@
-import { Dashboard } from "./components/Dashboard";
+import { Dashboard } from "./Components/Dashboard";
 
 function App() {
-  return (
-    <div style={{color:"white"}}>
-      <Dashboard />
-    </div>
-  );
+  return <Dashboard />;
 }
 
 export default App;
