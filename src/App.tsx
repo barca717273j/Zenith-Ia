@@ -1,7 +1,9 @@
+import { Dashboard } from "./components/Dashboard";
+
 function App() {
   return (
-    <div style={{color:"white", padding:"40px"}}>
-      TESTE REACT FUNCIONANDO
+    <div style={{color:"white"}}>
+      <Dashboard />
     </div>
   );
 }
