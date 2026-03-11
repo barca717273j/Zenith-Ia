@@ -6,8 +6,10 @@ const getAI = () => {
   if (!aiInstance) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not defined in the environment.");
-    }
+   if (!apiKey) {
+  console.warn("Gemini API not configured");
+  return null;
+}
     aiInstance = new GoogleGenAI({ apiKey });
   }
   return aiInstance;
