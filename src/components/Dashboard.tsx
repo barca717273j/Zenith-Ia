@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-//import { InfinityAI } from './InfinityAI';
+import { InfinityAI } from './InfinityAI';
 //import { AIAssistant } from './AIAssistant';
 //import { ZenithLogo } from './ZenithLogo';
 //import { RoutineSystem } from './RoutineSystem';
