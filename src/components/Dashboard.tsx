@@ -7,7 +7,7 @@ import { DailyMissions } from './DailyMissions';
 import { FocusTimer } from './FocusTimer';
 import { motion } from "framer-motion";
 import { Zap, Target, TrendingUp, Wallet, User, ChevronRight, MessageSquare, Sparkles, Quote, Gamepad2, Brain, Activity, ArrowUpRight, Timer, Dumbbell } from 'lucide-react';
-import { useGamification } from './GamificationContext';
+//import { useGamification } from './GamificationContext';
 
 interface DashboardProps {
   userData: any;
