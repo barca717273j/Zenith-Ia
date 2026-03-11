@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { InfinityAI } from './InfinityAI';
-//import { AIAssistant } from './AIAssistant';
-//import { ZenithLogo } from './ZenithLogo';
+import { AIAssistant } from './AIAssistant';
+import { ZenithLogo } from './ZenithLogo';
 //import { RoutineSystem } from './RoutineSystem';
 //import { DailyMissions } from './DailyMissions';
 //import { FocusTimer } from './FocusTimer';
