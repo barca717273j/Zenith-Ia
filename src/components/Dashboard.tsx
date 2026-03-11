@@ -17,7 +17,8 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab }) => {
   const [isAIOpen, setIsAIOpen] = useState(false);
-  const { level, levelName } = useGamification();
+  const level = 1;
+  const levelName = "Iniciante";
 
   return (
     <div className="p-6 space-y-12 pb-32 max-w-4xl mx-auto min-h-screen">
