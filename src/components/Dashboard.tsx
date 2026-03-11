@@ -21,11 +21,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab 
   const levelName = "Iniciante";
 
   return (
-  <div style={{color:"white", padding:"40px"}}>
-    TESTE DASHBOARD
+  <div>
+    <div>algo</div>
+    <div>outra coisa</div>
   </div>
 );
-      {/* Header */}
+  {/* Header */}
       <header className="flex justify-between items-center">
         <div className="flex items-center space-x-5">
           <div className="relative group">
