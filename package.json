@@ -16,7 +16,6 @@
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
-    "framer-motion": "^11.11.17"
     "framer-motion": "^11.11.17",
     "lucide-react": "^0.546.0",
     "react": "^19.0.0",
