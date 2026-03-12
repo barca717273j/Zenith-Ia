@@ -17,10 +17,12 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [language, setLanguage] = useState<Language>('pt-BR');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const t = translations[language];
 
@@ -44,8 +46,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
         setLoading(false);
         return;
       }
-      if (!acceptTerms) {
-        setError('Você deve aceitar os termos e condições');
+      if (!acceptTerms || !acceptPrivacy) {
+        setError('Você deve aceitar os termos e a política de privacidade');
         setLoading(false);
         return;
       }
@@ -58,6 +60,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
           password,
         });
         if (error) throw error;
+        onSuccess();
       } else {
         const { data: { user }, error } = await supabase.auth.signUp({
           email,
@@ -78,16 +81,24 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                 id: user.id, 
                 email: user.email, 
                 language, 
-                subscriptionTier: 'free',
-                energyLevel: 100,
-                displayName: fullName,
-                photoURL: user.user_metadata?.avatar_url || ''
+                subscription_tier: 'free',
+                energy_level: 100,
+                display_name: fullName,
+                photo_url: user.user_metadata?.avatar_url || ''
               }
             ]);
           if (profileError) console.error('Profile creation error:', profileError);
+          
+          // If session is created immediately (no email confirm), call onSuccess
+          // Otherwise show success message
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            onSuccess();
+          } else {
+            setSuccess(true);
+          }
         }
       }
-      onSuccess();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -147,7 +158,33 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
         </div>
 
         <AnimatePresence mode="wait">
-          {isLogin ? (
+          {success ? (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center space-y-6 py-8"
+            >
+              <div className="w-20 h-20 bg-zenith-scarlet/20 rounded-full flex items-center justify-center mx-auto border border-zenith-scarlet/30 shadow-[0_0_30px_rgba(255,36,0,0.2)]">
+                <Sparkles className="text-zenith-scarlet w-10 h-10" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Conta Criada!</h2>
+                <p className="text-white/60 text-sm leading-relaxed">
+                  Enviamos um link de confirmação para seu e-mail. Por favor, verifique sua caixa de entrada para ativar seu acesso ao Zenith.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setSuccess(false);
+                  setIsLogin(true);
+                }}
+                className="w-full btn-secondary py-4 text-[10px] font-bold uppercase tracking-widest"
+              >
+                Voltar para Login
+              </button>
+            </motion.div>
+          ) : isLogin ? (
             <motion.div
               key="login"
               initial={{ opacity: 0, x: -20 }}
@@ -304,17 +341,31 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                   />
                 </div>
 
-                <div className="flex items-center space-x-3 py-2">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={acceptTerms}
-                    onChange={(e) => setAcceptTerms(e.target.checked)}
-                    className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
-                  />
-                  <label htmlFor="terms" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors">
-                    {t.common.termsAccepted}
-                  </label>
+                <div className="space-y-3 py-2">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={acceptTerms}
+                      onChange={(e) => setAcceptTerms(e.target.checked)}
+                      className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
+                    />
+                    <label htmlFor="terms" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors">
+                      {t.common.termsAccepted}
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="privacy"
+                      checked={acceptPrivacy}
+                      onChange={(e) => setAcceptPrivacy(e.target.checked)}
+                      className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
+                    />
+                    <label htmlFor="privacy" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors">
+                      Aceito a Política de Privacidade
+                    </label>
+                  </div>
                 </div>
 
                 <button

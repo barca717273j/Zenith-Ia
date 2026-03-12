@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, CreditCard, PiggyBank, TrendingUp, TrendingDown, Sparkles, Zap, MessageSquare, X, Send, Bot, Activity, Timer } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, CreditCard, PiggyBank, TrendingUp, TrendingDown, Sparkles, Zap, MessageSquare, X, Send, Bot, Activity, Timer, BarChart3 } from 'lucide-react';
 import { supabase } from '../supabase';
-import { GoogleGenAI } from "@google/genai";
 import { Language } from '../translations';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface Transaction {
   id: string;
@@ -107,19 +107,24 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
     if (!aiMessage) return;
     setIsAiLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const model = ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Analise as seguintes transações financeiras e orçamentos e responda à pergunta do usuário: "${aiMessage}". 
-        Transações: ${JSON.stringify(transactions)}. 
-        Orçamentos: ${JSON.stringify(budgets)}.
-        Responda de forma curta, profissional e útil, como um mentor financeiro premium. Dê dicas práticas de economia baseada nos gastos.`,
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `Analise as seguintes transações financeiras e orçamentos e responda à pergunta do usuário: "${aiMessage}". 
+          Transações: ${JSON.stringify(transactions)}. 
+          Orçamentos: ${JSON.stringify(budgets)}.
+          Responda de forma curta, profissional e útil, como um mentor financeiro premium. Dê dicas práticas de economia baseada nos gastos.`,
+          systemInstruction: "Você é o Mentor Financeiro do Zenith IA. Sua missão é ajudar o usuário a atingir a liberdade financeira com dicas de alta performance."
+        })
       });
-      const response = await model;
-      setAiResponse(response.text || 'Desculpe, não consegui analisar seus dados agora.');
+      
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setAiResponse(data.text || 'Desculpe, não consegui analisar seus dados agora.');
     } catch (err) {
       console.error('AI Error:', err);
-      setAiResponse('Erro ao conectar com o Mentor Financeiro.');
+      setAiResponse('Erro ao conectar com o Mentor Financeiro. Verifique sua conexão.');
     } finally {
       setIsAiLoading(false);
     }
@@ -197,6 +202,42 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
               </p>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Chart Section */}
+      <div className="glass-card p-6 border-white/5 bg-white/[0.01]">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            <BarChart3 size={14} className="text-zenith-scarlet" />
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">Análise de Fluxo</h3>
+          </div>
+        </div>
+        <div className="h-48 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={[
+              { name: 'Entradas', value: totalIncome },
+              { name: 'Saídas', value: totalExpense }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#ffffff30', fontSize: 10, fontWeight: 'bold' }} 
+              />
+              <YAxis hide />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#000', border: '1px solid #ffffff10', borderRadius: '12px', fontSize: '10px' }}
+                itemStyle={{ color: '#fff' }}
+                cursor={{ fill: '#ffffff05' }}
+              />
+              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                <Cell fill="#ff2400" />
+                <Cell fill="#333" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
@@ -288,7 +329,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                   <div className="flex items-center space-x-4">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${
                       t_item.type === 'income' 
-                        ? 'bg-zenith-cyan/10 text-zenith-cyan border-zenith-cyan/20' 
+                        ? 'bg-zenith-scarlet/10 text-zenith-scarlet border-zenith-scarlet/20' 
                         : 'bg-white/5 text-white/20 border-white/10'
                     }`}>
                       {t_item.type === 'income' ? <ArrowUpRight size={18} /> : <ArrowDownLeft size={18} />}
@@ -327,7 +368,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                         {formatCurrency(b.spent)} de {formatCurrency(b.limit)}
                       </p>
                     </div>
-                    <span className={`text-xs font-mono font-bold ${isOver ? 'text-red-500' : 'text-zenith-cyan'}`}>
+                    <span className={`text-xs font-mono font-bold ${isOver ? 'text-red-500' : 'text-zenith-scarlet'}`}>
                       {Math.round(progress)}%
                     </span>
                   </div>
@@ -335,7 +376,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(100, progress)}%` }}
-                      className={`h-full rounded-full ${isOver ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-zenith-cyan shadow-[0_0_10px_rgba(0,240,255,0.5)]'}`}
+                      className={`h-full rounded-full ${isOver ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-zenith-scarlet shadow-[0_0_10px_rgba(255,36,0,0.5)]'}`}
                     />
                   </div>
                 </div>
@@ -365,7 +406,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                   <button
                     type="button"
                     onClick={() => setType('income')}
-                    className={`flex-1 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${type === 'income' ? 'bg-zenith-cyan text-black' : 'text-white/40'}`}
+                    className={`flex-1 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${type === 'income' ? 'bg-zenith-scarlet text-white' : 'text-white/40'}`}
                   >
                     {t.finance.income}
                   </button>
@@ -385,7 +426,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                       type="text" 
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-zenith-cyan transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
                       placeholder={t.finance.description}
                     />
                   </div>
@@ -395,7 +436,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                       type="number" 
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-zenith-cyan transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
                       placeholder="0.00"
                     />
                   </div>
@@ -420,14 +461,14 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
               exit={{ opacity: 0, y: 100 }}
               className="glass-card w-full max-w-md h-[80vh] flex flex-col bg-zenith-black border-white/10"
             >
-              <div className="p-6 border-b border-white/5 flex justify-between items-center bg-zenith-cyan/5">
+              <div className="p-6 border-b border-white/5 flex justify-between items-center bg-zenith-scarlet/5">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-xl bg-zenith-cyan/20 flex items-center justify-center text-zenith-cyan">
+                  <div className="w-10 h-10 rounded-xl bg-zenith-scarlet/20 flex items-center justify-center text-zenith-scarlet">
                     <Bot size={24} />
                   </div>
                   <div>
                     <h3 className="text-sm font-display font-bold uppercase tracking-widest">{t.finance.mentor}</h3>
-                    <p className="text-[9px] text-zenith-cyan font-bold uppercase tracking-widest">{t.finance.neuralAnalysis}</p>
+                    <p className="text-[9px] text-zenith-scarlet font-bold uppercase tracking-widest">{t.finance.neuralAnalysis}</p>
                   </div>
                 </div>
                 <button onClick={() => setShowAIChat(false)} className="text-white/40 hover:text-white"><X size={20} /></button>
@@ -436,7 +477,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {aiResponse ? (
                   <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 rounded-lg bg-zenith-cyan/20 flex items-center justify-center text-zenith-cyan flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-zenith-scarlet/20 flex items-center justify-center text-zenith-scarlet flex-shrink-0">
                       <Bot size={16} />
                     </div>
                     <div className="bg-white/5 p-4 rounded-2xl rounded-tl-none border border-white/10 text-sm text-white/80 leading-relaxed">
@@ -445,14 +486,14 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                   </div>
                 ) : (
                   <div className="text-center py-10 space-y-4">
-                    <Sparkles className="mx-auto text-zenith-cyan/40" size={32} />
+                    <Sparkles className="mx-auto text-zenith-scarlet/40" size={32} />
                     <p className="text-xs text-white/30 uppercase tracking-widest leading-relaxed">
                       {t.finance.askMentor}
                     </p>
                   </div>
                 )}
                 {isAiLoading && (
-                  <div className="flex items-center space-x-3 text-zenith-cyan">
+                  <div className="flex items-center space-x-3 text-zenith-scarlet">
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     <span className="text-[10px] font-bold uppercase tracking-widest">{t.finance.processing}</span>
                   </div>
@@ -467,12 +508,12 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                     onChange={(e) => setAiMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && askFinanceAI()}
                     placeholder={t.finance.placeholder}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-14 text-sm focus:outline-none focus:border-zenith-cyan transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-14 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
                   />
                   <button 
                     onClick={askFinanceAI}
                     disabled={isAiLoading || !aiMessage}
-                    className="absolute right-2 top-2 w-10 h-10 rounded-xl bg-zenith-cyan text-white flex items-center justify-center disabled:opacity-50 transition-all"
+                    className="absolute right-2 top-2 w-10 h-10 rounded-xl bg-zenith-scarlet text-white flex items-center justify-center disabled:opacity-50 transition-all"
                   >
                     <Send size={18} />
                   </button>

@@ -1,5 +1,5 @@
 {
-  "name": "Zenith",
-  "description": "Zenith: A premium mobile Life Operating System. Features include AI-powered life strategy, habit tracking with plan-based limits, cosmic life mapping, finance management, and mental focus games.",
-  "requestFramePermissions": ["notifications", "geolocation"]
+  "name": "Zenith IA",
+  "description": "Zenith IA: O Sistema Operacional de Vida definitivo. Alta performance, estratégia neural e gestão completa de rotina, hábitos e finanças em uma interface profissional.",
+  "requestFramePermissions": ["notifications", "geolocation", "camera"]
 }

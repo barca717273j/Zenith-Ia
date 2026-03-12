@@ -11,14 +11,14 @@ import { Exercises } from './components/Exercises';
 import { FocusTimer } from './components/FocusTimer';
 import { Onboarding } from './components/Onboarding';
 import { AdminPanel } from './components/AdminPanel';
-import { supabase } from './supabase';
-import { motion, AnimatePresence } from 'framer-motion';
+import { supabase, isSupabaseConfigured } from './supabase';
+import { motion, AnimatePresence } from 'motion/react';
+import { AlertCircle, ExternalLink, ShieldCheck } from 'lucide-react';
 
 import { translations, Language } from './translations';
 import { GamificationProvider } from './components/GamificationContext';
 
 export default function App() {
-
   const [session, setSession] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -29,128 +29,173 @@ export default function App() {
   const t = translations[lang];
 
   useEffect(() => {
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-
-      setSession(session);
-
-      if (session?.user) {
-        fetchUserData(session.user.id);
-      } else {
+    console.log('Zenith: Initializing App...');
+    // Check active session
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        console.log('Zenith: Initial session:', session?.user?.id);
+        setSession(session);
+        if (session?.user) {
+          fetchUserData(session.user.id);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error('Zenith: Session initialization error:', err);
         setLoading(false);
-      }
+      });
 
-    });
-
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-
+      console.log('Zenith: Auth state changed:', _event, session?.user?.id);
       setSession(session);
-
       if (session?.user) {
         fetchUserData(session.user.id);
       } else {
         setUserData(null);
         setLoading(false);
       }
-
     });
 
     return () => subscription.unsubscribe();
-
   }, []);
 
   const fetchUserData = async (userId?: string) => {
-
     const id = userId || session?.user?.id;
-
-    if (!id) return;
-
+    if (!id || !isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+    
     try {
-
       const { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', id)
         .single();
-
+      
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching user data:', error);
       }
-
-      setUserData(data || null);
-
-      if (data && (!data.displayName || !data.onboardingCompleted)) {
-        setShowOnboarding(true);
+      
+      if (data) {
+        setUserData(data);
+        // If user has no display name or hasn't completed onboarding, show it
+        if (!data.display_name || !data.onboarding_completed) {
+          setShowOnboarding(true);
+        } else {
+          setShowOnboarding(false);
+        }
+      } else {
+        // No user record found, create one (common after Google Login)
+        const { data: newUser, error: insertError } = await supabase
+          .from('users')
+          .insert([{
+            id: id,
+            email: session?.user?.email || '',
+            display_name: session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || 'User',
+            language: 'pt-BR',
+            subscription_tier: 'free',
+            energy_level: 100,
+            xp: 0,
+            streak: 0,
+            onboarding_completed: false
+          }])
+          .select()
+          .single();
+        
+        if (!insertError && newUser) {
+          setUserData(newUser);
+          setShowOnboarding(true);
+        } else {
+          console.error('Failed to create user record:', insertError);
+          setShowOnboarding(true);
+        }
       }
-
     } catch (err) {
-
       console.error('Fetch error:', err);
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-  const handleOnboardingComplete = async (data: any) => {
-
-    if (!session?.user) return;
-
+  const handleOnboardingComplete = async () => {
+    if (!session?.user || !isSupabaseConfigured) {
+      setShowOnboarding(false);
+      return;
+    }
+    
     try {
-
       const { error } = await supabase
         .from('users')
         .update({
-          onboardingCompleted: true,
-          primaryGoal: data.goal,
-          focusStyle: data.focusStyle,
+          onboarding_completed: true,
           updated_at: new Date().toISOString()
         })
         .eq('id', session.user.id);
-
+        
       if (error) throw error;
-
+      
       setShowOnboarding(false);
-      fetchUserData(session.user.id);
-
+      await fetchUserData(session.user.id);
     } catch (err) {
-
       console.error('Error saving onboarding:', err);
       setShowOnboarding(false);
-
     }
-
   };
 
-  if (loading) {
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-6 text-center">
+        <div className="max-w-sm space-y-8">
+          <div className="flex justify-center">
+            <div className="p-6 bg-red-900/20 rounded-full border border-red-500/30">
+              <AlertCircle className="w-12 h-12 text-red-500" />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <h1 className="text-2xl font-bold text-white">Configuração Necessária</h1>
+            <p className="text-white/60 text-sm leading-relaxed">
+              O Zenith IA requer conexão com o Supabase para funcionar. Por favor, configure as variáveis de ambiente <code className="bg-white/10 px-2 py-1 rounded">VITE_SUPABASE_URL</code> e <code className="bg-white/10 px-2 py-1 rounded">VITE_SUPABASE_ANON_KEY</code>.
+            </p>
+          </div>
+          <div className="flex flex-col space-y-3">
+            <a 
+              href="https://supabase.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center"
+            >
+              Criar Projeto no Supabase <ExternalLink className="ml-2 w-4 h-4" />
+            </a>
+            <div className="flex items-center justify-center space-x-2 text-white/20">
+              <ShieldCheck size={12} />
+              <span className="text-[8px] font-bold uppercase tracking-widest">Infraestrutura de Produção</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  if (loading) {
     return (
       <div className="min-h-screen bg-zenith-black flex items-center justify-center">
-
         <div className="text-center space-y-4">
-
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-            className="w-12 h-12 border-4 border-zenith-scarlet border-t-transparent rounded-full mx-auto"
+            className="w-12 h-12 border-4 border-zenith-scarlet border-t-transparent rounded-full shadow-[0_0_20px_rgba(255,36,0,0.3)] mx-auto"
           />
-
-          <p className="text-white/40 text-xs font-display uppercase tracking-widest">
-            {t.common.loading}
-          </p>
-
+          <p className="text-white/40 text-xs font-display uppercase tracking-widest">{t.common.loading}</p>
         </div>
-
       </div>
     );
-
   }
 
   if (!session) {
-    return <Auth onSuccess={() => {}} />;
+    return <Auth onSuccess={() => setLoading(true)} />;
   }
 
   if (showOnboarding) {
@@ -158,78 +203,51 @@ export default function App() {
   }
 
   const renderContent = () => {
-
     switch (activeTab) {
-
       case 'home':
-        return <Dashboard userData={userData} t={t} setActiveTab={setActiveTab} onUpdate={fetchUserData} />;
-
+        return <Dashboard key="home" userData={userData} t={t} setActiveTab={setActiveTab} onUpdate={fetchUserData} />;
       case 'tasks':
-        return <HabitTracker userData={userData} t={t} />;
-
+        return <HabitTracker key="tasks" userData={userData} t={t} />;
       case 'exercises':
-        return <Exercises t={t} userData={userData} />;
-
+        return <Exercises key="exercises" t={t} userData={userData} />;
       case 'focus':
-        return <FocusTimer t={t} isFullPage />;
-
+        return <FocusTimer key="focus" t={t} isFullPage />;
       case 'finance':
-        return <FinanceTracker userData={userData} t={t} language={lang} />;
-
+        return <FinanceTracker key="finance" userData={userData} t={t} language={lang} />;
       case 'profile':
-        return <Profile userData={userData} t={t} onUpdate={fetchUserData} />;
-
+        return <Profile key="profile" userData={userData} t={t} onUpdate={fetchUserData} />;
       case 'admin':
-        return userData?.isAdmin ? <AdminPanel t={t} /> : null;
-
+        return userData?.is_admin ? <AdminPanel key="admin" t={t} /> : null;
       case 'break':
-        return <TetrisGame t={t} />;
-
+        return <TetrisGame key="break" t={t} />;
       default:
-        return <Dashboard userData={userData} t={t} setActiveTab={setActiveTab} onUpdate={fetchUserData} />;
-
+        return <Dashboard key="home" userData={userData} t={t} setActiveTab={setActiveTab} onUpdate={fetchUserData} />;
     }
-
   };
 
   return (
-
     <GamificationProvider>
-
       <div className="min-h-screen bg-zenith-black text-white selection:bg-zenith-scarlet/30">
-
         <AnimatePresence mode="wait">
-
           <motion.main
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="max-w-md mx-auto"
+            className="w-full"
           >
-
             {renderContent()}
-
           </motion.main>
-
         </AnimatePresence>
 
-        <Navigation
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          t={t}
-          userData={userData}
-        />
+        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} t={t} userData={userData} />
 
+        {/* Background Ambience */}
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,#111,0%,#000,100%)]" />
         </div>
-
       </div>
-
     </GamificationProvider>
-
   );
-
 }

@@ -21,9 +21,9 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
   const { level, levelName, xp, streak } = useGamification();
 
   // Edit Profile State
-  const [editName, setEditName] = useState(userData?.displayName || '');
+  const [editName, setEditName] = useState(userData?.display_name || '');
   const [editEmail, setEditEmail] = useState(userData?.email || '');
-  const [editPhoto, setEditPhoto] = useState(userData?.photoURL || '');
+  const [editPhoto, setEditPhoto] = useState(userData?.photo_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
@@ -38,7 +38,7 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
     if (newCount === 5) {
       const { error } = await supabase
         .from('users')
-        .update({ isAdmin: !userData?.isAdmin })
+        .update({ is_admin: !userData?.is_admin })
         .eq('id', userData?.id);
       
       if (!error) {
@@ -59,8 +59,8 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
       const { error } = await supabase
         .from('users')
         .update({
-          displayName: editName,
-          photoURL: editPhoto
+          display_name: editName,
+          photo_url: editPhoto
         })
         .eq('id', userData.id);
 
@@ -302,8 +302,8 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
                 
                 <div className="relative w-40 h-40 rounded-full border-2 border-white/5 p-1.5 bg-white/[0.02] backdrop-blur-xl">
                   <div className="w-full h-full rounded-full bg-zenith-black flex items-center justify-center overflow-hidden border border-white/10">
-                    {userData?.photoURL ? (
-                      <img src={userData.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    {userData?.photo_url ? (
+                      <img src={userData.photo_url} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <div className="w-full h-full bg-white/5 flex items-center justify-center">
                         <User size={64} className="text-white/10" />
@@ -325,7 +325,7 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
               
               <div className="space-y-3">
                 <h1 className="text-4xl font-display font-bold tracking-tighter uppercase leading-none text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                  {userData?.displayName || 'Zenith User'}
+                  {userData?.display_name || 'Zenith User'}
                 </h1>
                 <div className="flex items-center justify-center space-x-4">
                   <div className="flex items-center space-x-2 bg-zenith-scarlet/10 px-3 py-1 rounded-lg border border-zenith-scarlet/20">
@@ -337,7 +337,7 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
                   <div className="flex items-center space-x-2 bg-white/5 px-3 py-1 rounded-lg border border-white/10">
                     <Shield size={12} className="text-white/40" />
                     <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
-                      {userData?.subscriptionTier || 'Free'}
+                      {userData?.subscription_tier || 'Free'}
                     </span>
                   </div>
                 </div>

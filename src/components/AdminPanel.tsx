@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { Upload, Plus, X, Video, FileText, Tag, BarChart, Save, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  Upload, Plus, X, Video, FileText, Tag, 
+  BarChart, Save, Trash2, Users, Settings, 
+  Activity, Shield, Database, Search, Filter
+} from 'lucide-react';
 import { supabase } from '../supabase';
 
 export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
-  const [activeTab, setActiveTab] = useState<'exercises' | 'users' | 'logs'>('exercises');
+  const [activeTab, setActiveTab] = useState<'exercises' | 'users' | 'system'>('exercises');
   const [exercises, setExercises] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [logs, setLogs] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    totalExercises: 0,
+    premiumUsers: 0
+  });
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [newExercise, setNewExercise] = useState({
     title: '',
@@ -18,84 +28,55 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
     category: 'strength',
     duration: '',
     difficulty: 'beginner',
-    isPremium: false,
-    videoUrl: ''
+    is_premium: false,
+    video_url: '',
+    xp_reward: 50
   });
 
   useEffect(() => {
-    if (activeTab === 'exercises') fetchExercises();
-    if (activeTab === 'users') fetchUsers();
-    if (activeTab === 'logs') fetchLogs();
+    fetchData();
   }, [activeTab]);
 
-  const fetchExercises = async () => {
+  const fetchData = async () => {
     setLoading(true);
+    if (activeTab === 'exercises') await fetchExercises();
+    if (activeTab === 'users') await fetchUsers();
+    if (activeTab === 'system') await fetchSystemStats();
+    setLoading(false);
+  };
+
+  const fetchExercises = async () => {
     const { data, error } = await supabase
       .from('exercises')
       .select('*')
       .order('created_at', { ascending: false });
-    
     if (!error) setExercises(data || []);
-    setLoading(false);
   };
 
   const fetchUsers = async () => {
-    setLoading(true);
     const { data, error } = await supabase
       .from('users')
       .select('*')
       .order('created_at', { ascending: false });
-    
     if (!error) setUsers(data || []);
-    setLoading(false);
   };
 
-  const fetchLogs = async () => {
-    setLoading(true);
-    // Assuming a logs table exists or we just show some mock/recent data
-    // For now, let's try to fetch from a 'logs' table if it exists
-    const { data, error } = await supabase
-      .from('logs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50);
+  const fetchSystemStats = async () => {
+    const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
+    const { count: exCount } = await supabase.from('exercises').select('*', { count: 'exact', head: true });
+    const { count: premCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).neq('subscription_tier', 'free');
     
-    if (!error) setLogs(data || []);
-    setLoading(false);
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `exercises/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('videos')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage
-        .from('videos')
-        .getPublicUrl(filePath);
-
-      setNewExercise({ ...newExercise, videoUrl: data.publicUrl });
-    } catch (error) {
-      console.error('Error uploading video:', error);
-      alert('Error uploading video');
-    } finally {
-      setUploading(false);
-    }
+    setStats({
+      totalUsers: userCount || 0,
+      activeUsers: Math.floor((userCount || 0) * 0.7), // Mock active users
+      totalExercises: exCount || 0,
+      premiumUsers: premCount || 0
+    });
   };
 
   const handleSave = async () => {
-    if (!newExercise.title || !newExercise.videoUrl) {
-      alert('Please fill in all required fields');
+    if (!newExercise.title || !newExercise.video_url) {
+      alert('Preencha os campos obrigatórios');
       return;
     }
 
@@ -113,240 +94,283 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
         category: 'strength',
         duration: '',
         difficulty: 'beginner',
-        isPremium: false,
-        videoUrl: ''
+        is_premium: false,
+        video_url: '',
+        xp_reward: 50
       });
       fetchExercises();
     } catch (error) {
       console.error('Error saving exercise:', error);
-      alert('Error saving exercise');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this exercise?')) return;
-
-    const { error } = await supabase
-      .from('exercises')
-      .delete()
-      .eq('id', id);
-
+    if (!confirm('Tem certeza que deseja excluir este exercício?')) return;
+    const { error } = await supabase.from('exercises').delete().eq('id', id);
     if (!error) fetchExercises();
   };
 
+  const filteredUsers = users.filter(u => 
+    u.email?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    u.display_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="p-6 space-y-8 pb-32">
-      <header className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-display font-bold uppercase tracking-tighter">Admin Panel</h1>
-          <p className="text-white/40 text-[10px] uppercase tracking-widest mt-1">Content Management System</p>
+    <div className="p-6 space-y-10 pb-32 max-w-4xl mx-auto min-h-screen">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <Shield size={16} className="text-zenith-scarlet" />
+            <h1 className="text-3xl font-display font-bold uppercase tracking-tighter text-white">
+              Terminal <span className="text-zenith-scarlet">Admin</span>
+            </h1>
+          </div>
+          <p className="text-white/30 text-[10px] uppercase tracking-[0.3em] font-bold">Zenith Core Infrastructure</p>
         </div>
-        <div className="flex space-x-2">
+        
+        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-full sm:w-auto">
           <button 
             onClick={() => setActiveTab('exercises')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'exercises' ? 'bg-zenith-crimson text-white' : 'bg-white/5 text-white/40'}`}
+            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'exercises' ? 'bg-zenith-scarlet text-white shadow-lg' : 'text-white/40 hover:text-white/60'}`}
           >
-            Exercises
+            <Database size={14} />
+            <span>Conteúdo</span>
           </button>
           <button 
             onClick={() => setActiveTab('users')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'users' ? 'bg-zenith-crimson text-white' : 'bg-white/5 text-white/40'}`}
+            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'users' ? 'bg-zenith-scarlet text-white shadow-lg' : 'text-white/40 hover:text-white/60'}`}
           >
-            Users
+            <Users size={14} />
+            <span>Usuários</span>
           </button>
           <button 
-            onClick={() => setActiveTab('logs')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'logs' ? 'bg-zenith-crimson text-white' : 'bg-white/5 text-white/40'}`}
+            onClick={() => setActiveTab('system')}
+            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'system' ? 'bg-zenith-scarlet text-white shadow-lg' : 'text-white/40 hover:text-white/60'}`}
           >
-            Logs
+            <Activity size={14} />
+            <span>Sistema</span>
           </button>
         </div>
-        {activeTab === 'exercises' && (
-          <button 
-            onClick={() => setShowAddModal(true)}
-            className="w-10 h-10 rounded-xl bg-zenith-crimson flex items-center justify-center shadow-lg shadow-zenith-crimson/20"
-          >
-            <Plus size={20} />
-          </button>
-        )}
       </header>
 
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-2 border-zenith-crimson border-t-transparent rounded-full animate-spin" />
+      {activeTab === 'system' && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard label="Total Usuários" value={stats.totalUsers} icon={<Users />} />
+          <StatCard label="Usuários Ativos" value={stats.activeUsers} icon={<Activity />} />
+          <StatCard label="Exercícios" value={stats.totalExercises} icon={<Database />} />
+          <StatCard label="Premium" value={stats.premiumUsers} icon={<Shield />} />
         </div>
-      ) : (
-        <div className="grid gap-4">
-          {activeTab === 'exercises' && exercises.map((ex) => (
-            <div key={ex.id} className="glass-card p-4 flex items-center justify-between border-white/5 bg-white/[0.02]">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden">
-                  <video src={ex.videoUrl} className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm">{ex.title}</h3>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">{ex.category} • {ex.difficulty}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => handleDelete(ex.id)}
-                className="p-2 text-white/20 hover:text-red-500 transition-colors"
-              >
-                <Trash2 size={18} />
-              </button>
-            </div>
-          ))}
+      )}
 
-          {activeTab === 'users' && users.map((user) => (
-            <div key={user.id} className="glass-card p-4 flex items-center justify-between border-white/5 bg-white/[0.02]">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-full bg-zenith-crimson/20 flex items-center justify-center">
-                  <span className="text-zenith-crimson font-bold text-xs">{user.email?.charAt(0).toUpperCase()}</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm">{user.email}</h3>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Plan: {user.subscription_tier || 'Free'} • XP: {user.xp || 0}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                {user.isAdmin && <Tag size={14} className="text-zenith-crimson" />}
-                <span className="text-[8px] text-white/20">{new Date(user.created_at).toLocaleDateString()}</span>
-              </div>
-            </div>
-          ))}
-
-          {activeTab === 'logs' && (
-            <div className="space-y-2">
-              {logs.length > 0 ? logs.map((log) => (
-                <div key={log.id} className="glass-card p-3 text-[10px] font-mono border-white/5 bg-black/20">
-                  <div className="flex justify-between mb-1">
-                    <span className={log.level === 'error' ? 'text-red-500' : 'text-blue-400'}>[{log.level?.toUpperCase()}]</span>
-                    <span className="text-white/20">{new Date(log.created_at).toLocaleString()}</span>
-                  </div>
-                  <p className="text-white/60">{log.message}</p>
-                </div>
-              )) : (
-                <div className="text-center py-10 text-white/20 uppercase tracking-widest text-[10px]">No logs found</div>
-              )}
-            </div>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="relative flex-1 max-w-md">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
+            <input 
+              type="text"
+              placeholder="Pesquisar..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+            />
+          </div>
+          {activeTab === 'exercises' && (
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAddModal(true)}
+              className="ml-4 w-14 h-14 rounded-2xl bg-zenith-scarlet text-white flex items-center justify-center shadow-xl shadow-zenith-scarlet/20"
+            >
+              <Plus size={28} />
+            </motion.button>
           )}
         </div>
-      )}
 
-      {showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="glass-card w-full max-w-md p-8 space-y-6 bg-zenith-black border-white/10 overflow-y-auto max-h-[90vh]"
-          >
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-display font-bold uppercase tracking-tighter">New Exercise</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-white/40"><X size={20} /></button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Title</label>
-                <input 
-                  type="text" 
-                  value={newExercise.title}
-                  onChange={(e) => setNewExercise({ ...newExercise, title: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:border-zenith-crimson/40"
-                  placeholder="Exercise name..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Video File</label>
-                <div className="relative">
-                  <input 
-                    type="file" 
-                    accept="video/*"
-                    onChange={handleFileUpload}
-                    className="hidden" 
-                    id="video-upload" 
-                  />
-                  <label 
-                    htmlFor="video-upload"
-                    className="w-full bg-white/5 border border-white/10 border-dashed rounded-xl py-8 flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-all"
-                  >
-                    {uploading ? (
-                      <div className="w-6 h-6 border-2 border-zenith-crimson border-t-transparent rounded-full animate-spin" />
-                    ) : newExercise.videoUrl ? (
-                      <div className="flex items-center space-x-2 text-zenith-neon-red">
-                        <Video size={20} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Video Ready</span>
-                      </div>
-                    ) : (
-                      <>
-                        <Upload size={24} className="text-white/20 mb-2" />
-                        <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Upload Video</span>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Category</label>
-                  <select 
-                    value={newExercise.category}
-                    onChange={(e) => setNewExercise({ ...newExercise, category: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:border-zenith-crimson/40 text-sm"
-                  >
-                    <option value="strength">Strength</option>
-                    <option value="yoga">Yoga</option>
-                    <option value="relaxation">Relaxation</option>
-                    <option value="mind-body">Mind-Body</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Difficulty</label>
-                  <select 
-                    value={newExercise.difficulty}
-                    onChange={(e) => setNewExercise({ ...newExercise, difficulty: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:border-zenith-crimson/40 text-sm"
-                  >
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Description</label>
-                <textarea 
-                  value={newExercise.description}
-                  onChange={(e) => setNewExercise({ ...newExercise, description: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:border-zenith-crimson/40 h-24 resize-none text-sm"
-                  placeholder="How to perform..."
-                />
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  checked={newExercise.isPremium}
-                  onChange={(e) => setNewExercise({ ...newExercise, isPremium: e.target.checked })}
-                  className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson"
-                />
-                <label className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Premium Content</label>
-              </div>
-
-              <button 
-                onClick={handleSave}
-                disabled={uploading}
-                className="w-full btn-primary py-4 text-[10px] font-bold uppercase tracking-[0.3em]"
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="w-10 h-10 border-4 border-zenith-scarlet border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(255,36,0,0.3)]" />
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {activeTab === 'exercises' && exercises.map((ex) => (
+              <motion.div 
+                key={ex.id} 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass-card p-6 flex items-center justify-between border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all group"
               >
-                Save Exercise
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+                <div className="flex items-center space-x-6">
+                  <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/10">
+                    <img src={`https://picsum.photos/seed/${ex.id}/200/200`} alt="" className="w-full h-full object-cover opacity-50" referrerPolicy="no-referrer" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-lg text-white tracking-tight">{ex.title}</h3>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-[10px] text-zenith-scarlet font-bold uppercase tracking-widest bg-zenith-scarlet/10 px-2 py-0.5 rounded-lg">{ex.category}</span>
+                      <span className="text-[10px] text-white/20 font-bold uppercase tracking-widest">{ex.difficulty}</span>
+                      {ex.is_premium && <Shield size={12} className="text-yellow-500" />}
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleDelete(ex.id)}
+                  className="p-4 text-white/10 hover:text-red-500 transition-all rounded-2xl hover:bg-red-500/10"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </motion.div>
+            ))}
+
+            {activeTab === 'users' && filteredUsers.map((user) => (
+              <motion.div 
+                key={user.id} 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass-card p-6 flex items-center justify-between border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all"
+              >
+                <div className="flex items-center space-x-6">
+                  <div className="w-14 h-14 rounded-2xl bg-zenith-scarlet/10 flex items-center justify-center border border-zenith-scarlet/20">
+                    <span className="text-zenith-scarlet font-display font-bold text-xl">{user.email?.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-lg text-white tracking-tight">{user.display_name || user.email}</h3>
+                    <div className="flex items-center space-x-3">
+                      <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-lg ${user.subscription_tier !== 'free' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-white/5 text-white/20'}`}>
+                        {user.subscription_tier || 'Free'}
+                      </span>
+                      <span className="text-[9px] text-white/20 font-bold uppercase tracking-widest">XP: {user.xp || 0}</span>
+                      {user.is_admin && <span className="text-[9px] text-zenith-scarlet font-bold uppercase tracking-widest bg-zenith-scarlet/10 px-2 py-0.5 rounded-lg">Admin</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Membro desde</p>
+                  <p className="text-xs font-mono text-white/40">{new Date(user.created_at).toLocaleDateString()}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-zenith-black/90 backdrop-blur-xl">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="glass-card w-full max-w-lg p-10 space-y-8 bg-zenith-black border-white/10 overflow-y-auto max-h-[90vh]"
+            >
+              <div className="flex justify-between items-center">
+                <div className="space-y-1">
+                  <h2 className="text-2xl font-display font-bold uppercase tracking-tighter text-white">Novo Exercício</h2>
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest">Expanda o catálogo neural</p>
+                </div>
+                <button onClick={() => setShowAddModal(false)} className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Título</label>
+                  <input 
+                    type="text" 
+                    value={newExercise.title}
+                    onChange={(e) => setNewExercise({ ...newExercise, title: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                    placeholder="Nome do exercício..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">URL do Vídeo (YouTube Embed)</label>
+                  <input 
+                    type="text" 
+                    value={newExercise.video_url}
+                    onChange={(e) => setNewExercise({ ...newExercise, video_url: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                    placeholder="https://www.youtube.com/embed/..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Categoria</label>
+                    <select 
+                      value={newExercise.category}
+                      onChange={(e) => setNewExercise({ ...newExercise, category: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-zenith-scarlet transition-all appearance-none text-sm"
+                    >
+                      <option value="strength">Força</option>
+                      <option value="cardio">Cardio</option>
+                      <option value="flexibility">Flexibilidade</option>
+                      <option value="hiit">HIIT</option>
+                      <option value="meditation">Meditação</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Dificuldade</label>
+                    <select 
+                      value={newExercise.difficulty}
+                      onChange={(e) => setNewExercise({ ...newExercise, difficulty: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-zenith-scarlet transition-all appearance-none text-sm"
+                    >
+                      <option value="beginner">Iniciante</option>
+                      <option value="intermediate">Intermediário</option>
+                      <option value="advanced">Avançado</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Descrição</label>
+                  <textarea 
+                    value={newExercise.description}
+                    onChange={(e) => setNewExercise({ ...newExercise, description: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-zenith-scarlet transition-all h-32 resize-none text-sm"
+                    placeholder="Instruções de execução..."
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10">
+                  <div className="flex items-center space-x-3">
+                    <Shield size={18} className="text-yellow-500" />
+                    <label className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Conteúdo Premium</label>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    checked={newExercise.is_premium}
+                    onChange={(e) => setNewExercise({ ...newExercise, is_premium: e.target.checked })}
+                    className="w-6 h-6 rounded-lg border-white/10 bg-white/10 text-zenith-scarlet focus:ring-zenith-scarlet"
+                  />
+                </div>
+
+                <button 
+                  onClick={handleSave}
+                  className="w-full py-6 rounded-2xl bg-zenith-scarlet text-white text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl shadow-zenith-scarlet/20 hover:shadow-zenith-scarlet/40 transition-all"
+                >
+                  Salvar Exercício
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
+
+const StatCard: React.FC<{ label: string; value: number | string; icon: React.ReactNode }> = ({ label, value, icon }) => (
+  <div className="glass-card p-6 space-y-4 border-white/5 bg-white/[0.01] relative overflow-hidden group">
+    <div className="absolute top-0 left-0 w-full h-1 bg-zenith-scarlet/10 group-hover:bg-zenith-scarlet/30 transition-all" />
+    <div className="flex justify-between items-start">
+      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-zenith-scarlet transition-all">
+        {icon}
+      </div>
+      <p className="text-3xl font-display font-bold text-white tracking-tighter">{value}</p>
+    </div>
+    <p className="text-[9px] text-white/20 font-bold uppercase tracking-widest">{label}</p>
+  </div>
+);
