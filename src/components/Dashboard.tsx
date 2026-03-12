@@ -5,7 +5,7 @@ import { ZenithLogo } from './ZenithLogo';
 import { RoutineSystem } from './RoutineSystem';
 import { FocusTimer } from './FocusTimer';
 import { motion } from 'framer-motion';
-import { Zap, Target, TrendingUp, Wallet, User, MessageSquare, Sparkles, Brain, Activity, ArrowUpRight, Timer, Dumbbell } from 'lucide-react';
+import { Zap, Target, TrendingUp, User, MessageSquare, Sparkles, Brain, ArrowUpRight, Timer } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 
 interface DashboardProps {
@@ -19,6 +19,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
 
   const [isAIOpen, setIsAIOpen] = useState(false);
   const { level, levelName } = useGamification();
+
+  if (!userData) return null;
 
   const greeting =
     t?.dashboard?.aiGreeting?.split?.('.')?.[0] ||
@@ -78,18 +80,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
           <div className="w-full h-full rounded-[20px] bg-zenith-black flex items-center justify-center overflow-hidden relative z-10 border border-white/10">
 
             {userData?.photoURL ? (
-
               <img
                 src={userData.photoURL}
                 alt="Profile"
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
-
             ) : (
-
               <User size={32} className="text-white/10" />
-
             )}
 
           </div>
@@ -109,7 +107,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
 
         <div className="flex items-center space-x-4 relative z-10">
 
-          <div className="w-12 h-12 relative">
+          {/* Corrigido tamanho do InfinityAI */}
+          <div className="scale-[0.25] origin-left">
             <InfinityAI isResponding={false} />
           </div>
 
@@ -133,8 +132,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-white/10 transition-all">
           <MessageSquare size={18} className="text-zenith-cyan" />
         </div>
-
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-32 h-32 bg-zenith-cyan/5 blur-[40px] rounded-full pointer-events-none" />
 
       </section>
 
