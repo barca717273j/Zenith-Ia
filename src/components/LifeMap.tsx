@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Activity, Brain, Target, Zap, Heart, Users, Briefcase, Compass } from 'lucide-react';
+import { supabase } from '../supabase';
 
 const connections = [
   ['health', 'knowledge'],
@@ -19,15 +20,63 @@ interface LifeMapProps {
 }
 
 export const LifeMap: React.FC<LifeMapProps> = ({ userData, t }) => {
+  const [progressData, setProgressData] = React.useState<Record<string, number>>({
+    health: 0.5,
+    wealth: 0.3,
+    knowledge: 0.4,
+    relationships: 0.6,
+    growth: 0.7,
+    career: 0.4,
+    creativity: 0.3,
+    spiritual: 0.2
+  });
+
+  const fetchProgress = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // 1. Health (Exercises)
+    const { count: exerciseCount } = await supabase.from('exercise_history').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+    
+    // 2. Wealth (Finance Goals)
+    const { data: goals } = await supabase.from('finance_goals').select('current_amount, target_amount').eq('user_id', user.id);
+    const wealthProgress = goals?.length ? goals.reduce((acc, g) => acc + (g.current_amount / g.target_amount), 0) / goals.length : 0.1;
+
+    // 3. Knowledge (Mental Gym - using focus_minutes as proxy)
+    const { data: uData } = await supabase.from('users').select('focus_minutes, xp, level').eq('id', user.id).single();
+    const knowledgeProgress = Math.min(1, (uData?.focus_minutes || 0) / 500);
+
+    // 4. Relationships (Social posts)
+    const { count: postCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+
+    // 5. Growth (Level)
+    const growthProgress = Math.min(1, (uData?.level || 1) / 50);
+
+    setProgressData({
+      health: Math.min(1, (exerciseCount || 0) / 20 + 0.1),
+      wealth: Math.min(1, wealthProgress + 0.1),
+      knowledge: Math.min(1, knowledgeProgress + 0.1),
+      relationships: Math.min(1, (postCount || 0) / 10 + 0.1),
+      growth: growthProgress,
+      career: Math.min(1, (uData?.focus_minutes || 0) / 1000 + 0.2),
+      creativity: 0.4, // Placeholder for now
+      spiritual: 0.3 // Placeholder for now
+    });
+  };
+
+  React.useEffect(() => {
+    fetchProgress();
+  }, []);
+
   const categories = [
-    { id: 'health', label: t.map.categories.health, x: 100, y: 100, progress: 0.8, icon: <Heart size={14} /> },
-    { id: 'wealth', label: t.map.categories.wealth, x: 300, y: 150, progress: 0.4, icon: <Zap size={14} /> },
-    { id: 'knowledge', label: t.map.categories.mind, x: 200, y: 300, progress: 0.6, icon: <Brain size={14} /> },
-    { id: 'relationships', label: t.map.categories.social, x: 50, y: 400, progress: 0.9, icon: <Users size={14} /> },
-    { id: 'growth', label: t.map.categories.growth, x: 350, y: 450, progress: 0.7, icon: <Activity size={14} /> },
-    { id: 'career', label: t.map.categories.career, x: 150, y: 550, progress: 0.5, icon: <Briefcase size={14} /> },
-    { id: 'creativity', label: t.map.categories.leisure, x: 300, y: 650, progress: 0.3, icon: <Sparkles size={14} /> },
-    { id: 'spiritual', label: t.map.categories.spirit, x: 50, y: 700, progress: 0.2, icon: <Compass size={14} /> },
+    { id: 'health', label: t.map.categories.health, x: 100, y: 100, progress: progressData.health, icon: <Heart size={14} /> },
+    { id: 'wealth', label: t.map.categories.wealth, x: 300, y: 150, progress: progressData.wealth, icon: <Zap size={14} /> },
+    { id: 'knowledge', label: t.map.categories.mind, x: 200, y: 300, progress: progressData.knowledge, icon: <Brain size={14} /> },
+    { id: 'relationships', label: t.map.categories.social, x: 50, y: 400, progress: progressData.relationships, icon: <Users size={14} /> },
+    { id: 'growth', label: t.map.categories.growth, x: 350, y: 450, progress: progressData.growth, icon: <Activity size={14} /> },
+    { id: 'career', label: t.map.categories.career, x: 150, y: 550, progress: progressData.career, icon: <Briefcase size={14} /> },
+    { id: 'creativity', label: t.map.categories.leisure, x: 300, y: 650, progress: progressData.creativity, icon: <Sparkles size={14} /> },
+    { id: 'spiritual', label: t.map.categories.spirit, x: 50, y: 700, progress: progressData.spiritual, icon: <Compass size={14} /> },
   ];
 
   return (

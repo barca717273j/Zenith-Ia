@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../supabase';
 
-export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
+export const AdminPanel: React.FC<{ t: any; userData: any }> = ({ t, userData }) => {
   const [activeTab, setActiveTab] = useState<'exercises' | 'users' | 'system'>('exercises');
   const [exercises, setExercises] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
@@ -21,6 +21,8 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [newTier, setNewTier] = useState('');
   
   const [newExercise, setNewExercise] = useState({
     title: '',
@@ -72,6 +74,95 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
       totalExercises: exCount || 0,
       premiumUsers: premCount || 0
     });
+  };
+
+  const handleUpdateTier = async () => {
+    if (!selectedUser || !newTier) return;
+    const { error } = await supabase
+      .from('users')
+      .update({ subscription_tier: newTier })
+      .eq('id', selectedUser.id);
+    
+    if (!error) {
+      setUsers(users.map(u => u.id === selectedUser.id ? { ...u, subscription_tier: newTier } : u));
+      setSelectedUser(null);
+      setNewTier('');
+    }
+  };
+
+  const handleSeedData = async () => {
+    if (!confirm('Deseja popular o banco com dados profissionais?')) return;
+    setLoading(true);
+    
+    const seedExercises = [
+      {
+        title: 'Treino A - Peito e Tríceps',
+        description: 'Foco em hipertrofia de empurrar. Supino Reto, Supino Inclinado, Crucifixo, Tríceps Corda e Tríceps Testa.',
+        category: 'split',
+        duration: '60 min',
+        difficulty: 'intermediate',
+        is_premium: true,
+        video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        xp_reward: 150
+      },
+      {
+        title: 'Yoga para Foco Mental',
+        description: 'Sessão guiada para clareza e redução de ansiedade. Foco em respiração e equilíbrio.',
+        category: 'yoga',
+        duration: '20 min',
+        difficulty: 'beginner',
+        is_premium: false,
+        video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        xp_reward: 80
+      },
+      {
+        title: 'Meditação de Visualização',
+        description: 'Técnica de visualização criativa para metas de longo prazo.',
+        category: 'mind',
+        duration: '15 min',
+        difficulty: 'beginner',
+        is_premium: false,
+        video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        xp_reward: 60
+      },
+      {
+        title: 'Dieta de Alta Performance',
+        description: 'Sugestões de refeições para manter energia estável durante o dia.',
+        category: 'nutrition',
+        duration: '10 min',
+        difficulty: 'beginner',
+        is_premium: true,
+        video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        xp_reward: 50
+      }
+    ];
+
+    const { error } = await supabase.from('exercises').insert(seedExercises);
+    
+    // Seed Finance Budgets and Goals for the admin
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const seedBudgets = [
+        { user_id: user.id, category: 'Alimentação', limit_amount: 1500, current_amount: 0 },
+        { user_id: user.id, category: 'Transporte', limit_amount: 500, current_amount: 0 },
+        { user_id: user.id, category: 'Lazer', limit_amount: 800, current_amount: 0 }
+      ];
+      const seedGoals = [
+        { user_id: user.id, title: 'Fundo de Emergência', target_amount: 10000, current_amount: 2500, deadline: '2026-12-31' },
+        { user_id: user.id, title: 'Viagem Zenith', target_amount: 5000, current_amount: 1200, deadline: '2026-08-15' }
+      ];
+      
+      await supabase.from('finance_budgets').insert(seedBudgets);
+      await supabase.from('finance_goals').insert(seedGoals);
+    }
+
+    if (!error) {
+      alert('Dados semeados com sucesso!');
+      fetchExercises();
+    } else {
+      console.error('Seed error:', error);
+    }
+    setLoading(false);
   };
 
   const handleSave = async () => {
@@ -175,14 +266,25 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
             />
           </div>
           {activeTab === 'exercises' && (
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowAddModal(true)}
-              className="ml-4 w-14 h-14 rounded-2xl bg-zenith-scarlet text-white flex items-center justify-center shadow-xl shadow-zenith-scarlet/20"
-            >
-              <Plus size={28} />
-            </motion.button>
+            <div className="flex space-x-2">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSeedData}
+                className="w-14 h-14 rounded-2xl bg-white/5 text-white/40 flex items-center justify-center border border-white/10"
+                title="Seed Data"
+              >
+                <Database size={20} />
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowAddModal(true)}
+                className="w-14 h-14 rounded-2xl bg-zenith-scarlet text-white flex items-center justify-center shadow-xl shadow-zenith-scarlet/20"
+              >
+                <Plus size={28} />
+              </motion.button>
+            </div>
           )}
         </div>
 
@@ -243,15 +345,96 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Membro desde</p>
-                  <p className="text-xs font-mono text-white/40">{new Date(user.created_at).toLocaleDateString()}</p>
+                <div className="flex items-center space-x-3">
+                  <button 
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setNewTier(user.subscription_tier || 'Free');
+                    }}
+                    className="p-4 text-white/10 hover:text-zenith-scarlet transition-all rounded-2xl hover:bg-zenith-scarlet/10"
+                  >
+                    <Settings size={20} />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(user.id)}
+                    className="p-4 text-white/10 hover:text-red-500 transition-all rounded-2xl hover:bg-red-500/10"
+                  >
+                    <Trash2 size={20} />
+                  </button>
                 </div>
               </motion.div>
             ))}
           </div>
         )}
       </div>
+
+      {/* User Management Modal */}
+      <AnimatePresence>
+        {selectedUser && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-zenith-black/90 backdrop-blur-xl">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="glass-card w-full max-w-md p-10 space-y-8 bg-zenith-black border-white/10"
+            >
+              <div className="flex justify-between items-center">
+                <div className="space-y-1">
+                  <h2 className="text-2xl font-display font-bold uppercase tracking-tighter text-white">Gerenciar Usuário</h2>
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest">{selectedUser.display_name || selectedUser.email}</p>
+                </div>
+                <button onClick={() => setSelectedUser(null)} className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">Plano de Assinatura</label>
+                  <select 
+                    value={newTier}
+                    onChange={(e) => setNewTier(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-zenith-scarlet transition-all appearance-none text-sm"
+                  >
+                    <option value="Free">Free</option>
+                    <option value="Pro">Pro</option>
+                    <option value="Elite">Elite</option>
+                    <option value="Master">Master</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10">
+                  <div className="flex items-center space-x-3">
+                    <Shield size={18} className="text-zenith-scarlet" />
+                    <label className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Privilégios Admin</label>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedUser.is_admin}
+                    onChange={async (e) => {
+                      const { error } = await supabase
+                        .from('users')
+                        .update({ is_admin: e.target.checked })
+                        .eq('id', selectedUser.id);
+                      if (!error) {
+                        setUsers(users.map(u => u.id === selectedUser.id ? { ...u, is_admin: e.target.checked } : u));
+                        setSelectedUser({ ...selectedUser, is_admin: e.target.checked });
+                      }
+                    }}
+                    className="w-6 h-6 rounded-lg border-white/10 bg-white/10 text-zenith-scarlet focus:ring-zenith-scarlet"
+                  />
+                </div>
+
+                <button 
+                  onClick={handleUpdateTier}
+                  className="w-full py-6 rounded-2xl bg-zenith-scarlet text-white text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl shadow-zenith-scarlet/20 hover:shadow-zenith-scarlet/40 transition-all"
+                >
+                  Salvar Alterações
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Add Modal */}
       <AnimatePresence>
@@ -303,11 +486,13 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
                       onChange={(e) => setNewExercise({ ...newExercise, category: e.target.value })}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:border-zenith-scarlet transition-all appearance-none text-sm"
                     >
-                      <option value="strength">Força</option>
-                      <option value="cardio">Cardio</option>
-                      <option value="flexibility">Flexibilidade</option>
-                      <option value="hiit">HIIT</option>
-                      <option value="meditation">Meditação</option>
+                      <option value="training">Treino</option>
+                      <option value="body">Corpo</option>
+                      <option value="mind">Mente</option>
+                      <option value="spirituality">Espírito</option>
+                      <option value="nutrition">Nutrição</option>
+                      <option value="yoga">Yoga</option>
+                      <option value="split">Divisões</option>
                     </select>
                   </div>
                   <div className="space-y-2">

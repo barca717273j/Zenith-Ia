@@ -1,4 +1,99 @@
-export type SubscriptionTier = 'basic' | 'pro' | 'elite' | 'master';
+export type SubscriptionTier = 'free' | 'pro' | 'elite' | 'master';
+
+export type UserIdentity = 'discipline_warrior' | 'strategic_mind' | 'mental_athlete' | 'wealth_builder' | 'focus_monk';
+
+export type MascoteState = 'sleeping' | 'energized' | 'happy' | 'tired';
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  display_name: string;
+  language: 'en' | 'pt-BR' | 'pt-PT' | 'fr' | 'es' | 'ja';
+  subscription_tier: SubscriptionTier;
+  energy_level: number;
+  xp: number;
+  level: number;
+  streak: number;
+  onboarding_completed: boolean;
+  identity?: UserIdentity;
+  life_score: number;
+  mascote_state: MascoteState;
+  bio?: string;
+  is_private: boolean;
+  photo_url?: string;
+  is_admin?: boolean;
+  focus_minutes?: number;
+  tasks_completed?: number;
+  habits_count?: number;
+  missions_completed?: number;
+  finance_goals_reached?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface HotStreak {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  streak_count: number;
+  last_activity: string;
+  status: 'active' | 'dead';
+}
+
+export interface SocialPost {
+  id: string;
+  user_id: string;
+  content: string;
+  type: 'achievement' | 'routine' | 'photo' | 'text';
+  image_url?: string;
+  boosts: number;
+  created_at: string;
+  comments_count?: number;
+}
+
+export interface SocialComment {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  user?: {
+    display_name: string;
+    photo_url: string;
+  };
+}
+
+export interface Follow {
+  follower_id: string;
+  following_id: string;
+  created_at: string;
+}
+
+export interface Habit {
+  id: string;
+  user_id: string;
+  title: string;
+  category: string;
+  icon: string;
+  target_value: number;
+  current_value: number;
+  unit: string;
+  streak: number;
+  xp_reward: number;
+  last_completed?: string;
+  created_at?: string;
+}
+
+export interface Routine {
+  id: string;
+  user_id: string;
+  time: string;
+  task: string;
+  category: string;
+  period: 'morning' | 'afternoon' | 'evening';
+  icon: string;
+  created_at?: string;
+}
 
 export interface TierLimits {
   aiMessagesPerDay: number;
@@ -12,7 +107,7 @@ export interface TierLimits {
 }
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
-  basic: {
+  free: {
     aiMessagesPerDay: 5,
     hasFullRoutines: false,
     hasExercises: false,

@@ -66,7 +66,7 @@ export const Subscription: React.FC<SubscriptionProps> = ({ userData, t }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          priceId: `price_${planId}_placeholder`, // In real app, use actual Stripe price IDs
+          planId,
           userId: userData.id,
           email: userData.email
         }),
@@ -135,14 +135,14 @@ export const Subscription: React.FC<SubscriptionProps> = ({ userData, t }) => {
 
             <button
               onClick={() => handleSubscribe(plan.id)}
-              disabled={loading !== null || userData?.subscriptionTier === plan.id}
+              disabled={loading !== null || userData?.subscription_tier?.toLowerCase() === plan.id.toLowerCase()}
               className={`w-full py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center space-x-3 ${plan.button} disabled:opacity-50`}
             >
               {loading === plan.id ? (
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>{userData?.subscriptionTier === plan.id ? t.common.currentPlan : t.common.get}</span>
+                  <span>{userData?.subscription_tier?.toLowerCase() === plan.id.toLowerCase() ? t.common.currentPlan : t.common.get}</span>
                   <ArrowRight size={14} />
                 </>
               )}

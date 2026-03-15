@@ -45,17 +45,17 @@ export const ZenithLogo: React.FC<ZenithLogoProps> = ({ size = 40, className = "
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* Central Geometric Symbol */}
+        {/* Minimalist Z Logo */}
         <motion.path
-          d="M 50 20 L 80 50 L 50 80 L 20 50 Z"
+          d="M 30 30 L 70 30 L 30 70 L 70 70"
           stroke="url(#zenith-grad)"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          strokeWidth="12"
+          strokeLinecap="square"
+          strokeLinejoin="miter"
           filter="url(#zenith-glow)"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 2, ease: "easeInOut" }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
         />
 
         {/* Inner Core */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, ListTodo, Dumbbell, Wallet, User, ShieldCheck } from 'lucide-react';
+import { Home, ListTodo, Dumbbell, Wallet, User, ShieldCheck, Users } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface NavItemProps {
@@ -63,6 +63,12 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab,
           label={t.nav.finance}
           isActive={activeTab === 'finance'}
           onClick={() => setActiveTab('finance')}
+        />
+        <NavItem
+          icon={<Users size={20} />}
+          label={t.social.title}
+          isActive={activeTab === 'social'}
+          onClick={() => setActiveTab('social')}
         />
         <NavItem
           icon={<User size={20} />}

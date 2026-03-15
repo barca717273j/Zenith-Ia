@@ -2,16 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Play, Pause, RotateCcw, Zap, Sparkles, Timer, Brain } from 'lucide-react';
 import { useGamification } from './GamificationContext';
+import { supabase } from '../supabase';
 
-export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFullPage = false }) => {
+export const FocusTimer: React.FC<{ t: any; userData: any; isFullPage?: boolean }> = ({ t, userData, isFullPage = false }) => {
   const [mode, setMode] = useState<'focus' | 'break'>('focus');
+  const [focusDuration, setFocusDuration] = useState(25 * 60);
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
   const [sessions, setSessions] = useState(0);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customMinutes, setCustomMinutes] = useState('25');
   const { addXP } = useGamification();
 
-  const FOCUS_TIME = 25 * 60;
+  const saveFocusSession = async (duration: number) => {
+    if (!userData?.id) return;
+    try {
+      await supabase.from('focus_sessions').insert([{
+        user_id: userData.id,
+        duration: duration,
+        mode: 'focus'
+      }]);
+    } catch (err) {
+      console.error('Error saving focus session:', err);
+    }
+  };
+
   const BREAK_TIME = 5 * 60;
+
+  const presets = [15, 25, 45, 60];
 
   useEffect(() => {
     let interval: any = null;
@@ -24,27 +42,44 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
       if (mode === 'focus') {
         addXP(100);
         setSessions(s => s + 1);
+        saveFocusSession(focusDuration);
         setMode('break');
         setTimeLeft(BREAK_TIME);
-        if (Notification.permission === 'granted') {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
           new Notification('Zenith Focus', { body: 'Focus session complete! Time for a break.' });
         }
       } else {
         setMode('focus');
-        setTimeLeft(FOCUS_TIME);
-        if (Notification.permission === 'granted') {
+        setTimeLeft(focusDuration);
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
           new Notification('Zenith Focus', { body: 'Break over! Ready to focus?' });
         }
       }
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, mode, addXP]);
+  }, [isActive, timeLeft, mode, addXP, focusDuration]);
 
   const toggleTimer = () => setIsActive(!isActive);
   const resetTimer = () => {
     setIsActive(false);
     setMode('focus');
-    setTimeLeft(FOCUS_TIME);
+    setTimeLeft(focusDuration);
+  };
+
+  const handlePresetClick = (mins: number) => {
+    setIsActive(false);
+    setFocusDuration(mins * 60);
+    setTimeLeft(mins * 60);
+    setMode('focus');
+    setShowCustomInput(false);
+  };
+
+  const handleCustomSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mins = parseInt(customMinutes);
+    if (!isNaN(mins) && mins > 0) {
+      handlePresetClick(mins);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -53,7 +88,7 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const totalTime = mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
+  const totalTime = mode === 'focus' ? focusDuration : BREAK_TIME;
   const progress = ((totalTime - timeLeft) / totalTime) * 100;
 
   return (
@@ -79,6 +114,50 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
           </span>
         </div>
       </div>
+
+      {/* Time Presets */}
+      {!isActive && mode === 'focus' && (
+        <div className="flex flex-wrap justify-center gap-2 relative z-10">
+          {presets.map((mins) => (
+            <button
+              key={mins}
+              onClick={() => handlePresetClick(mins)}
+              className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
+                focusDuration === mins * 60 
+                  ? 'bg-white text-black' 
+                  : 'bg-white/5 text-white/40 border border-white/5 hover:bg-white/10'
+              }`}
+            >
+              {mins}m
+            </button>
+          ))}
+          <button
+            onClick={() => setShowCustomInput(!showCustomInput)}
+            className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
+              showCustomInput 
+                ? 'bg-zenith-scarlet text-white' 
+                : 'bg-white/5 text-white/40 border border-white/5 hover:bg-white/10'
+            }`}
+          >
+            Custom
+          </button>
+        </div>
+      )}
+
+      {showCustomInput && !isActive && mode === 'focus' && (
+        <form onSubmit={handleCustomSubmit} className="flex items-center space-x-2 relative z-10 justify-center">
+          <input
+            type="number"
+            value={customMinutes}
+            onChange={(e) => setCustomMinutes(e.target.value)}
+            className="w-20 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-center text-white font-bold focus:outline-none focus:border-zenith-scarlet/50"
+            placeholder="Mins"
+          />
+          <button type="submit" className="bg-zenith-scarlet text-white px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+            Set
+          </button>
+        </form>
+      )}
 
       <div className="relative flex items-center justify-center py-10">
         {/* Progress Ring */}

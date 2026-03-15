@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield, Camera, Mail, Lock, Globe, Save, AlertCircle } from 'lucide-react';
+import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield, Camera, Mail, Lock, Globe, Save, AlertCircle, Timer } from 'lucide-react';
 import { Subscription } from './Subscription';
 import { TetrisGame } from './TetrisGame';
 import { Journal } from './Journal';
@@ -50,6 +50,44 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userData.id}-${Math.random()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ photo_url: publicUrl })
+        .eq('id', userData.id);
+
+      if (updateError) throw updateError;
+
+      setEditPhoto(publicUrl);
+      await onUpdate();
+      setMessage({ type: 'success', text: 'Foto atualizada com sucesso!' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleUpdateProfile = async () => {
@@ -125,17 +163,26 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
                   <div className="w-32 h-32 rounded-full border-2 border-white/5 p-1 bg-white/[0.02] backdrop-blur-xl overflow-hidden">
                     <img src={editPhoto || 'https://picsum.photos/seed/user/200'} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                   </div>
-                  <button className="absolute bottom-0 right-0 w-10 h-10 rounded-xl bg-zenith-scarlet flex items-center justify-center border border-white/20 shadow-lg">
+                  <label className="absolute bottom-0 right-0 w-10 h-10 rounded-xl bg-zenith-scarlet flex items-center justify-center border border-white/20 shadow-lg cursor-pointer hover:scale-110 transition-transform">
                     <Camera size={18} />
-                  </button>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                    />
+                  </label>
                 </div>
-                <input 
-                  type="text" 
-                  value={editPhoto}
-                  onChange={(e) => setEditPhoto(e.target.value)}
-                  placeholder="URL da Imagem de Perfil"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all placeholder:text-white/10"
-                />
+                <div className="w-full space-y-2">
+                  <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold ml-1">Ou insira uma URL</label>
+                  <input 
+                    type="text" 
+                    value={editPhoto}
+                    onChange={(e) => setEditPhoto(e.target.value)}
+                    placeholder="URL da Imagem de Perfil"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all placeholder:text-white/10"
+                  />
+                </div>
               </div>
 
               <div className="space-y-6">
@@ -345,10 +392,31 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
             </header>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-5">
-              <StatItem icon={<Zap size={18} />} label="XP Total" value={xp.toString()} color="text-zenith-scarlet" />
-              <StatItem icon={<Flame size={18} />} label="Streak" value={`${streak}d`} color="text-orange-500" />
-              <StatItem icon={<Award size={18} />} label="Rank" value={`#${level}`} color="text-zenith-scarlet" />
+            <div className="grid grid-cols-2 gap-4">
+              <StatItem 
+                icon={<Zap size={18} />} 
+                label={t.profile.stats.xp} 
+                value={xp.toLocaleString()} 
+                color="text-zenith-scarlet" 
+              />
+              <StatItem 
+                icon={<Flame size={18} />} 
+                label={t.profile.stats.streak} 
+                value={`${streak}d`} 
+                color="text-orange-500" 
+              />
+              <StatItem 
+                icon={<Timer size={18} />} 
+                label={t.profile.stats.focus} 
+                value={`${userData.focus_minutes || 0}m`} 
+                color="text-purple-500" 
+              />
+              <StatItem 
+                icon={<Sparkles size={18} />} 
+                label={t.profile.stats.missions} 
+                value={(userData.missions_completed || 0).toString()} 
+                color="text-zenith-cyan" 
+              />
             </div>
 
             <div className="space-y-4">
@@ -380,7 +448,7 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
               <MenuButton 
                 icon={<User size={20} />} 
                 label={t.profile.editProfile} 
-                sublabel="Editar perfil e dados pessoais" 
+                sublabel={t.profile.editProfileDesc} 
                 onClick={() => setView('edit-profile')} 
               />
               <MenuButton 
@@ -398,7 +466,7 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
               <MenuButton 
                 icon={<Shield size={20} />} 
                 label={t.profile.security} 
-                sublabel="Senha e autenticação" 
+                sublabel={t.profile.securityDesc} 
                 onClick={() => setView('security')} 
               />
               <MenuButton 
@@ -408,6 +476,21 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
                 onClick={handleLogout} 
                 danger
               />
+              
+              <div className="pt-8">
+                <button 
+                  onClick={() => {
+                    if (window.confirm(t.profile.deleteConfirm)) {
+                      // Logic for account deletion would go here
+                      supabase.auth.signOut();
+                    }
+                  }}
+                  className="w-full p-5 rounded-2xl border border-red-500/20 bg-red-500/5 flex items-center justify-center space-x-3 text-red-500/60 hover:text-red-500 hover:bg-red-500/10 transition-all group"
+                >
+                  <LogOut size={18} />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t.profile.deleteAccount}</span>
+                </button>
+              </div>
             </div>
 
             <div className="pt-12 pb-8 text-center">

@@ -11,50 +11,34 @@ interface AuthProps {
 import { translations, Language } from '../translations';
 
 export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [language, setLanguage] = useState<Language>('pt-BR');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const t = translations[language];
-
-  const languages: { code: Language; label: string; flag: string }[] = [
-    { code: 'pt-BR', label: 'Português (Brasil)', flag: '🇧🇷' },
-    { code: 'pt-PT', label: 'Português (Portugal)', flag: '🇵🇹' },
-    { code: 'en', label: 'English', flag: '🇺🇸' },
-    { code: 'fr', label: 'Français', flag: '🇫🇷' },
-    { code: 'es', label: 'Español', flag: '🇪🇸' },
-    { code: 'ja', label: '日本語', flag: '🇯🇵' },
-  ];
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    if (!isLogin) {
-      if (password !== confirmPassword) {
-        setError('As senhas não coincidem');
-        setLoading(false);
-        return;
-      }
-      if (!acceptTerms || !acceptPrivacy) {
-        setError('Você deve aceitar os termos e a política de privacidade');
-        setLoading(false);
-        return;
-      }
-    }
-
     try {
-      if (isLogin) {
+      if (authMode === 'forgot') {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        });
+        if (error) throw error;
+        setResetSent(true);
+      } else if (authMode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -62,6 +46,18 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
         if (error) throw error;
         onSuccess();
       } else {
+        // Register
+        if (password !== confirmPassword) {
+          setError(t.common.passwordsDoNotMatch);
+          setLoading(false);
+          return;
+        }
+        if (!acceptTerms) {
+          setError(t.common.mustAcceptTerms);
+          setLoading(false);
+          return;
+        }
+
         const { data: { user }, error } = await supabase.auth.signUp({
           email,
           password,
@@ -84,13 +80,12 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                 subscription_tier: 'free',
                 energy_level: 100,
                 display_name: fullName,
-                photo_url: user.user_metadata?.avatar_url || ''
+                photo_url: user.user_metadata?.avatar_url || '',
+                onboarding_completed: false
               }
             ]);
           if (profileError) console.error('Profile creation error:', profileError);
           
-          // If session is created immediately (no email confirm), call onSuccess
-          // Otherwise show success message
           const { data: { session } } = await supabase.auth.getSession();
           if (session) {
             onSuccess();
@@ -108,6 +103,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
   const handleGoogle = async () => {
     setLoading(true);
+    setError('');
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -118,9 +114,20 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
       if (error) throw error;
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
+  };
+
+  const isFormValid = () => {
+    if (authMode === 'forgot') return email.length > 0;
+    if (authMode === 'login') return email.length > 0 && password.length >= 6;
+    return (
+      fullName.length > 0 &&
+      email.length > 0 &&
+      password.length >= 6 &&
+      password === confirmPassword &&
+      acceptTerms
+    );
   };
 
   const getPasswordStrength = (pass: string) => {
@@ -169,22 +176,102 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                 <Sparkles className="text-zenith-scarlet w-10 h-10" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Conta Criada!</h2>
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tight">{t.common.accountCreated}</h2>
                 <p className="text-white/60 text-sm leading-relaxed">
-                  Enviamos um link de confirmação para seu e-mail. Por favor, verifique sua caixa de entrada para ativar seu acesso ao Zenith.
+                  {t.common.confirmationEmailSent}
                 </p>
               </div>
               <button
                 onClick={() => {
                   setSuccess(false);
-                  setIsLogin(true);
+                  setAuthMode('login');
                 }}
                 className="w-full btn-secondary py-4 text-[10px] font-bold uppercase tracking-widest"
               >
-                Voltar para Login
+                {t.common.backToLogin}
               </button>
             </motion.div>
-          ) : isLogin ? (
+          ) : resetSent ? (
+            <motion.div
+              key="reset-sent"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center space-y-6 py-8"
+            >
+              <div className="w-20 h-20 bg-zenith-scarlet/20 rounded-full flex items-center justify-center mx-auto border border-zenith-scarlet/30 shadow-[0_0_30px_rgba(255,36,0,0.2)]">
+                <Mail className="text-zenith-scarlet w-10 h-10" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tight">{t.common.emailSent}</h2>
+                <p className="text-white/60 text-sm leading-relaxed">
+                  {t.common.resetLinkSent}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setResetSent(false);
+                  setAuthMode('login');
+                }}
+                className="w-full btn-secondary py-4 text-[10px] font-bold uppercase tracking-widest"
+              >
+                {t.common.backToLogin}
+              </button>
+            </motion.div>
+          ) : authMode === 'forgot' ? (
+            <motion.div
+              key="forgot"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-6"
+            >
+              <div className="space-y-2 text-center">
+                <h2 className="text-xl font-bold text-white uppercase tracking-tight">{t.common.recoverPassword}</h2>
+                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">{t.common.enterEmailToReset}</p>
+              </div>
+              <form onSubmit={handleAuth} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-neon-red transition-colors">
+                      <Mail size={18} />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      placeholder="seu@email.com"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || !isFormValid()}
+                  className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl disabled:opacity-50 disabled:grayscale"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>{t.common.sending}</span>
+                    </div>
+                  ) : (
+                    <span>{t.common.recoverPassword}</span>
+                  )}
+                </button>
+              </form>
+              <div className="text-center">
+                <button
+                  onClick={() => setAuthMode('login')}
+                  className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                >
+                  {t.common.backToLogin}
+                </button>
+              </div>
+            </motion.div>
+          ) : authMode === 'login' ? (
             <motion.div
               key="login"
               initial={{ opacity: 0, x: -20 }}
@@ -213,7 +300,11 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
-                    <button type="button" className="text-[9px] text-zenith-neon-red hover:underline uppercase tracking-widest font-bold">
+                    <button 
+                      type="button" 
+                      onClick={() => setAuthMode('forgot')}
+                      className="text-[9px] text-zenith-neon-red hover:underline uppercase tracking-widest font-bold"
+                    >
                       {t.common.forgotPassword}
                     </button>
                   </div>
@@ -241,11 +332,14 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl"
+                  disabled={loading || !isFormValid()}
+                  className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl disabled:opacity-50 disabled:grayscale"
                 >
                   {loading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>{t.common.entering}</span>
+                    </div>
                   ) : (
                     <span>{t.common.enterZenith}</span>
                   )}
@@ -254,7 +348,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
               <div className="text-center">
                 <button
-                  onClick={() => setIsLogin(false)}
+                  onClick={() => setAuthMode('register')}
                   className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
                 >
                   {t.common.dontHaveAccount}
@@ -278,7 +372,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
-                    placeholder="Seu nome completo"
+                    placeholder={t.common.fullNamePlaceholder}
                   />
                 </div>
 
@@ -336,45 +430,38 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                    className={`w-full bg-white/5 border rounded-2xl py-4 px-4 focus:outline-none transition-all text-sm font-medium ${password && confirmPassword && password !== confirmPassword ? 'border-red-500' : 'border-white/10 focus:border-zenith-neon-red'}`}
                     placeholder="••••••••"
                   />
                 </div>
 
                 <div className="space-y-3 py-2">
-                  <div className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      checked={acceptTerms}
-                      onChange={(e) => setAcceptTerms(e.target.checked)}
-                      className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
-                    />
-                    <label htmlFor="terms" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors">
-                      {t.common.termsAccepted}
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      id="privacy"
-                      checked={acceptPrivacy}
-                      onChange={(e) => setAcceptPrivacy(e.target.checked)}
-                      className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
-                    />
-                    <label htmlFor="privacy" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors">
-                      Aceito a Política de Privacidade
+                  <div className="flex items-start space-x-3">
+                    <div className="pt-0.5">
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        checked={acceptTerms}
+                        onChange={(e) => setAcceptTerms(e.target.checked)}
+                        className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
+                      />
+                    </div>
+                    <label htmlFor="terms" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors leading-relaxed">
+                      {t.common.iAgreeTo} <a href="#" className="text-zenith-neon-red hover:underline">{t.common.termsOfUse}</a> {t.common.and} <a href="#" className="text-zenith-neon-red hover:underline">{t.common.privacyPolicy}</a>
                     </label>
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl"
+                  disabled={loading || !isFormValid()}
+                  className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl disabled:opacity-50 disabled:grayscale"
                 >
                   {loading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>{t.common.creatingAccount}</span>
+                    </div>
                   ) : (
                     <span>{t.common.createAccount}</span>
                   )}
@@ -383,7 +470,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
               <div className="text-center">
                 <button
-                  onClick={() => setIsLogin(true)}
+                  onClick={() => setAuthMode('login')}
                   className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
                 >
                   {t.common.alreadyHaveAccount}
@@ -414,7 +501,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
         <div className="flex items-center justify-center space-x-2 text-white/20">
           <Shield size={12} />
-          <span className="text-[8px] font-bold uppercase tracking-widest">Criptografia de Ponta a Ponta</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest">{t.common.endToEndEncryption}</span>
         </div>
       </motion.div>
     </div>

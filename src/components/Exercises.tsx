@@ -12,12 +12,13 @@ interface Exercise {
   id: string;
   title: string;
   description: string;
-  category: 'strength' | 'cardio' | 'flexibility' | 'hiit' | 'meditation';
+  category: 'body' | 'mind' | 'spirituality' | 'health' | 'nutrition' | 'training' | 'yoga' | 'split';
   duration: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   video_url: string;
   is_premium: boolean;
   xp_reward: number;
+  tags?: string[];
 }
 
 interface ExerciseHistory {
@@ -94,11 +95,13 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
 
   const categories = [
     { id: 'all', label: 'Todos', icon: <Activity size={18} /> },
-    { id: 'strength', label: 'Força', icon: <Dumbbell size={18} /> },
-    { id: 'cardio', label: 'Cardio', icon: <Heart size={18} /> },
-    { id: 'hiit', label: 'HIIT', icon: <Zap size={18} /> },
-    { id: 'flexibility', label: 'Flexibilidade', icon: <Wind size={18} /> },
-    { id: 'meditation', label: 'Meditação', icon: <Brain size={18} /> },
+    { id: 'training', label: 'Treino', icon: <Dumbbell size={18} /> },
+    { id: 'body', label: 'Corpo', icon: <Heart size={18} /> },
+    { id: 'mind', label: 'Mente', icon: <Brain size={18} /> },
+    { id: 'spirituality', label: 'Espírito', icon: <Sparkles size={18} /> },
+    { id: 'nutrition', label: 'Nutrição', icon: <Zap size={18} /> },
+    { id: 'yoga', label: 'Yoga', icon: <Wind size={18} /> },
+    { id: 'split', label: 'Divisões', icon: <TrendingUp size={18} /> },
   ];
 
   const filteredExercises = activeCategory === 'all' 

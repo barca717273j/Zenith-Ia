@@ -24,7 +24,7 @@ const RANDOM_TETROMINO = () => {
   return { ...TETROMINOS[key], type: key };
 };
 
-export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
+export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void }> = ({ t, onGameOver }) => {
   const [grid, setGrid] = useState<string[][]>(Array(ROWS).fill(null).map(() => Array(COLS).fill('')));
   const [activePiece, setActivePiece] = useState<any>(null);
   const [nextPiece, setNextPiece] = useState<any>(RANDOM_TETROMINO());
@@ -41,6 +41,12 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
   const dropCounterRef = useRef<number>(0);
   const requestRef = useRef<number>(0);
   const touchStartRef = useRef<{ x: number, y: number } | null>(null);
+
+  useEffect(() => {
+    if (gameOver && onGameOver) {
+      onGameOver(score);
+    }
+  }, [gameOver, score, onGameOver]);
 
   const checkCollision = useCallback((nextPos: { x: number, y: number }, piece = activePiece?.shape) => {
     if (!piece) return false;
@@ -194,6 +200,29 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
     lastTimeRef.current = performance.now();
   };
 
+  const handleManualControl = (key: string) => {
+    if (!isPlaying || gameOver) return;
+    switch (key) {
+      case 'ArrowLeft': move({ x: -1, y: 0 }); break;
+      case 'ArrowRight': move({ x: 1, y: 0 }); break;
+      case 'ArrowDown': drop(); break;
+      case 'ArrowUp': handleRotate(); break;
+      case ' ': 
+        while (move({ x: 0, y: 1 }));
+        drop();
+        break;
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      handleManualControl(e.key);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, gameOver, move, drop, handleRotate]);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStartRef.current = { x: touch.clientX, y: touch.clientY };
@@ -276,24 +305,24 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
   }
 
   return (
-    <div className="p-4 space-y-6 pb-32 flex flex-col items-center max-w-md mx-auto min-h-screen select-none touch-none">
+    <div className="p-4 space-y-8 pb-32 flex flex-col items-center max-w-2xl mx-auto min-h-screen select-none touch-none">
       <header className="w-full flex justify-between items-center">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <Brain size={20} className="text-zenith-scarlet" />
-            <h1 className="text-xl font-display font-bold uppercase tracking-[0.2em]">{t.gym.title}</h1>
+            <Brain size={24} className="text-zenith-scarlet" />
+            <h1 className="text-2xl font-display font-bold uppercase tracking-tighter text-white">{t.gym.title}</h1>
           </div>
           <p className="text-white/30 text-[10px] uppercase tracking-widest">{t.gym.subtitle}</p>
         </div>
-        <div className="flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/10">
-          <Clock size={14} className="text-zenith-scarlet" />
-          <span className="text-sm font-mono font-bold text-zenith-scarlet">{formatTime(timeLeft)}</span>
+        <div className="flex items-center space-x-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10">
+          <Clock size={16} className="text-zenith-scarlet" />
+          <span className="text-lg font-mono font-bold text-zenith-scarlet">{formatTime(timeLeft)}</span>
         </div>
       </header>
 
-      <div className="w-full flex gap-4 items-start">
+      <div className="w-full flex flex-col lg:flex-row gap-8 items-center lg:items-start justify-center">
         <div 
-          className="relative flex-1 aspect-[10/20] rounded-3xl overflow-hidden border border-white/10 bg-black/60 backdrop-blur-xl shadow-2xl"
+          className="relative w-full max-w-[300px] aspect-[10/20] rounded-3xl overflow-hidden border-4 border-white/5 bg-black/60 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.5)]"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -320,7 +349,7 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
               </p>
               <button
                 onClick={resetGame}
-                className="w-full btn-primary py-4 text-[10px] font-bold uppercase tracking-[0.3em]"
+                className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em]"
               >
                 {t.gym.start}
               </button>
@@ -349,7 +378,7 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
               </div>
               <button
                 onClick={resetGame}
-                className="mt-8 w-full btn-primary py-4 text-[10px] font-bold uppercase tracking-[0.3em]"
+                className="mt-8 w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em]"
               >
                 {t.gym.newSession}
               </button>
@@ -378,86 +407,100 @@ export const TetrisGame: React.FC<{ t: any }> = ({ t }) => {
           </div>
         </div>
 
-        {/* Side Info */}
-        <div className="w-24 space-y-4">
-          <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center">
-            <p className="text-[8px] text-white/40 uppercase tracking-widest mb-2">{t.gym.nextPiece}</p>
-            <div className="aspect-square flex items-center justify-center">
-              {nextPiece && (
-                <div className="grid grid-cols-4 gap-[2px]">
-                  {nextPiece.shape.map((row: number[], y: number) => (
-                    row.map((value: number, x: number) => (
-                      <div 
-                        key={`${x}-${y}`}
-                        className="w-3 h-3 rounded-[1px]"
-                        style={{ backgroundColor: value !== 0 ? nextPiece.color : 'transparent' }}
-                      />
-                    ))
-                  ))}
-                </div>
-              )}
+        {/* Side Info & Controls */}
+        <div className="w-full lg:w-48 space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+            <div className="bg-white/5 rounded-3xl p-6 border border-white/10 text-center space-y-2">
+              <p className="text-[10px] text-white/40 uppercase tracking-widest">{t.gym.nextPiece}</p>
+              <div className="aspect-square flex items-center justify-center">
+                {nextPiece && (
+                  <div className="grid grid-cols-4 gap-[2px]">
+                    {nextPiece.shape.map((row: number[], y: number) => (
+                      row.map((value: number, x: number) => (
+                        <div 
+                          key={`${x}-${y}`}
+                          className="w-4 h-4 rounded-[1px]"
+                          style={{ backgroundColor: value !== 0 ? nextPiece.color : 'transparent' }}
+                        />
+                      ))
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white/5 rounded-3xl p-6 border border-white/10 text-center flex flex-col justify-center">
+              <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">{t.gym.scoreCurrent}</p>
+              <p className="text-3xl font-display font-bold text-white">{score}</p>
             </div>
           </div>
 
-          <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center">
-            <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">{t.gym.scoreCurrent}</p>
-            <p className="text-lg font-display font-bold text-white">{score}</p>
-          </div>
-
-          <div className="flex flex-col space-y-2">
+          <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => setIsPlaying(!isPlaying)}
-              className="w-full aspect-square rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all"
+              className="py-6 rounded-3xl bg-white/5 flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all"
             >
-              {isPlaying ? <Pause size={18} className="text-white/60" /> : <Play size={18} className="text-white/60" />}
+              {isPlaying ? <Pause size={24} className="text-white/60" /> : <Play size={24} className="text-white/60" />}
             </button>
             <button 
               onClick={resetGame}
-              className="w-full aspect-square rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all"
+              className="py-6 rounded-3xl bg-white/5 flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all"
             >
-              <RotateCcw size={18} className="text-white/60" />
+              <RotateCcw size={24} className="text-white/60" />
             </button>
+          </div>
+
+          {/* Mobile Controls - Visible on small screens */}
+          <div className="grid grid-cols-3 gap-3 lg:hidden pt-4">
+            <div />
+            <button 
+              onPointerDown={() => handleManualControl('ArrowUp')}
+              className="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 active:bg-white/20 active:scale-95 transition-all"
+            >
+              <ArrowUp size={24} />
+            </button>
+            <div />
+            
+            <button 
+              onPointerDown={() => handleManualControl('ArrowLeft')}
+              className="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 active:bg-white/20 active:scale-95 transition-all"
+            >
+              <ArrowLeft size={24} />
+            </button>
+            <button 
+              onPointerDown={() => handleManualControl('ArrowDown')}
+              className="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 active:bg-white/20 active:scale-95 transition-all"
+            >
+              <ArrowDown size={24} />
+            </button>
+            <button 
+              onPointerDown={() => handleManualControl('ArrowRight')}
+              className="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 active:bg-white/20 active:scale-95 transition-all"
+            >
+              <ArrowRight size={24} />
+            </button>
+            
+            <div />
+            <button 
+              onPointerDown={() => handleManualControl(' ')}
+              className="w-full aspect-square rounded-2xl bg-zenith-scarlet/10 border border-zenith-scarlet/20 flex items-center justify-center text-zenith-scarlet active:bg-zenith-scarlet/30 active:scale-95 transition-all"
+            >
+              <Zap size={24} />
+            </button>
+            <div />
           </div>
         </div>
       </div>
 
-      {/* Stats & Controls Info */}
-      <div className="w-full max-w-[280px] space-y-6">
-        {/* Mobile Instructions */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
-              <ArrowLeft size={12} className="text-zenith-scarlet" />
-            </div>
-            <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlLeft}</span>
-          </div>
-          <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
-              <ArrowRight size={12} className="text-zenith-scarlet" />
-            </div>
-            <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlRight}</span>
-          </div>
-          <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
-              <ArrowUp size={12} className="text-zenith-scarlet" />
-            </div>
-            <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlRotate}</span>
-          </div>
-          <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center space-x-3">
-            <div className="w-6 h-6 rounded-lg bg-zenith-scarlet/10 flex items-center justify-center">
-              <ArrowDown size={12} className="text-zenith-scarlet" />
-            </div>
-            <span className="text-[9px] text-white/40 uppercase font-bold">{t.gym.controlDrop}</span>
-          </div>
-        </div>
-
-        <div className="glass-card p-6 border-white/5 bg-white/[0.02] relative overflow-hidden">
+      {/* Instructions */}
+      <div className="w-full max-w-md space-y-6">
+        <div className="glass-card p-8 border-white/5 bg-white/[0.02] relative overflow-hidden">
           <div className="absolute top-0 left-0 w-1 h-full bg-zenith-scarlet/30" />
-          <div className="flex items-center space-x-3 mb-2">
-            <Zap size={14} className="text-zenith-scarlet" />
-            <p className="text-[10px] text-white/60 uppercase tracking-[0.2em] font-bold">{t.gym.tipTitle}</p>
+          <div className="flex items-center space-x-3 mb-4">
+            <Zap size={18} className="text-zenith-scarlet" />
+            <p className="text-[12px] text-white/60 uppercase tracking-[0.2em] font-bold">{t.gym.tipTitle}</p>
           </div>
-          <p className="text-[10px] text-white/30 uppercase tracking-[0.15em] leading-relaxed italic">
+          <p className="text-[12px] text-white/30 uppercase tracking-[0.15em] leading-relaxed italic">
             "{t.gym.tipDesc}"
           </p>
         </div>

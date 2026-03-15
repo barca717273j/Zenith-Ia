@@ -20,7 +20,7 @@ interface Routine {
   period: 'morning' | 'afternoon' | 'evening';
 }
 
-export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
+export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData }) => {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newTask, setNewTask] = useState('');
@@ -44,8 +44,14 @@ export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
     { id: 'evening', label: 'Noite', icon: <Moon size={14} /> },
   ];
 
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
+
   useEffect(() => {
-    fetchRoutines();
+    if (userData?.id) {
+      fetchRoutines();
+    }
 
     const interval = setInterval(() => {
       const now = new Date();
@@ -61,55 +67,61 @@ export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [userData?.id]);
 
-  const fetchRoutines = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data } = await supabase
-        .from('routines')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('time', { ascending: true });
-      if (data) setRoutines(data);
+  const requestNotificationPermission = async () => {
+    if (typeof Notification !== 'undefined') {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
     }
   };
 
   const triggerAlarm = (routine: Routine) => {
-    if (Notification.permission === 'granted') {
-      new Notification('Zenith IA', {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      new Notification('Zenith Life OS', {
         body: `Protocolo Ativo: ${routine.task}`,
-        icon: '/zenith-logo.png'
+        icon: '/zenith-logo.png',
+        silent: false,
+        tag: routine.id
       });
+      
+      // Play sound
       const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
       audio.play().catch(e => console.log('Audio play failed', e));
     }
   };
 
+  const fetchRoutines = async () => {
+    if (!userData?.id) return;
+    const { data } = await supabase
+      .from('routines')
+      .select('*')
+      .eq('user_id', userData.id)
+      .order('time', { ascending: true });
+    if (data) setRoutines(data);
+  };
+
   const addRoutine = async () => {
-    if (!newTask) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data, error } = await supabase
-        .from('routines')
-        .insert([{ 
-          user_id: user.id, 
-          task: newTask, 
-          time: newTime, 
-          category: newCategory,
-          icon: newIcon,
-          period: newPeriod,
-          completed: false, 
-          notified: false 
-        }])
-        .select()
-        .single();
-      
-      if (data) {
-        setRoutines(prev => [...prev, data].sort((a, b) => a.time.localeCompare(b.time)));
-        setNewTask('');
-        setIsAdding(false);
-      }
+    if (!newTask || !userData?.id) return;
+    const { data, error } = await supabase
+      .from('routines')
+      .insert([{ 
+        user_id: userData.id, 
+        task: newTask, 
+        time: newTime, 
+        category: newCategory,
+        icon: newIcon,
+        period: newPeriod,
+        completed: false, 
+        notified: false 
+      }])
+      .select()
+      .single();
+    
+    if (data) {
+      setRoutines(prev => [...prev, data].sort((a, b) => a.time.localeCompare(b.time)));
+      setNewTask('');
+      setIsAdding(false);
     }
   };
 
@@ -153,14 +165,27 @@ export const RoutineSystem: React.FC<{ t: any }> = ({ t }) => {
           </h2>
           <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Sincronizado com Zenith Core</p>
         </div>
-        <motion.button 
-          whileHover={{ scale: 1.1, rotate: 90 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsAdding(true)}
-          className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-zenith-scarlet transition-all group shadow-xl"
-        >
-          <Plus size={28} className="text-white/40 group-hover:text-zenith-scarlet transition-colors" />
-        </motion.button>
+        <div className="flex items-center space-x-3">
+          {notificationPermission !== 'granted' && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={requestNotificationPermission}
+              className="p-3 rounded-xl bg-zenith-scarlet/10 border border-zenith-scarlet/20 text-zenith-scarlet hover:bg-zenith-scarlet/20 transition-all flex items-center space-x-2"
+            >
+              <Bell size={18} />
+              <span className="text-[9px] font-bold uppercase tracking-widest">Ativar Alertas</span>
+            </motion.button>
+          )}
+          <motion.button 
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsAdding(true)}
+            className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-zenith-scarlet transition-all group shadow-xl"
+          >
+            <Plus size={28} className="text-white/40 group-hover:text-zenith-scarlet transition-colors" />
+          </motion.button>
+        </div>
       </header>
 
       {/* Progress Card */}

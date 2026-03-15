@@ -23,6 +23,7 @@ interface Habit {
   target: number;
   current_progress: number;
   completion_history?: string[]; // Array of ISO dates
+  reminder_time?: string; // HH:mm format
 }
 
 interface Achievement {
@@ -48,21 +49,47 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
   const [newHabitName, setNewHabitName] = useState('');
   const [newFrequency, setNewFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [newTarget, setNewTarget] = useState(1);
+  const [newReminderTime, setNewReminderTime] = useState('');
   const { addXP } = useGamification();
 
   useEffect(() => {
-    fetchHabits();
-    fetchTasks();
-  }, []);
+    if (userData?.id) {
+      fetchHabits();
+      fetchTasks();
+    }
+
+    // Request notification permission
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // Check for reminders every minute
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      
+      habits.forEach(habit => {
+        if (habit.reminder_time === currentTime && !habit.completed_today) {
+          if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+            new Notification('Zenith Habit Reminder', {
+              body: `Time for your habit: ${habit.name}`,
+              icon: '/icon-192x192.png'
+            });
+          }
+        }
+      });
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [userData?.id, habits.length]);
 
   const fetchHabits = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!userData?.id) return;
 
     const { data, error } = await supabase
       .from('habits')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', userData.id);
 
     if (data) {
       const today = new Date().toDateString();
@@ -78,13 +105,12 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
   };
 
   const fetchTasks = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!userData?.id) return;
 
     const { data, error } = await supabase
       .from('tasks')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userData.id)
       .order('created_at', { ascending: false });
 
     if (data) {
@@ -93,20 +119,19 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
   };
 
   const addHabit = async () => {
-    if (!newHabitName.trim()) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!newHabitName.trim() || !userData?.id) return;
 
     if (activeView === 'habits') {
       const newHabit = {
         name: newHabitName,
         streak: 0,
         completed_today: false,
-        user_id: user.id,
+        user_id: userData.id,
         frequency: newFrequency,
         target: newTarget,
         current_progress: 0,
-        completion_history: []
+        completion_history: [],
+        reminder_time: newReminderTime || null
       };
 
       const { data, error } = await supabase
@@ -123,7 +148,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
       const newTask = {
         name: newHabitName,
         completed: false,
-        user_id: user.id,
+        user_id: userData.id,
         priority: 'medium'
       };
 
@@ -501,8 +526,14 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
               </div>
               <div className="grid grid-cols-7 gap-2">
                 {Array.from({ length: 31 }).map((_, i) => {
-                  const hasActivity = i % 3 === 0;
-                  const isToday = i === 11; // March 12
+                  const date = new Date();
+                  date.setDate(i + 1);
+                  const dateStr = date.toISOString().split('T')[0];
+                  
+                  // Check if any habit was completed on this day
+                  const hasActivity = habits.some(h => h.completion_history?.includes(dateStr));
+                  const isToday = new Date().getDate() === i + 1 && new Date().getMonth() === date.getMonth();
+                  
                   return (
                     <div 
                       key={i} 
@@ -559,30 +590,41 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
                 </div>
 
                 {activeView === 'habits' && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Frequência</label>
-                      <select
-                        value={newFrequency}
-                        onChange={(e) => setNewFrequency(e.target.value as any)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-zenith-scarlet transition-all appearance-none"
-                      >
-                        <option value="daily">Diário</option>
-                        <option value="weekly">Semanal</option>
-                        <option value="monthly">Mensal</option>
-                      </select>
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Frequência</label>
+                        <select
+                          value={newFrequency}
+                          onChange={(e) => setNewFrequency(e.target.value as any)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-zenith-scarlet transition-all appearance-none"
+                        >
+                          <option value="daily">Diário</option>
+                          <option value="weekly">Semanal</option>
+                          <option value="monthly">Mensal</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Meta (Vezes)</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={newTarget}
+                          onChange={(e) => setNewTarget(parseInt(e.target.value) || 1)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Meta (Vezes)</label>
+                      <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Lembrete (Opcional)</label>
                       <input
-                        type="number"
-                        min="1"
-                        value={newTarget}
-                        onChange={(e) => setNewTarget(parseInt(e.target.value) || 1)}
+                        type="time"
+                        value={newReminderTime}
+                        onChange={(e) => setNewReminderTime(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-zenith-scarlet transition-all"
                       />
                     </div>
-                  </div>
+                  </>
                 )}
 
                 <button 

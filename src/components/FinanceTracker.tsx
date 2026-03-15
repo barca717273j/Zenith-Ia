@@ -22,11 +22,8 @@ interface FinanceTrackerProps {
 
 export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, language }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [budgets, setBudgets] = useState<any[]>([
-    { category: 'Alimentação', limit: 1000, spent: 450 },
-    { category: 'Transporte', limit: 500, spent: 120 },
-    { category: 'Lazer', limit: 300, spent: 280 },
-  ]);
+  const [budgets, setBudgets] = useState<any[]>([]);
+  const [goals, setGoals] = useState<any[]>([]);
 
   const formatCurrency = (amount: number) => {
     const config: Record<Language, { locale: string, currency: string }> = {
@@ -47,7 +44,11 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
   const [aiMessage, setAiMessage] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'flow' | 'budget'>('flow');
+  const [activeTab, setActiveTab] = useState<'flow' | 'budget' | 'goals'>('flow');
+  
+  const [showAddGoalModal, setShowAddGoalModal] = useState(false);
+  const [newGoalName, setNewGoalName] = useState('');
+  const [newGoalTarget, setNewGoalTarget] = useState('');
 
   // Form state
   const [description, setDescription] = useState('');
@@ -55,7 +56,11 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
   const [type, setType] = useState<'income' | 'expense'>('expense');
 
   useEffect(() => {
-    fetchTransactions();
+    if (userData?.id) {
+      fetchTransactions();
+      fetchBudgets();
+      fetchGoals();
+    }
   }, [userData]);
 
   const fetchTransactions = async () => {
@@ -74,6 +79,56 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
       console.error('Error fetching transactions:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBudgets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('finance_budgets')
+        .select('*')
+        .eq('user_id', userData.id);
+      if (error) throw error;
+      if (data && data.length > 0) {
+        setBudgets(data);
+      } else {
+        setBudgets([
+          { category: 'Alimentação', limit: 1000, spent: 450 },
+          { category: 'Transporte', limit: 500, spent: 120 },
+          { category: 'Lazer', limit: 300, spent: 280 },
+        ]);
+      }
+    } catch (err) {
+      console.error('Error fetching budgets:', err);
+      setBudgets([
+        { category: 'Alimentação', limit: 1000, spent: 450 },
+        { category: 'Transporte', limit: 500, spent: 120 },
+        { category: 'Lazer', limit: 300, spent: 280 },
+      ]);
+    }
+  };
+
+  const fetchGoals = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('finance_goals')
+        .select('*')
+        .eq('user_id', userData.id);
+      if (error) throw error;
+      if (data && data.length > 0) {
+        setGoals(data);
+      } else {
+        setGoals([
+          { id: '1', name: 'Reserva de Emergência', target: 5000, current: 1200 },
+          { id: '2', name: 'Viagem Japão', target: 15000, current: 3500 },
+        ]);
+      }
+    } catch (err) {
+      console.error('Error fetching goals:', err);
+      setGoals([
+        { id: '1', name: 'Reserva de Emergência', target: 5000, current: 1200 },
+        { id: '2', name: 'Viagem Japão', target: 15000, current: 3500 },
+      ]);
     }
   };
 
@@ -127,6 +182,31 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
       setAiResponse('Erro ao conectar com o Mentor Financeiro. Verifique sua conexão.');
     } finally {
       setIsAiLoading(false);
+    }
+  };
+
+  const handleAddGoal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGoalName || !newGoalTarget) return;
+    
+    try {
+      const { error } = await supabase
+        .from('finance_goals')
+        .insert([{
+          user_id: userData.id,
+          name: newGoalName,
+          target: parseFloat(newGoalTarget),
+          current: 0
+        }]);
+
+      if (error) throw error;
+      
+      setNewGoalName('');
+      setNewGoalTarget('');
+      setShowAddGoalModal(false);
+      fetchGoals();
+    } catch (err) {
+      console.error('Error adding goal:', err);
     }
   };
 
@@ -255,40 +335,13 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
         >
           {t.finance.budgets}
         </button>
+        <button
+          onClick={() => setActiveTab('goals')}
+          className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all ${activeTab === 'goals' ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white/60'}`}
+        >
+          {t.finance.goals}
+        </button>
       </div>
-
-      {/* Savings Goals */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center space-x-2">
-            <PiggyBank size={14} className="text-zenith-scarlet" />
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">Metas de Reserva</h3>
-          </div>
-        </div>
-        <div className="flex space-x-4 overflow-x-auto pb-4 no-scrollbar">
-          <GoalCard 
-            icon={<TrendingUp size={20} />} 
-            label="Reserva de Emergência" 
-            current={2500} 
-            target={10000} 
-            color="scarlet" 
-          />
-          <GoalCard 
-            icon={<CreditCard size={20} />} 
-            label="Viagem Japão" 
-            current={1200} 
-            target={15000} 
-            color="scarlet" 
-          />
-          <GoalCard 
-            icon={<Zap size={20} />} 
-            label="Novo Setup" 
-            current={4500} 
-            target={5000} 
-            color="scarlet" 
-          />
-        </div>
-      </section>
 
       {/* Main Content */}
       {loading ? (
@@ -349,7 +402,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
             </div>
           </section>
         )
-      ) : (
+      ) : activeTab === 'budget' ? (
         <section className="space-y-6">
           <div className="flex items-center space-x-3">
             <Sparkles size={18} className="text-white/40" />
@@ -384,7 +437,91 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
             })}
           </div>
         </section>
+      ) : (
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <PiggyBank size={18} className="text-white/40" />
+              <h3 className="text-xs font-display font-bold text-white/60 uppercase tracking-[0.2em]">{t.finance.goals}</h3>
+            </div>
+            <button 
+              onClick={() => setShowAddGoalModal(true)}
+              className="text-zenith-scarlet text-[10px] font-bold uppercase tracking-widest flex items-center space-x-2"
+            >
+              <Plus size={14} />
+              <span>{t.finance.addGoal}</span>
+            </button>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {goals.map((goal) => (
+              <GoalCard 
+                key={goal.id}
+                icon={goal.icon} 
+                label={goal.name} 
+                current={goal.current} 
+                target={goal.target} 
+                color="scarlet" 
+              />
+            ))}
+          </div>
+        </section>
       )}
+
+      {/* Add Goal Modal */}
+      <AnimatePresence>
+        {showAddGoalModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAddGoalModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md glass-card p-8 border-white/10 bg-zinc-900"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-xl font-bold font-display uppercase tracking-tight">{t.finance.addGoal}</h2>
+                <button onClick={() => setShowAddGoalModal(false)} className="text-white/40 hover:text-white">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddGoal} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">{t.finance.goalName}</label>
+                  <input
+                    type="text"
+                    value={newGoalName}
+                    onChange={(e) => setNewGoalName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                    placeholder="Ex: Reserva de Emergência"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">{t.finance.targetAmount}</label>
+                  <input
+                    type="number"
+                    value={newGoalTarget}
+                    onChange={(e) => setNewGoalTarget(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <button type="submit" className="w-full btn-primary py-4 text-[10px] font-bold uppercase tracking-[0.3em]">
+                  {t.finance.saveGoal}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Add Transaction Modal */}
       <AnimatePresence>

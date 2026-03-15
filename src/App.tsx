@@ -10,7 +10,11 @@ import { TetrisGame } from './components/TetrisGame';
 import { Exercises } from './components/Exercises';
 import { FocusTimer } from './components/FocusTimer';
 import { Onboarding } from './components/Onboarding';
+import { MentalGym } from './components/MentalGym';
+import { Social } from './components/Social';
 import { AdminPanel } from './components/AdminPanel';
+import { Journal } from './components/Journal';
+import { Stats } from './components/Stats';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertCircle, ExternalLink, ShieldCheck } from 'lucide-react';
@@ -211,15 +215,23 @@ export default function App() {
       case 'exercises':
         return <Exercises key="exercises" t={t} userData={userData} />;
       case 'focus':
-        return <FocusTimer key="focus" t={t} isFullPage />;
+        return <FocusTimer key="focus" t={t} userData={userData} isFullPage />;
       case 'finance':
         return <FinanceTracker key="finance" userData={userData} t={t} language={lang} />;
       case 'profile':
         return <Profile key="profile" userData={userData} t={t} onUpdate={fetchUserData} />;
+      case 'social':
+        return <Social key="social" userData={userData} t={t} />;
+      case 'journal':
+        return <Journal key="journal" userData={userData} t={t} />;
+      case 'stats':
+        return <Stats key="stats" userData={userData} />;
+      case 'map':
+        return <LifeMap key="map" userData={userData} t={t} />;
       case 'admin':
-        return userData?.is_admin ? <AdminPanel key="admin" t={t} /> : null;
+        return userData?.is_admin ? <AdminPanel key="admin" t={t} userData={userData} /> : null;
       case 'break':
-        return <TetrisGame key="break" t={t} />;
+        return <MentalGym key="break" t={t} userData={userData} />;
       default:
         return <Dashboard key="home" userData={userData} t={t} setActiveTab={setActiveTab} onUpdate={fetchUserData} />;
     }

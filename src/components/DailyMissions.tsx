@@ -1,16 +1,86 @@
 import React from 'react';
+import { supabase } from '../supabase';
 import { motion } from 'motion/react';
 import { Target, Star, Trophy, Sparkles, ShieldCheck, Zap, Award, ChevronRight } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 
-export const DailyMissions: React.FC<{ t: any }> = ({ t }) => {
-  const { xp, level, levelName } = useGamification();
+export const DailyMissions: React.FC<{ t: any; userData: any }> = ({ t, userData }) => {
+  const { xp, level, levelName, refreshStats } = useGamification();
+  const [missions, setMissions] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const missions = [
-    { id: 1, title: 'Sincronizar 3 Hábitos', progress: 1, total: 3, xp: 50, icon: <ShieldCheck size={16} /> },
-    { id: 2, title: 'Foco Neural 25m', progress: 0, total: 1, xp: 30, icon: <Zap size={16} /> },
-    { id: 3, title: 'Completar Ciclo de Rotina', progress: 2, total: 4, xp: 40, icon: <Target size={16} /> },
-  ];
+  const fetchMissionProgress = async () => {
+    if (!userData?.id) return;
+
+    const today = new Date().toISOString().split('T')[0];
+
+    try {
+      // 1. Habits completed today
+      const { data: habits } = await supabase
+        .from('habits')
+        .select('completion_history')
+        .eq('user_id', userData.id);
+      
+      const habitsCompletedToday = habits?.filter(h => h.completion_history?.includes(today)).length || 0;
+
+      // 2. Focus Session today
+      const { data: focusSessions } = await supabase
+        .from('focus_sessions')
+        .select('duration')
+        .eq('user_id', userData.id)
+        .gte('created_at', today);
+      
+      const totalFocusToday = focusSessions?.reduce((acc, s) => acc + s.duration, 0) || 0;
+      const focusMinutesToday = Math.floor(totalFocusToday / 60);
+
+      // 3. Routines completed today
+      const { data: routines } = await supabase
+        .from('routines')
+        .select('completed')
+        .eq('user_id', userData.id)
+        .eq('completed', true);
+      
+      // Since we don't have routine_logs, we'll use the 'completed' status for today's mission
+      const routinesCompletedToday = routines?.length || 0;
+
+      const realMissions = [
+        { 
+          id: 1, 
+          title: 'Sincronizar 3 Hábitos', 
+          progress: habitsCompletedToday, 
+          total: 3, 
+          xp: 50, 
+          icon: <ShieldCheck size={16} /> 
+        },
+        { 
+          id: 2, 
+          title: 'Foco Neural 25m', 
+          progress: Math.min(25, focusMinutesToday), 
+          total: 25, 
+          xp: 30, 
+          icon: <Zap size={16} /> 
+        },
+        { 
+          id: 3, 
+          title: 'Completar Ciclo de Rotina', 
+          progress: routinesCompletedToday, 
+          total: 4, 
+          xp: 40, 
+          icon: <Target size={16} /> 
+        },
+      ];
+
+      setMissions(realMissions);
+    } catch (err) {
+      console.error('Error fetching mission progress:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchMissionProgress();
+  }, [userData]);
 
   return (
     <div className="space-y-8">
@@ -66,7 +136,11 @@ export const DailyMissions: React.FC<{ t: any }> = ({ t }) => {
         </div>
 
         <div className="space-y-5 relative z-10">
-          {missions.map((m) => (
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <div className="w-6 h-6 border-2 border-zenith-electric-blue border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : missions.map((m) => (
             <motion.div 
               key={m.id} 
               whileHover={{ x: 4 }}
@@ -91,8 +165,8 @@ export const DailyMissions: React.FC<{ t: any }> = ({ t }) => {
                 <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden p-[1px]">
                   <motion.div 
                     initial={{ width: 0 }}
-                    animate={{ width: `${(m.progress / m.total) * 100}%` }}
-                    className="h-full bg-white/10 group-hover:bg-zenith-electric-blue/40 transition-all rounded-full" 
+                    animate={{ width: `${Math.min(100, (m.progress / m.total) * 100)}%` }}
+                    className={`h-full transition-all rounded-full ${m.progress >= m.total ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-white/10 group-hover:bg-zenith-electric-blue/40'}`} 
                   />
                 </div>
               </div>
