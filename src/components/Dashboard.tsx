@@ -329,6 +329,7 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string; 
       <div className="flex items-center space-x-1.5 text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg border border-emerald-400/10">
         <TrendingUp size={12} />
         <span className="text-[10px] font-bold uppercase tracking-tighter">{trend}</span>
+
       </div>
     </div>
     <div className="relative z-10">
