@@ -36,12 +36,10 @@ export const DailyMissions: React.FC<{ t: any; userData: any }> = ({ t, userData
       // 3. Routines completed today
       const { data: routines } = await supabase
         .from('routines')
-        .select('completed')
-        .eq('user_id', userData.id)
-        .eq('completed', true);
+        .select('last_completed')
+        .eq('user_id', userData.id);
       
-      // Since we don't have routine_logs, we'll use the 'completed' status for today's mission
-      const routinesCompletedToday = routines?.length || 0;
+      const routinesCompletedToday = routines?.filter(r => r.last_completed?.startsWith(today)).length || 0;
 
       const realMissions = [
         { 

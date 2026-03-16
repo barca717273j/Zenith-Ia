@@ -38,7 +38,7 @@ export const Stats: React.FC<{ userData: any }> = ({ userData }) => {
     try {
       // Fetch habits and routines to calculate daily scores
       const { data: habits } = await supabase.from('habits').select('completion_history').eq('user_id', userData.id);
-      const { data: routines } = await supabase.from('routines').select('completed').eq('user_id', userData.id);
+      const { data: routines } = await supabase.from('routines').select('last_completed').eq('user_id', userData.id);
       
       const stats = last7Days.map(date => {
         let dailyScore = 20; // Base score
@@ -50,9 +50,12 @@ export const Stats: React.FC<{ userData: any }> = ({ userData }) => {
           }
         });
 
-        // For routines, we'll just use a random factor for now or assume if they are completed today
-        // Realistically we'd need a routine_logs table for historical routine data
-        // But let's use what we have
+        // Count routines completed on this date
+        routines?.forEach(r => {
+          if (r.last_completed?.startsWith(date)) {
+            dailyScore += 15;
+          }
+        });
         
         const d = new Date(date);
         return {

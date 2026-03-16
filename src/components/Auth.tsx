@@ -64,6 +64,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
           options: {
             data: {
               full_name: fullName,
+              username: email.split('@')[0],
             }
           }
         });
@@ -76,11 +77,14 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
               { 
                 id: user.id, 
                 email: user.email, 
+                username: email.split('@')[0],
+                full_name: fullName,
+                display_name: fullName,
                 language, 
                 subscription_tier: 'free',
                 energy_level: 100,
-                display_name: fullName,
                 photo_url: user.user_metadata?.avatar_url || '',
+                avatar_url: user.user_metadata?.avatar_url || '',
                 onboarding_completed: false
               }
             ]);
@@ -238,6 +242,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     </div>
                     <input
                       type="email"
+                      name="email"
+                      autoComplete="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -288,6 +294,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     </div>
                     <input
                       type="email"
+                      name="email"
+                      autoComplete="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -314,6 +322,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     </div>
                     <input
                       type={showPassword ? "text" : "password"}
+                      name="password"
+                      autoComplete="current-password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -368,6 +378,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                   <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.fullName}</label>
                   <input
                     type="text"
+                    name="name"
+                    autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -380,6 +392,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                   <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
                   <input
                     type="email"
+                    name="email"
+                    autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -393,6 +407,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                   <div className="relative group">
                     <input
                       type={showPassword ? "text" : "password"}
+                      name="new-password"
+                      autoComplete="new-password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -427,6 +443,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                   <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.confirmPassword}</label>
                   <input
                     type="password"
+                    name="confirm-password"
+                    autoComplete="new-password"
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}

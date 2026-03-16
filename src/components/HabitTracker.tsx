@@ -14,7 +14,8 @@ import {
 
 interface Habit {
   id: string;
-  name: string;
+  title: string;
+  description?: string;
   streak: number;
   completed_today: boolean;
   user_id: string;
@@ -72,7 +73,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
         if (habit.reminder_time === currentTime && !habit.completed_today) {
           if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
             new Notification('Zenith Habit Reminder', {
-              body: `Time for your habit: ${habit.name}`,
+              body: `Time for your habit: ${habit.title}`,
               icon: '/icon-192x192.png'
             });
           }
@@ -123,7 +124,8 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
 
     if (activeView === 'habits') {
       const newHabit = {
-        name: newHabitName,
+        title: newHabitName,
+        description: '',
         streak: 0,
         completed_today: false,
         user_id: userData.id,
@@ -146,7 +148,8 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
       }
     } else {
       const newTask = {
-        name: newHabitName,
+        title: newHabitName,
+        description: '',
         completed: false,
         user_id: userData.id,
         priority: 'medium'
@@ -360,7 +363,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
                     </button>
                     <div className="space-y-1">
                       <p className={`text-lg font-bold tracking-tight transition-all ${habit.completed_today ? 'text-white/20 line-through' : 'text-white'}`}>
-                        {habit.name}
+                        {habit.title}
                       </p>
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-1.5 text-[10px] text-zenith-scarlet font-bold uppercase tracking-widest">
@@ -411,7 +414,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
                   </button>
                   <div className="space-y-1">
                     <p className={`text-base font-bold tracking-tight transition-all ${task.completed ? 'text-white/20 line-through' : 'text-white'}`}>
-                      {task.name}
+                      {task.title}
                     </p>
                     <div className="flex items-center space-x-2">
                       <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-zenith-scarlet' : task.priority === 'medium' ? 'bg-orange-500' : 'bg-white/20'}`} />

@@ -32,62 +32,26 @@ export const ZenithLogo: React.FC<ZenithLogoProps> = ({ size = 40, className = "
           </filter>
         </defs>
         
-        {/* Outer Ring */}
-        <motion.circle
-          cx="50"
-          cy="50"
-          r="45"
-          stroke="url(#zenith-grad)"
-          strokeWidth="1"
-          strokeDasharray="4 8"
-          opacity="0.2"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-
-        {/* Minimalist Z Logo */}
+        {/* Modern Z Logo */}
         <motion.path
           d="M 30 30 L 70 30 L 30 70 L 70 70"
           stroke="url(#zenith-grad)"
           strokeWidth="12"
-          strokeLinecap="square"
-          strokeLinejoin="miter"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           filter="url(#zenith-glow)"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
-        />
-
-        {/* Inner Core */}
-        <motion.circle
-          cx="50"
-          cy="50"
-          r="8"
-          fill="url(#zenith-grad)"
+          initial={{ pathLength: 0, opacity: 0 }}
           animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.5, 1, 0.5],
-            filter: ["blur(4px)", "blur(8px)", "blur(4px)"]
+            pathLength: 1, 
+            opacity: 1,
+            filter: ["drop-shadow(0 0 2px #ff2400)", "drop-shadow(0 0 8px #ff2400)", "drop-shadow(0 0 2px #ff2400)"]
           }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ 
+            pathLength: { duration: 1.5, ease: "easeInOut" },
+            opacity: { duration: 0.5 },
+            filter: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+          }}
         />
-
-        {/* Orbiting Particles */}
-        {[0, 120, 240].map((angle, i) => (
-          <motion.circle
-            key={i}
-            cx="50"
-            cy="50"
-            r="2"
-            fill="white"
-            animate={{
-              x: [Math.cos(angle * Math.PI / 180) * 30, Math.cos((angle + 360) * Math.PI / 180) * 30],
-              y: [Math.sin(angle * Math.PI / 180) * 30, Math.sin((angle + 360) * Math.PI / 180) * 30],
-              opacity: [0, 1, 0]
-            }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: i * 0.5 }}
-          />
-        ))}
       </svg>
     </motion.div>
   );

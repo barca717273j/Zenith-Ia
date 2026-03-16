@@ -1,31 +1,147 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield, Camera, Mail, Lock, Globe, Save, AlertCircle, Timer } from 'lucide-react';
+import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield, Camera, Mail, Lock, Globe, Save, AlertCircle, Timer, Grid, Heart, MessageSquare } from 'lucide-react';
 import { Subscription } from './Subscription';
 import { TetrisGame } from './TetrisGame';
 import { Journal } from './Journal';
 import { useGamification } from './GamificationContext';
 import { supabase } from '../supabase';
+import { uploadAvatar } from '../services/profileService';
 
 interface ProfileProps {
   userData: any;
   t: any;
   onUpdate: () => Promise<void> | void;
+  targetUserId?: string;
 }
 
-type ProfileView = 'main' | 'subscription' | 'gym' | 'journal' | 'edit-profile' | 'security' | 'preferences';
+type ProfileView = 'main' | 'subscription' | 'gym' | 'journal' | 'edit-profile' | 'security' | 'preferences' | 'followers' | 'following';
 
-export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
+export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate, targetUserId }) => {
   const [view, setView] = useState<ProfileView>('main');
   const [clickCount, setClickCount] = useState(0);
   const { level, levelName, xp, streak } = useGamification();
+  const [targetUser, setTargetUser] = useState<any>(null);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followList, setFollowList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const isOwnProfile = !targetUserId || targetUserId === userData?.id;
+  const currentProfileId = targetUserId || userData?.id;
+
+  useEffect(() => {
+    if (currentProfileId) {
+      fetchProfileData();
+      fetchPosts();
+      fetchSocialStats();
+      if (!isOwnProfile) checkFollowStatus();
+    }
+  }, [currentProfileId, userData?.id]);
+
+  const fetchProfileData = async () => {
+    if (isOwnProfile) {
+      setTargetUser(userData);
+      return;
+    }
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', currentProfileId)
+      .single();
+    if (data) setTargetUser(data);
+  };
+
+  const fetchPosts = async () => {
+    const { data } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('user_id', currentProfileId)
+      .order('created_at', { ascending: false });
+    if (data) setPosts(data);
+  };
+
+  const checkFollowStatus = async () => {
+    const { data } = await supabase
+      .from('followers')
+      .select('*')
+      .eq('follower_id', userData.id)
+      .eq('following_id', currentProfileId)
+      .single();
+    setIsFollowing(!!data);
+  };
+
+  const toggleFollow = async () => {
+    if (isFollowing) {
+      await supabase
+        .from('followers')
+        .delete()
+        .eq('follower_id', userData.id)
+        .eq('following_id', currentProfileId);
+    } else {
+      await supabase
+        .from('followers')
+        .insert([{ follower_id: userData.id, following_id: currentProfileId }]);
+      
+      // Notification
+      await supabase.from('notifications').insert([{
+        user_id: currentProfileId,
+        title: 'Novo Seguidor!',
+        message: `${userData.display_name} começou a seguir você.`,
+        type: 'social'
+      }]);
+    }
+    setIsFollowing(!isFollowing);
+    fetchSocialStats();
+  };
+
+  const fetchFollowers = async () => {
+    const { data } = await supabase
+      .from('followers')
+      .select('follower:users!followers_follower_id_fkey(*)')
+      .eq('following_id', currentProfileId);
+    if (data) setFollowList(data.map((f: any) => f.follower));
+    setView('followers');
+  };
+
+  const fetchFollowing = async () => {
+    const { data } = await supabase
+      .from('followers')
+      .select('following:users!followers_following_id_fkey(*)')
+      .eq('follower_id', currentProfileId);
+    if (data) setFollowList(data.map((f: any) => f.following));
+    setView('following');
+  };
 
   // Edit Profile State
-  const [editName, setEditName] = useState(userData?.display_name || '');
+  const [editName, setEditName] = useState(userData?.full_name || userData?.display_name || '');
+  const [editUsername, setEditUsername] = useState(userData?.username || '');
+  const [editBio, setEditBio] = useState(userData?.bio || '');
   const [editEmail, setEditEmail] = useState(userData?.email || '');
-  const [editPhoto, setEditPhoto] = useState(userData?.photo_url || '');
+  const [editPhoto, setEditPhoto] = useState(userData?.avatar_url || userData?.photo_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [socialStats, setSocialStats] = useState({ followers: 0, following: 0, posts: 0 });
+
+  const fetchSocialStats = async () => {
+    try {
+      const [followersCount, followingCount, postsCount] = await Promise.all([
+        supabase.from('followers').select('*', { count: 'exact', head: true }).eq('following_id', currentProfileId),
+        supabase.from('followers').select('*', { count: 'exact', head: true }).eq('follower_id', currentProfileId),
+        supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', currentProfileId)
+      ]);
+
+      setSocialStats({
+        followers: followersCount.count || 0,
+        following: followingCount.count || 0,
+        posts: postsCount.count || 0
+      });
+    } catch (error) {
+      console.error('Error fetching social stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Security State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -59,28 +175,16 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
     setIsSaving(true);
     setMessage(null);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userData.id}-${Math.random()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      await uploadAvatar(file);
+      
+      // We need to get the new URL to update the local state
+      // Since the service doesn't return it, we'll fetch it from the user data
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('users').select('avatar_url').eq('id', user.id).single();
+        if (data?.avatar_url) setEditPhoto(data.avatar_url);
+      }
 
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ photo_url: publicUrl })
-        .eq('id', userData.id);
-
-      if (updateError) throw updateError;
-
-      setEditPhoto(publicUrl);
       await onUpdate();
       setMessage({ type: 'success', text: 'Foto atualizada com sucesso!' });
     } catch (err: any) {
@@ -97,7 +201,11 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
       const { error } = await supabase
         .from('users')
         .update({
+          full_name: editName,
           display_name: editName,
+          username: editUsername,
+          bio: editBio,
+          avatar_url: editPhoto,
           photo_url: editPhoto
         })
         .eq('id', userData.id);
@@ -161,7 +269,7 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
               <div className="flex flex-col items-center space-y-6">
                 <div className="relative group">
                   <div className="w-32 h-32 rounded-full border-2 border-white/5 p-1 bg-white/[0.02] backdrop-blur-xl overflow-hidden">
-                    <img src={editPhoto || 'https://picsum.photos/seed/user/200'} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                    <img src={editPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.id}`} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                   </div>
                   <label className="absolute bottom-0 right-0 w-10 h-10 rounded-xl bg-zenith-scarlet flex items-center justify-center border border-white/20 shadow-lg cursor-pointer hover:scale-110 transition-transform">
                     <Camera size={18} />
@@ -196,6 +304,33 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Globe size={12} className="text-zenith-scarlet" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Username</label>
+                  </div>
+                  <input 
+                    type="text" 
+                    value={editUsername}
+                    onChange={(e) => setEditUsername(e.target.value)}
+                    placeholder="@username"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 ml-1">
+                    <Book size={12} className="text-zenith-scarlet" />
+                    <label className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Bio</label>
+                  </div>
+                  <textarea 
+                    value={editBio}
+                    onChange={(e) => setEditBio(e.target.value)}
+                    placeholder="Conte um pouco sobre você..."
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-zenith-scarlet transition-all min-h-[100px] resize-none"
                   />
                 </div>
 
@@ -339,26 +474,58 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
             </div>
           </div>
         );
-      default:
+      case 'followers':
+      case 'following':
         return (
-          <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto min-h-screen">
+          <div className="p-6 space-y-8 pb-32 max-w-2xl mx-auto min-h-screen">
+            <header className="flex items-center space-x-4">
+              <button onClick={() => setView('main')} className="p-2 rounded-xl bg-white/5 text-white/40">
+                <ChevronRight className="rotate-180" size={20} />
+              </button>
+              <h2 className="text-xl font-bold uppercase tracking-tight">
+                {view === 'followers' ? t.social.followers : t.social.following}
+              </h2>
+            </header>
+            <div className="space-y-4">
+              {followList.map((user) => (
+                <div key={user.id} className="glass-card p-4 flex items-center justify-between border-white/5 bg-white/[0.02]">
+                  <div className="flex items-center space-x-3">
+                    <img src={user.avatar_url || user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} className="w-12 h-12 rounded-full object-cover" />
+                    <div>
+                      <p className="text-sm font-bold text-white">{user.display_name}</p>
+                      <p className="text-[10px] text-white/30 uppercase tracking-widest">@{user.username || 'user'}</p>
+                    </div>
+                  </div>
+                  <button className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white/60">
+                    Ver Perfil
+                  </button>
+                </div>
+              ))}
+              {followList.length === 0 && (
+                <div className="text-center py-20 text-white/20 uppercase text-[10px] font-bold tracking-widest">
+                  Lista vazia
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      default:
+        if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-2 border-zenith-scarlet border-t-transparent rounded-full animate-spin" /></div>;
+        return (
+          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
             <header className="flex flex-col items-center text-center space-y-8">
               <div className="relative group">
-                {/* Outer Glow Ring */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-zenith-scarlet via-zenith-crimson to-zenith-scarlet rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
                 
                 <div className="relative w-40 h-40 rounded-full border-2 border-white/5 p-1.5 bg-white/[0.02] backdrop-blur-xl">
                   <div className="w-full h-full rounded-full bg-zenith-black flex items-center justify-center overflow-hidden border border-white/10">
-                    {userData?.photo_url ? (
-                      <img src={userData.photo_url} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    {(targetUser?.avatar_url || targetUser?.photo_url) ? (
+                      <img src={targetUser.avatar_url || targetUser.photo_url} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
-                      <div className="w-full h-full bg-white/5 flex items-center justify-center">
-                        <User size={64} className="text-white/10" />
-                      </div>
+                      <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${targetUser?.id}`} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     )}
                   </div>
                   
-                  {/* Level Badge */}
                   <motion.div 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -370,137 +537,134 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate }) => {
                 </div>
               </div>
               
-              <div className="space-y-3">
-                <h1 className="text-4xl font-display font-bold tracking-tighter uppercase leading-none text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                  {userData?.display_name || 'Zenith User'}
-                </h1>
-                <div className="flex items-center justify-center space-x-4">
-                  <div className="flex items-center space-x-2 bg-zenith-scarlet/10 px-3 py-1 rounded-lg border border-zenith-scarlet/20">
-                    <Sparkles size={12} className="text-zenith-scarlet" />
-                    <span className="text-zenith-scarlet text-[10px] font-bold uppercase tracking-[0.2em]">
-                      {levelName}
-                    </span>
+              <div className="space-y-4 w-full">
+                <div className="space-y-1">
+                  <h1 className="text-4xl font-display font-bold tracking-tighter uppercase leading-none text-white">
+                    {targetUser?.full_name || targetUser?.display_name || 'Zenith User'}
+                  </h1>
+                  <p className="text-sm text-white/40 font-medium">@{targetUser?.username || 'zenith_user'}</p>
+                </div>
+                
+                {targetUser?.bio && (
+                  <p className="text-sm text-white/60 max-w-xs mx-auto leading-relaxed">
+                    {targetUser.bio}
+                  </p>
+                )}
+
+                <div className="flex items-center justify-center space-x-8 py-4 border-y border-white/5">
+                  <div className="text-center">
+                    <p className="text-xl font-bold text-white">{socialStats.posts}</p>
+                    <p className="text-[8px] text-white/30 uppercase font-bold tracking-[0.2em]">Publicações</p>
                   </div>
-                  <div className="flex items-center space-x-2 bg-white/5 px-3 py-1 rounded-lg border border-white/10">
-                    <Shield size={12} className="text-white/40" />
-                    <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
-                      {userData?.subscription_tier || 'Free'}
-                    </span>
-                  </div>
+                  <button onClick={fetchFollowers} className="text-center group">
+                    <p className="text-xl font-bold text-white group-hover:text-zenith-scarlet transition-colors">{socialStats.followers}</p>
+                    <p className="text-[8px] text-white/30 uppercase font-bold tracking-[0.2em]">{t.social.followers}</p>
+                  </button>
+                  <button onClick={fetchFollowing} className="text-center group">
+                    <p className="text-xl font-bold text-white group-hover:text-zenith-scarlet transition-colors">{socialStats.following}</p>
+                    <p className="text-[8px] text-white/30 uppercase font-bold tracking-[0.2em]">{t.social.following}</p>
+                  </button>
+                </div>
+
+                <div className="flex space-x-3">
+                  {isOwnProfile ? (
+                    <button 
+                      onClick={() => setView('edit-profile')}
+                      className="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 transition-all"
+                    >
+                      Editar Perfil
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={toggleFollow}
+                      className={`flex-1 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
+                        isFollowing 
+                          ? 'bg-white/5 border border-white/10 text-white/60' 
+                          : 'bg-zenith-scarlet text-white shadow-lg shadow-zenith-scarlet/20'
+                      }`}
+                    >
+                      {isFollowing ? 'Seguindo' : 'Seguir'}
+                    </button>
+                  )}
+                  {isOwnProfile && (
+                    <button onClick={() => setView('preferences')} className="p-4 rounded-2xl bg-white/5 border border-white/10 text-white/40">
+                      <Settings size={18} />
+                    </button>
+                  )}
                 </div>
               </div>
             </header>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <StatItem 
-                icon={<Zap size={18} />} 
-                label={t.profile.stats.xp} 
-                value={xp.toLocaleString()} 
-                color="text-zenith-scarlet" 
-              />
-              <StatItem 
-                icon={<Flame size={18} />} 
-                label={t.profile.stats.streak} 
-                value={`${streak}d`} 
-                color="text-orange-500" 
-              />
-              <StatItem 
-                icon={<Timer size={18} />} 
-                label={t.profile.stats.focus} 
-                value={`${userData.focus_minutes || 0}m`} 
-                color="text-purple-500" 
-              />
-              <StatItem 
-                icon={<Sparkles size={18} />} 
-                label={t.profile.stats.missions} 
-                value={(userData.missions_completed || 0).toString()} 
-                color="text-zenith-cyan" 
-              />
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 mb-6 ml-2">
-                <div className="h-px flex-1 bg-white/5" />
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/20">Protocolos</h3>
-                <div className="h-px flex-1 bg-white/5" />
+            {/* Post Grid */}
+            <div className="space-y-6">
+              <div className="flex items-center space-x-3 ml-1">
+                <Grid size={14} className="text-zenith-scarlet" />
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/40">Publicações</h3>
               </div>
               
-              <MenuButton 
-                icon={<Brain size={20} />} 
-                label={t.profile.mentalGym} 
-                sublabel={t.profile.cognitiveTraining} 
-                onClick={() => setView('gym')} 
-              />
-              <MenuButton 
-                icon={<Book size={20} />} 
-                label={t.profile.journal} 
-                sublabel={t.profile.dailyReflections} 
-                onClick={() => setView('journal')} 
-              />
-
-              <div className="flex items-center space-x-3 my-8 ml-2">
-                <div className="h-px flex-1 bg-white/5" />
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/20">Configurações</h3>
-                <div className="h-px flex-1 bg-white/5" />
-              </div>
-
-              <MenuButton 
-                icon={<User size={20} />} 
-                label={t.profile.editProfile} 
-                sublabel={t.profile.editProfileDesc} 
-                onClick={() => setView('edit-profile')} 
-              />
-              <MenuButton 
-                icon={<CreditCard size={20} />} 
-                label={t.profile.subscription} 
-                sublabel={t.profile.managePlan} 
-                onClick={() => setView('subscription')} 
-              />
-              <MenuButton 
-                icon={<Settings size={20} />} 
-                label={t.profile.preferences} 
-                sublabel={t.profile.appPreferences} 
-                onClick={() => setView('preferences')} 
-              />
-              <MenuButton 
-                icon={<Shield size={20} />} 
-                label={t.profile.security} 
-                sublabel={t.profile.securityDesc} 
-                onClick={() => setView('security')} 
-              />
-              <MenuButton 
-                icon={<LogOut size={20} />} 
-                label={t.profile.signOut} 
-                sublabel="Encerrar sessão com segurança" 
-                onClick={handleLogout} 
-                danger
-              />
-              
-              <div className="pt-8">
-                <button 
-                  onClick={() => {
-                    if (window.confirm(t.profile.deleteConfirm)) {
-                      // Logic for account deletion would go here
-                      supabase.auth.signOut();
-                    }
-                  }}
-                  className="w-full p-5 rounded-2xl border border-red-500/20 bg-red-500/5 flex items-center justify-center space-x-3 text-red-500/60 hover:text-red-500 hover:bg-red-500/10 transition-all group"
-                >
-                  <LogOut size={18} />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t.profile.deleteAccount}</span>
-                </button>
+              <div className="grid grid-cols-3 gap-1 sm:gap-2">
+                {posts.map((post) => (
+                  <motion.div 
+                    key={post.id}
+                    whileHover={{ scale: 0.98 }}
+                    className="aspect-square bg-white/5 border border-white/5 overflow-hidden relative group cursor-pointer rounded-lg"
+                  >
+                    {post.image_url ? (
+                      <img src={post.image_url} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center p-4">
+                        <p className="text-[8px] text-white/20 text-center line-clamp-3">{post.content}</p>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-4">
+                      <div className="flex items-center space-x-1 text-white">
+                        <Heart size={14} fill="currentColor" />
+                        <span className="text-xs font-bold">{post.likes_count || 0}</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-white">
+                        <MessageSquare size={14} fill="currentColor" />
+                        <span className="text-xs font-bold">{post.comments_count || 0}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+                {posts.length === 0 && (
+                  <div className="col-span-3 py-20 text-center border border-dashed border-white/5 rounded-3xl bg-white/[0.01]">
+                    <p className="text-[10px] text-white/20 uppercase tracking-widest font-bold">Nenhuma publicação ainda</p>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="pt-12 pb-8 text-center">
-              <button 
-                onClick={handleVersionClick}
-                className="text-[8px] font-bold uppercase tracking-[0.5em] text-white/10 hover:text-white/20 transition-colors outline-none"
-              >
-                Zenith OS v2.4.1 Build 2026
-              </button>
-            </div>
+            {isOwnProfile && (
+              <div className="space-y-4 pt-12 border-t border-white/5">
+                <div className="flex items-center space-x-3 mb-6 ml-2">
+                  <div className="h-px flex-1 bg-white/5" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/20">Protocolos</h3>
+                  <div className="h-px flex-1 bg-white/5" />
+                </div>
+                
+                <MenuButton 
+                  icon={<Brain size={20} />} 
+                  label={t.profile.mentalGym} 
+                  sublabel={t.profile.cognitiveTraining} 
+                  onClick={() => setView('gym')} 
+                />
+                <MenuButton 
+                  icon={<Book size={20} />} 
+                  label={t.profile.journal} 
+                  sublabel={t.profile.dailyReflections} 
+                  onClick={() => setView('journal')} 
+                />
+                <MenuButton 
+                  icon={<LogOut size={20} />} 
+                  label={t.profile.signOut} 
+                  sublabel="Encerrar sessão com segurança" 
+                  onClick={handleLogout} 
+                  danger
+                />
+              </div>
+            )}
           </div>
         );
     }

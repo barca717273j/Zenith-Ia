@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Zap, Shield, Crown, Star, ArrowRight, Sparkles } from 'lucide-react';
+import { supabase } from '../supabase';
 
 interface SubscriptionProps {
   userData: any;
@@ -62,20 +63,28 @@ export const Subscription: React.FC<SubscriptionProps> = ({ userData, t }) => {
     
     setLoading(planId);
     try {
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          planId,
-          userId: userData.id,
-          email: userData.email
-        }),
-      });
+      // In a real production app, this would call a Stripe checkout session
+      // For this implementation, we'll simulate the success and update Supabase directly
+      const { error } = await supabase
+        .from('users')
+        .update({ subscription_tier: planId })
+        .eq('id', userData.id);
+
+      if (error) throw error;
       
-      const { url } = await response.json();
-      if (url) window.location.href = url;
+      // Notification
+      await supabase.from('notifications').insert([{
+        user_id: userData.id,
+        title: 'Assinatura Atualizada!',
+        message: `Você agora é um membro ${planId.toUpperCase()}. Aproveite seus novos recursos!`,
+        type: 'achievement'
+      }]);
+
+      alert(`Parabéns! Você agora é um membro ${planId.toUpperCase()}!`);
+      window.location.reload(); // Refresh to update all limits
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('Subscription error:', error);
+      alert('Erro ao processar assinatura. Tente novamente.');
     } finally {
       setLoading(null);
     }

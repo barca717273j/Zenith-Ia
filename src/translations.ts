@@ -331,6 +331,20 @@ export const translations = {
       ml: 'ml',
       session: 'session',
       workout: 'workout'
+    },
+    map: {
+      title: 'Life Map',
+      subtitle: 'Neural Evolution Visualization',
+      categories: {
+        health: 'Health',
+        wealth: 'Wealth',
+        mind: 'Mind',
+        social: 'Social',
+        growth: 'Growth',
+        career: 'Career',
+        leisure: 'Leisure',
+        spirit: 'Spirit'
+      }
     }
   },
   'pt-BR': {
@@ -663,6 +677,20 @@ export const translations = {
       ml: 'ml',
       session: 'sessão',
       workout: 'treino'
+    },
+    map: {
+      title: 'Mapa da Vida',
+      subtitle: 'Visualização da Evolução Neural',
+      categories: {
+        health: 'Saúde',
+        wealth: 'Riqueza',
+        mind: 'Mente',
+        social: 'Social',
+        growth: 'Crescimento',
+        career: 'Carreira',
+        leisure: 'Lazer',
+        spirit: 'Espiritual'
+      }
     }
   },
   'pt-PT': {
@@ -849,6 +877,20 @@ export const translations = {
       ml: 'ml',
       session: 'sessão',
       workout: 'treino'
+    },
+    map: {
+      title: 'Mapa da Vida',
+      subtitle: 'Visualização da Evolução Neural',
+      categories: {
+        health: 'Saúde',
+        wealth: 'Riqueza',
+        mind: 'Mente',
+        social: 'Social',
+        growth: 'Crescimento',
+        career: 'Carreira',
+        leisure: 'Lazer',
+        spirit: 'Espiritual'
+      }
     }
   },
   'fr': {
@@ -1035,6 +1077,20 @@ export const translations = {
       ml: 'ml',
       session: 'session',
       workout: 'entraînement'
+    },
+    map: {
+      title: 'Carte de Vie',
+      subtitle: 'Visualisation de l\'Évolution Neurale',
+      categories: {
+        health: 'Santé',
+        wealth: 'Richesse',
+        mind: 'Esprit',
+        social: 'Social',
+        growth: 'Croissance',
+        career: 'Carrière',
+        leisure: 'Loisirs',
+        spirit: 'Esprit'
+      }
     }
   },
   'es': {
@@ -1221,6 +1277,20 @@ export const translations = {
       ml: 'ml',
       session: 'sesión',
       workout: 'entrenamiento'
+    },
+    map: {
+      title: 'Mapa de Vida',
+      subtitle: 'Visualización de la Evolución Neural',
+      categories: {
+        health: 'Salud',
+        wealth: 'Riqueza',
+        mind: 'Mente',
+        social: 'Social',
+        growth: 'Crecimiento',
+        career: 'Carrera',
+        leisure: 'Ocio',
+        spirit: 'Espíritu'
+      }
     }
   },
   'ja': {
@@ -1407,6 +1477,20 @@ export const translations = {
       ml: 'ml',
       session: 'セッション',
       workout: 'ワークアウト'
+    },
+    map: {
+      title: 'ライフマップ',
+      subtitle: 'ニューラル進化の可視化',
+      categories: {
+        health: '健康',
+        wealth: '富',
+        mind: '精神',
+        social: 'ソーシャル',
+        growth: '成長',
+        career: 'キャリア',
+        leisure: 'レジャー',
+        spirit: 'スピリット'
+      }
     }
   }
 };

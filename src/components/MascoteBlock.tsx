@@ -5,10 +5,11 @@ import { MascoteState } from '../types';
 
 interface MascoteBlockProps {
   state: MascoteState;
+  energyLevel?: number;
   t: any;
 }
 
-export const MascoteBlock: React.FC<MascoteBlockProps> = ({ state, t }) => {
+export const MascoteBlock: React.FC<MascoteBlockProps> = ({ state, energyLevel = 75, t }) => {
   const getIcon = () => {
     switch (state) {
       case 'sleeping': return <Moon className="text-blue-400" size={40} />;
@@ -60,7 +61,7 @@ export const MascoteBlock: React.FC<MascoteBlockProps> = ({ state, t }) => {
       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
         <motion.div 
           initial={{ width: 0 }}
-          animate={{ width: `${state === 'energized' ? 100 : state === 'tired' ? 25 : state === 'sleeping' ? 10 : 75}%` }}
+          animate={{ width: `${energyLevel}%` }}
           className="h-full bg-zenith-electric-blue shadow-[0_0_10px_rgba(0,112,243,0.5)]"
         />
       </div>

@@ -12,7 +12,8 @@ import { useGamification } from './GamificationContext';
 interface Routine {
   id: string;
   time: string;
-  task: string;
+  title: string;
+  description?: string;
   completed: boolean;
   notified: boolean;
   category: string;
@@ -79,7 +80,7 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
   const triggerAlarm = (routine: Routine) => {
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       new Notification('Zenith Life OS', {
-        body: `Protocolo Ativo: ${routine.task}`,
+        body: `Protocolo Ativo: ${routine.title}`,
         icon: '/zenith-logo.png',
         silent: false,
         tag: routine.id
@@ -107,7 +108,8 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
       .from('routines')
       .insert([{ 
         user_id: userData.id, 
-        task: newTask, 
+        title: newTask, 
+        description: '',
         time: newTime, 
         category: newCategory,
         icon: newIcon,
@@ -128,7 +130,10 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
   const toggleRoutine = async (id: string, completed: boolean) => {
     const { error } = await supabase
       .from('routines')
-      .update({ completed: !completed })
+      .update({ 
+        completed: !completed,
+        last_completed: !completed ? new Date().toISOString() : null
+      })
       .eq('id', id);
     
     if (!error) {
@@ -257,7 +262,7 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
             </button>
             <div className="flex-1 min-w-0">
               <p className={`text-lg font-bold tracking-tight truncate transition-all ${r.completed ? 'text-white/20 line-through' : 'text-white'}`}>
-                {r.task}
+                {r.title}
               </p>
               <div className="flex items-center space-x-3 mt-2">
                 <div className="flex items-center space-x-2 text-[10px] text-zenith-scarlet font-mono bg-zenith-scarlet/10 px-3 py-1 rounded-xl border border-zenith-scarlet/10">

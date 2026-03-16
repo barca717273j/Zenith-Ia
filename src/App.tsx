@@ -98,7 +98,11 @@ export default function App() {
           .insert([{
             id: id,
             email: session?.user?.email || '',
+            username: session?.user?.email?.split('@')[0] || 'user',
+            full_name: session?.user?.user_metadata?.full_name || '',
             display_name: session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || 'User',
+            avatar_url: session?.user?.user_metadata?.avatar_url || session?.user?.user_metadata?.picture || '',
+            photo_url: session?.user?.user_metadata?.avatar_url || session?.user?.user_metadata?.picture || '',
             language: 'pt-BR',
             subscription_tier: 'free',
             energy_level: 100,
@@ -221,7 +225,7 @@ export default function App() {
       case 'profile':
         return <Profile key="profile" userData={userData} t={t} onUpdate={fetchUserData} />;
       case 'social':
-        return <Social key="social" userData={userData} t={t} />;
+        return <Social key="social" userData={userData} t={t} onUpdate={fetchUserData} />;
       case 'journal':
         return <Journal key="journal" userData={userData} t={t} />;
       case 'stats':

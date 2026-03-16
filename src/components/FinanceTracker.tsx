@@ -7,7 +7,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 interface Transaction {
   id: string;
-  description: string;
+  title: string;
+  description?: string;
   amount: number;
   type: 'income' | 'expense';
   date: string;
@@ -68,7 +69,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('finance')
+        .from('finances')
         .select('*')
         .eq('user_id', userData.id)
         .order('date', { ascending: false });
@@ -138,10 +139,11 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
 
     try {
       const { error } = await supabase
-        .from('finance')
+        .from('finances')
         .insert([{
           user_id: userData.id,
-          description,
+          title: description,
+          description: '',
           amount: parseFloat(amount),
           type,
           date: new Date().toISOString().split('T')[0]
@@ -388,7 +390,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
                       {t_item.type === 'income' ? <ArrowUpRight size={18} /> : <ArrowDownLeft size={18} />}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white tracking-tight">{t_item.description}</p>
+                      <p className="text-sm font-bold text-white tracking-tight">{t_item.title}</p>
                       <p className="text-[9px] text-white/20 uppercase tracking-widest font-bold mt-0.5">{t_item.date}</p>
                     </div>
                   </div>

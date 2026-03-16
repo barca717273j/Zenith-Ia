@@ -7,6 +7,8 @@ export type MascoteState = 'sleeping' | 'energized' | 'happy' | 'tired';
 export interface UserProfile {
   id: string;
   email: string;
+  username?: string;
+  full_name?: string;
   display_name: string;
   language: 'en' | 'pt-BR' | 'pt-PT' | 'fr' | 'es' | 'ja';
   subscription_tier: SubscriptionTier;
@@ -21,6 +23,7 @@ export interface UserProfile {
   bio?: string;
   is_private: boolean;
   photo_url?: string;
+  avatar_url?: string;
   is_admin?: boolean;
   focus_minutes?: number;
   tasks_completed?: number;
@@ -43,12 +46,19 @@ export interface HotStreak {
 export interface SocialPost {
   id: string;
   user_id: string;
-  content: string;
-  type: 'achievement' | 'routine' | 'photo' | 'text';
+  caption: string;
+  type?: 'achievement' | 'routine' | 'photo' | 'text';
   image_url?: string;
-  boosts: number;
-  created_at: string;
+  likes_count: number;
   comments_count?: number;
+  created_at: string;
+  user?: {
+    display_name: string;
+    full_name?: string;
+    username?: string;
+    photo_url: string;
+    avatar_url?: string;
+  };
 }
 
 export interface SocialComment {
@@ -59,7 +69,10 @@ export interface SocialComment {
   created_at: string;
   user?: {
     display_name: string;
+    full_name?: string;
+    username?: string;
     photo_url: string;
+    avatar_url?: string;
   };
 }
 
@@ -88,10 +101,13 @@ export interface Routine {
   id: string;
   user_id: string;
   time: string;
-  task: string;
+  title: string;
+  description?: string;
   category: string;
   period: 'morning' | 'afternoon' | 'evening';
   icon: string;
+  completed: boolean;
+  last_completed?: string;
   created_at?: string;
 }
 

@@ -3,13 +3,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Users, Search, Heart, MessageSquare, Zap, UserPlus, UserCheck, Flame, TrendingUp, Sparkles, Share2, MoreHorizontal, X, Camera, ArrowUpRight } from 'lucide-react';
 import { supabase } from '../supabase';
 import { SocialPost, UserProfile, Follow, HotStreak, SocialComment } from '../types';
+import { Profile } from './Profile';
+import { loadFeed } from '../services/feedService';
+import { createPost } from '../services/postService';
 
 interface SocialProps {
   userData: UserProfile;
   t: any;
+  onUpdate: () => Promise<void> | void;
 }
 
-export const Social: React.FC<SocialProps> = ({ userData, t }) => {
+export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
   const [activeTab, setActiveTab] = useState<'feed' | 'discover' | 'profile'>('feed');
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,16 +23,40 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostImage, setNewPostImage] = useState<string | null>(null);
   const [isPosting, setIsPosting] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (activeTab === 'feed') fetchFeed();
+    if (activeTab === 'discover') fetchHotStreaks();
+  }, [activeTab]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewPostImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        setIsPosting(true);
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${userData.id}-${Math.random()}.${fileExt}`;
+        const filePath = `posts/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('posts')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('posts')
+          .getPublicUrl(filePath);
+
+        setNewPostImage(publicUrl);
+      } catch (err: any) {
+        console.error('Error uploading image:', err);
+        alert('Erro ao carregar imagem: ' + err.message);
+      } finally {
+        setIsPosting(false);
+      }
     }
   };
 
@@ -36,44 +64,53 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
     if (!newPostContent.trim() && !newPostImage) return;
     setIsPosting(true);
     
-    const { data, error } = await supabase
-      .from('posts')
-      .insert([{
-        user_id: userData.id,
-        content: newPostContent,
-        image_url: newPostImage,
-        likes_count: 0,
-        comments_count: 0
-      }])
-      .select()
-      .single();
-    
-    if (!error && data) {
-      setPosts([data, ...posts]);
-      setNewPostContent('');
-      setNewPostImage(null);
+    try {
+      // We need a File object for the service, but currently we have a publicUrl string
+      // In a real app, we'd upload the file directly. 
+      // Since the UI currently handles the upload and sets a URL, 
+      // I'll adapt the service or keep the current logic but use the service pattern.
+      // Actually, I'll just use the service logic directly here to match the user's intent.
+      
+      const { data, error } = await supabase
+        .from('posts')
+        .insert([{
+          user_id: userData.id,
+          caption: newPostContent,
+          image_url: newPostImage,
+          likes_count: 0,
+          comments_count: 0
+        }])
+        .select(`
+          *,
+          user:users (
+            display_name,
+            avatar_url,
+            photo_url,
+            xp,
+            level,
+            identity
+          )
+        `)
+        .single();
+      
+      if (error) throw error;
+      if (data) {
+        setPosts([data, ...posts]);
+        setNewPostContent('');
+        setNewPostImage(null);
+      }
+    } catch (err: any) {
+      console.error('Error creating post:', err);
+      alert('Erro ao criar post: ' + err.message);
+    } finally {
+      setIsPosting(false);
     }
-    setIsPosting(false);
   };
 
   const fetchFeed = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          user:users (
-            display_name,
-            photo_url,
-            xp,
-            identity
-          )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(20);
-      
-      if (error) throw error;
+      const data = await loadFeed();
       setPosts(data || []);
     } catch (err) {
       console.error('Error fetching feed:', err);
@@ -107,7 +144,7 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .ilike('display_name', `%${query}%`)
+        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,full_name.ilike.%${query}%`)
         .neq('id', userData.id)
         .limit(10);
       
@@ -118,17 +155,35 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
     }
   };
 
-  const handleBoost = async (postId: string) => {
-    // Optimistic update
-    setPosts(prev => prev.map(p => p.id === postId ? { ...p, boosts: p.boosts + 1 } : p));
-    
+  const handleBoost = async (postId: string, postUserId: string) => {
     try {
-      const { error } = await supabase.rpc('increment_boosts', { post_id: postId });
-      if (error) {
-        // Fallback if RPC fails
-        const { data: post } = await supabase.from('posts').select('likes_count').eq('id', postId).single();
-        if (post) {
-          await supabase.from('posts').update({ likes_count: post.likes_count + 1 }).eq('id', postId);
+      // Check if already liked
+      const { data: existingLike } = await supabase
+        .from('likes')
+        .select('*')
+        .eq('user_id', userData.id)
+        .eq('post_id', postId)
+        .maybeSingle();
+
+      if (existingLike) {
+        // Unlike
+        await supabase.from('likes').delete().eq('id', existingLike.id);
+        await supabase.rpc('decrement_likes', { post_id: postId });
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes_count: Math.max(0, (p.likes_count || 0) - 1) } : p));
+      } else {
+        // Like
+        await supabase.from('likes').insert([{ user_id: userData.id, post_id: postId }]);
+        await supabase.rpc('increment_likes', { post_id: postId });
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes_count: (p.likes_count || 0) + 1 } : p));
+
+        // Notification
+        if (postUserId !== userData.id) {
+          await supabase.from('notifications').insert([{
+            user_id: postUserId,
+            title: 'Novo Boost!',
+            message: `${userData.username || userData.display_name} deu um boost no seu post.`,
+            type: 'social'
+          }]);
         }
       }
     } catch (err) {
@@ -182,7 +237,7 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
             <div className="glass-card p-6 border-white/5 bg-white/[0.01] space-y-6">
               <div className="flex space-x-4">
                 <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
-                  <img src={userData.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.id}`} alt="Avatar" className="w-full h-full object-cover" />
+                  <img src={userData.avatar_url || userData.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.id}`} alt="Avatar" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 space-y-4">
                   <textarea
@@ -245,7 +300,18 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
               </div>
             ) : (
               posts.map((post) => (
-                <PostCard key={post.id} post={post} onBoost={() => handleBoost(post.id)} t={t} currentUserId={userData.id} />
+                <PostCard 
+                  key={post.id} 
+                  post={post} 
+                  onBoost={() => handleBoost(post.id, post.user_id)} 
+                  onViewProfile={() => {
+                    setSelectedUserId(post.user_id);
+                    setActiveTab('profile');
+                  }}
+                  t={t} 
+                  currentUserId={userData.id} 
+                  currentUserData={userData} 
+                />
               ))
             )}
           </motion.div>
@@ -275,7 +341,17 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
                 <p className="text-center text-white/20 text-[10px] font-bold uppercase tracking-widest py-10">Nenhum usuário encontrado</p>
               ) : (
                 searchResults.map((user) => (
-                  <UserCard key={user.id} user={user} t={t} />
+                  <UserCard 
+                    key={user.id} 
+                    user={user} 
+                    t={t} 
+                    currentUserId={userData.id} 
+                    currentUserData={userData} 
+                    onViewProfile={() => {
+                      setSelectedUserId(user.id);
+                      setActiveTab('profile');
+                    }}
+                  />
                 ))
               )}
             </div>
@@ -288,37 +364,13 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
           >
-            <div className="glass-card p-6 border-white/5 bg-white/[0.01] flex flex-col items-center text-center space-y-4">
-              <div className="w-24 h-24 rounded-full border-2 border-zenith-electric-blue/20 p-1">
-                <img src={userData.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.id}`} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">{userData.display_name}</h2>
-                <p className="text-[10px] text-zenith-electric-blue font-bold uppercase tracking-widest">{userData.identity}</p>
-              </div>
-              <div className="flex space-x-8 pt-4 border-t border-white/5 w-full">
-                <div className="flex-1 text-center">
-                  <p className="text-lg font-bold text-white">{posts.filter(p => p.user_id === userData.id).length}</p>
-                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Posts</p>
-                </div>
-                <div className="flex-1 text-center">
-                  <p className="text-lg font-bold text-white">{userData.streak}</p>
-                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Streak</p>
-                </div>
-                <div className="flex-1 text-center">
-                  <p className="text-lg font-bold text-white">{userData.level}</p>
-                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Level</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              {posts.filter(p => p.user_id === userData.id).map((post) => (
-                <PostCard key={post.id} post={post} onBoost={() => handleBoost(post.id)} t={t} currentUserId={userData.id} />
-              ))}
-            </div>
+            <Profile 
+              userData={userData} 
+              t={t} 
+              onUpdate={onUpdate} 
+              targetUserId={selectedUserId || userData.id} 
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -326,23 +378,41 @@ export const Social: React.FC<SocialProps> = ({ userData, t }) => {
   );
 };
 
-const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId: string }> = ({ post, onBoost, t, currentUserId }) => {
+const PostCard: React.FC<{ post: any; onBoost: () => void; onViewProfile: () => void; t: any; currentUserId: string; currentUserData: any }> = ({ post, onBoost, onViewProfile, t, currentUserId, currentUserData }) => {
   const user = post.user || {};
   const date = new Date(post.created_at).toLocaleDateString();
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<SocialComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    checkIfLiked();
+  }, [post.id, currentUserId]);
+
+  const checkIfLiked = async () => {
+    const { data } = await supabase
+      .from('likes')
+      .select('*')
+      .eq('user_id', currentUserId)
+      .eq('post_id', post.id)
+      .maybeSingle();
+    setIsLiked(!!data);
+  };
 
   const fetchComments = async () => {
     setLoadingComments(true);
     const { data, error } = await supabase
-      .from('social_comments')
+      .from('comments')
       .select(`
         *,
         user:users (
           display_name,
-          photo_url
+          username,
+          full_name,
+          photo_url,
+          avatar_url
         )
       `)
       .eq('post_id', post.id)
@@ -355,7 +425,7 @@ const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     const { data, error } = await supabase
-      .from('social_comments')
+      .from('comments')
       .insert([{
         post_id: post.id,
         user_id: currentUserId,
@@ -365,7 +435,10 @@ const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId
         *,
         user:users (
           display_name,
-          photo_url
+          username,
+          full_name,
+          photo_url,
+          avatar_url
         )
       `)
       .single();
@@ -373,6 +446,19 @@ const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId
     if (!error && data) {
       setComments([...comments, data]);
       setNewComment('');
+      
+      // Increment comments_count in posts table
+      await supabase.rpc('increment_comments', { post_id: post.id });
+
+      // Notification
+      if (post.user_id !== currentUserId) {
+        await supabase.from('notifications').insert([{
+          user_id: post.user_id,
+          title: 'Novo Comentário!',
+          message: `${currentUserData.username || currentUserData.display_name} comentou no seu post.`,
+          type: 'social'
+        }]);
+      }
     }
   };
 
@@ -387,25 +473,27 @@ const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId
       className="glass-card p-6 space-y-4 border-white/5 bg-white/[0.01] relative overflow-hidden group"
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
+        <button onClick={onViewProfile} className="flex items-center space-x-3 text-left">
           <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 overflow-hidden">
-            <img src={user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user_id}`} alt="Avatar" className="w-full h-full object-cover" />
+            <img src={user.avatar_url || user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user_id}`} alt="Avatar" className="w-full h-full object-cover" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white">{user.display_name || `User ${post.user_id.slice(0, 5)}`}</p>
+            <p className="text-sm font-bold text-white">
+              {user.username || user.display_name || `User ${post.user_id.slice(0, 5)}`}
+            </p>
             <div className="flex items-center space-x-2">
               <span className="text-[8px] text-white/40 uppercase font-bold tracking-widest">{date}</span>
               <div className="w-1 h-1 rounded-full bg-white/20" />
               <span className="text-[8px] text-zenith-electric-blue uppercase font-bold tracking-widest">LVL {user.level || 1}</span>
             </div>
           </div>
-        </div>
+        </button>
         <button className="text-white/20 hover:text-white/60 transition-colors">
           <MoreHorizontal size={18} />
         </button>
       </div>
 
-      <p className="text-sm text-white/80 leading-relaxed">{post.content}</p>
+      <p className="text-sm text-white/80 leading-relaxed">{post.caption}</p>
 
       {post.image_url && (
         <div className="aspect-video rounded-2xl overflow-hidden border border-white/10">
@@ -415,14 +503,17 @@ const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId
 
       <div className="flex items-center space-x-6 pt-4 border-t border-white/5">
         <button 
-          onClick={onBoost}
+          onClick={() => {
+            onBoost();
+            setIsLiked(!isLiked);
+          }}
           className="flex items-center space-x-2 group/btn"
         >
-          <div className="p-2 rounded-lg bg-zenith-scarlet/10 text-zenith-scarlet group-hover/btn:bg-zenith-scarlet/20 transition-all">
-            <Zap size={14} className={post.boosts > 0 ? 'fill-current' : ''} />
+          <div className={`p-2 rounded-lg transition-all ${isLiked ? 'bg-zenith-scarlet/20 text-zenith-scarlet shadow-[0_0_15px_rgba(255,36,0,0.3)]' : 'bg-zenith-scarlet/10 text-zenith-scarlet group-hover/btn:bg-zenith-scarlet/20'}`}>
+            <Zap size={14} className={isLiked ? 'fill-current' : ''} />
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 group-hover/btn:text-zenith-scarlet transition-colors">
-            {post.boosts || 0} Boosts
+          <span className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${isLiked ? 'text-zenith-scarlet' : 'text-white/40 group-hover/btn:text-zenith-scarlet'}`}>
+            {post.likes_count || 0} Boosts
           </span>
         </button>
 
@@ -465,10 +556,12 @@ const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId
                 comments.map((comment) => (
                   <div key={comment.id} className="flex space-x-3">
                     <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
-                      <img src={comment.user?.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user_id}`} alt="Avatar" className="w-full h-full object-cover" />
+                      <img src={comment.user?.avatar_url || comment.user?.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user_id}`} alt="Avatar" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 bg-white/5 rounded-xl p-3 space-y-1">
-                      <p className="text-[10px] font-bold text-white/60">{comment.user?.display_name}</p>
+                      <p className="text-[10px] font-bold text-white/60">
+                        {comment.user?.username || comment.user?.display_name}
+                      </p>
                       <p className="text-xs text-white/80">{comment.content}</p>
                     </div>
                   </div>
@@ -500,26 +593,68 @@ const PostCard: React.FC<{ post: any; onBoost: () => void; t: any; currentUserId
   );
 };
 
-const UserCard: React.FC<{ user: UserProfile; t: any }> = ({ user, t }) => {
+const UserCard: React.FC<{ user: UserProfile; t: any; currentUserId: string; currentUserData: any; onViewProfile: () => void }> = ({ user, t, currentUserId, currentUserData, onViewProfile }) => {
   const [isFollowing, setIsFollowing] = useState(false);
+
+  useEffect(() => {
+    checkFollowStatus();
+  }, [user.id, currentUserId]);
+
+  const checkFollowStatus = async () => {
+    const { data } = await supabase
+      .from('followers')
+      .select('*')
+      .eq('follower_id', currentUserId)
+      .eq('following_id', user.id)
+      .maybeSingle();
+    
+    if (data) setIsFollowing(true);
+  };
+
+  const toggleFollow = async () => {
+    if (isFollowing) {
+      const { error } = await supabase
+        .from('followers')
+        .delete()
+        .eq('follower_id', currentUserId)
+        .eq('following_id', user.id);
+      
+      if (!error) setIsFollowing(false);
+    } else {
+      const { error } = await supabase
+        .from('followers')
+        .insert([{ follower_id: currentUserId, following_id: user.id }]);
+      
+      if (!error) {
+        setIsFollowing(true);
+        // Notification
+        await supabase.from('notifications').insert([{
+          user_id: user.id,
+          title: 'Novo Seguidor!',
+          message: `${currentUserData.username || currentUserData.display_name} começou a seguir você.`,
+          type: 'social'
+        }]);
+      }
+    }
+  };
 
   return (
     <div className="glass-card p-4 flex items-center justify-between border-white/5 bg-white/[0.01]">
-      <div className="flex items-center space-x-4">
+      <button onClick={onViewProfile} className="flex items-center space-x-4 text-left">
         <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 overflow-hidden">
-          <img src={user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="Avatar" className="w-full h-full object-cover" />
+          <img src={user.avatar_url || user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="Avatar" className="w-full h-full object-cover" />
         </div>
         <div>
-          <p className="text-sm font-bold text-white">{user.display_name}</p>
+          <p className="text-sm font-bold text-white">{user.username || user.display_name}</p>
           <div className="flex items-center space-x-2">
             <span className="text-[8px] text-white/40 uppercase font-bold tracking-widest">LVL {user.level}</span>
             <div className="w-1 h-1 rounded-full bg-white/20" />
             <span className="text-[8px] text-zenith-cyan uppercase font-bold tracking-widest">{user.identity}</span>
           </div>
         </div>
-      </div>
+      </button>
       <button
-        onClick={() => setIsFollowing(!isFollowing)}
+        onClick={toggleFollow}
         className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
           isFollowing 
             ? 'bg-white/5 text-white/60 border border-white/10' 

@@ -39,18 +39,18 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const today = new Date().toISOString().split('T')[0];
       
       // 1. Habits
-      const { data: habits } = await supabase.from('habits').select('id').eq('user_id', user.id);
-      const { data: completedHabits } = await supabase.from('habit_logs').select('id').eq('user_id', user.id).eq('date', today);
+      const { data: habits } = await supabase.from('habits').select('completion_history').eq('user_id', user.id);
+      const completedHabitsCount = habits?.filter(h => h.completion_history?.includes(today)).length || 0;
       
       // 2. Routines
-      const { data: routines } = await supabase.from('routines').select('id').eq('user_id', user.id);
-      const { data: completedRoutines } = await supabase.from('routine_logs').select('id').eq('user_id', user.id).eq('date', today);
+      const { data: routines } = await supabase.from('routines').select('last_completed').eq('user_id', user.id);
+      const completedRoutinesCount = routines?.filter(r => r.last_completed?.startsWith(today)).length || 0;
 
       // 3. Exercises
       const { data: completedExercises } = await supabase.from('exercise_history').select('id').eq('user_id', user.id).gte('completed_at', today);
 
       const totalItems = (habits?.length || 0) + (routines?.length || 0) + 1; // +1 for at least one exercise goal
-      const completedItems = (completedHabits?.length || 0) + (completedRoutines?.length || 0) + (completedExercises?.length ? 1 : 0);
+      const completedItems = completedHabitsCount + completedRoutinesCount + (completedExercises?.length ? 1 : 0);
       
       const progress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
       setDailyProgress(Math.min(100, progress));

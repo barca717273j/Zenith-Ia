@@ -1,14 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js"
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey
 
-if (!isSupabaseConfigured) {
-  console.warn('Zenith: Supabase credentials missing. Please check your environment variables.');
-}
-
-// Fallback to empty strings to prevent crash during initialization, 
-// but features will fail gracefully or show setup UI.
-export const supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseAnonKey || 'placeholder');
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)

@@ -54,10 +54,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
               className="w-16 h-16 rounded-2xl border-2 border-white/5 p-0.5 bg-white/[0.02] relative group"
             >
               <div className="w-full h-full rounded-[14px] bg-zenith-black flex items-center justify-center overflow-hidden relative z-10 border border-white/10">
-                {userData?.photo_url ? (
-                  <img src={userData.photo_url} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                {(userData?.avatar_url || userData?.photo_url) ? (
+                  <img src={userData.avatar_url || userData.photo_url} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
-                  <User size={28} className="text-white/10" />
+                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.id}`} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 )}
               </div>
               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-zenith-scarlet rounded-lg flex items-center justify-center border border-zenith-black z-20">
@@ -68,7 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
             <div className="space-y-0.5">
               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">{t.dashboard.welcome}</p>
               <h1 className="text-2xl font-bold font-display tracking-tight text-white uppercase">
-                {userData?.display_name || 'Zenith'}
+                {userData?.full_name || userData?.display_name || 'Zenith'}
               </h1>
             </div>
           </div>
@@ -154,7 +154,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
           </button>
         </div>
         <div className="glass-card p-2 border-white/5 bg-white/[0.01]">
-          <RoutineSystem t={t} />
+          <RoutineSystem t={t} userData={userData} />
         </div>
       </section>
 
@@ -199,6 +199,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
           <MascoteBlock 
             state={userData?.energy_level > 70 ? 'energized' : userData?.energy_level > 30 ? 'happy' : 'tired'} 
+            energyLevel={userData?.energy_level}
             t={t} 
           />
           <DailyMissions t={t} userData={userData} />
@@ -303,7 +304,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userData, t, setActiveTab,
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">Sessão de Foco</h3>
           </div>
           <div onClick={() => setActiveTab('focus')} className="glass-card p-5 cursor-pointer hover:bg-white/[0.02] transition-all">
-            <FocusTimer t={t} />
+            <FocusTimer t={t} userData={userData} />
           </div>
         </section>
       </div>
@@ -329,7 +330,6 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string; 
       <div className="flex items-center space-x-1.5 text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg border border-emerald-400/10">
         <TrendingUp size={12} />
         <span className="text-[10px] font-bold uppercase tracking-tighter">{trend}</span>
-
       </div>
     </div>
     <div className="relative z-10">
