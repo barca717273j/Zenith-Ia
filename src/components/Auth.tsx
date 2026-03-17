@@ -26,32 +26,29 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
   const t = translations[language];
 
-  const handleLogin = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleLogin = async (email: string, password: string) => {
     console.log("Login clicked");
     setLoading(true);
     setError('');
 
     try {
+      await supabase.auth.signOut();
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error(error);
+        console.error("LOGIN ERROR:", error);
         alert(error.message);
         return;
       }
 
+      console.log("USER LOGGED:", data.user);
+
       if (data.user) {
-        console.log("User:", data.user);
-        // Step 7: Redirect
-        // Since we are in a SPA without router, we call onSuccess to trigger App.tsx logic
-        // but we also follow the user's request for window.location.href if they really want it.
-        // However, window.location.href = "/home" will break the app if it's not handled.
-        // I'll stick to the most reliable way for THIS app which is onSuccess()
-        onSuccess();
+        window.location.href = "/home";
       }
     } catch (err: any) {
       setError(err.message);
@@ -63,7 +60,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (authMode === 'login') {
-      return handleLogin();
+      return handleLogin(email, password);
     }
     
     setLoading(true);
@@ -372,7 +369,8 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                 </div>
 
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => handleLogin(email, password)}
                   disabled={loading || !isFormValid()}
                   className="w-full btn-primary py-5 text-[10px] font-bold uppercase tracking-[0.3em] shadow-xl disabled:opacity-50 disabled:grayscale"
                 >
@@ -382,7 +380,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                       <span>{t.common.entering}</span>
                     </div>
                   ) : (
-                    <span>{t.common.enterZenith}</span>
+                    <span>Entrar</span>
                   )}
                 </button>
               </form>

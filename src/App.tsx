@@ -15,7 +15,7 @@ import { Social } from './components/Social';
 import { AdminPanel } from './components/AdminPanel';
 import { Journal } from './components/Journal';
 import { Stats } from './components/Stats';
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabase } from './supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertCircle, ExternalLink, ShieldCheck } from 'lucide-react';
 
@@ -33,11 +33,8 @@ export default function App() {
   const t = translations[lang];
 
   useEffect(() => {
-    // Step 3 & 8: Fix session persistence and add logs
-    console.log("Zenith: Initializing Auth...");
-    
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Zenith: Session retrieved:", session?.user?.id);
+      console.log("SESSION:", session);
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserData(session.user.id);
@@ -47,12 +44,9 @@ export default function App() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Zenith: Auth state changed:", _event, session?.user?.id);
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserData(session.user.id);
-        // Step 7: Ensure redirect after login
-        setActiveTab('home');
       } else {
         setUserData(null);
         setLoading(false);
@@ -66,7 +60,7 @@ export default function App() {
 
   const fetchUserData = async (userId?: string) => {
     const id = userId || user?.id;
-    if (!id || !isSupabaseConfigured) {
+    if (!id) {
       setLoading(false);
       return;
     }
@@ -128,7 +122,7 @@ export default function App() {
   };
 
   const handleOnboardingComplete = async () => {
-    if (!user || !isSupabaseConfigured) {
+    if (!user) {
       setShowOnboarding(false);
       return;
     }
@@ -152,7 +146,7 @@ export default function App() {
     }
   };
 
-  if (!isSupabaseConfigured) {
+  if (false) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-6 text-center">
         <div className="max-w-sm space-y-8">
