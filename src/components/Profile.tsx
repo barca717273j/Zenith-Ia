@@ -175,19 +175,38 @@ export const Profile: React.FC<ProfileProps> = ({ userData, t, onUpdate, targetU
     setIsSaving(true);
     setMessage(null);
     try {
-      await uploadAvatar(file);
-      
-      // We need to get the new URL to update the local state
-      // Since the service doesn't return it, we'll fetch it from the user data
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase.from('users').select('avatar_url').eq('id', user.id).single();
-        if (data?.avatar_url) setEditPhoto(data.avatar_url);
-      }
+      // Step 5: Fix profile image upload
+      const { data: userDataAuth } = await supabase.auth.getUser();
+      const user = userDataAuth.user;
+      if (!user) throw new Error("User not authenticated");
 
+      const filePath = `${user.id}-${Date.now()}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from("users") // Using 'users' as per existing App.tsx logic, but following the upsert pattern
+        .upsert({
+          id: user.id,
+          avatar_url: urlData.publicUrl,
+          photo_url: urlData.publicUrl,
+        });
+
+      if (updateError) throw updateError;
+
+      setEditPhoto(urlData.publicUrl);
       await onUpdate();
       setMessage({ type: 'success', text: 'Foto atualizada com sucesso!' });
     } catch (err: any) {
+      console.error('Upload error:', err);
       setMessage({ type: 'error', text: err.message });
     } finally {
       setIsSaving(false);

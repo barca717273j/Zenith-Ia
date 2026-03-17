@@ -34,35 +34,36 @@ export default function App() {
 
   useEffect(() => {
     console.log('Zenith: Initializing App...');
-    // Check active session
-    supabase.auth.getSession()
-      .then(({ data: { session } }) => {
-        console.log('Zenith: Initial session:', session?.user?.id);
-        setSession(session);
-        if (session?.user) {
-          fetchUserData(session.user.id);
-        } else {
-          setLoading(false);
-        }
-      })
-      .catch(err => {
-        console.error('Zenith: Session initialization error:', err);
+    
+    // Step 2: Ensure session persistence
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Zenith: Initial session:', session?.user?.id);
+      setSession(session);
+      if (session?.user) {
+        fetchUserData(session.user.id);
+        // Step 3: Force redirect after login (simulated by setting active tab)
+        setActiveTab('home');
+      } else {
         setLoading(false);
-      });
+      }
+    });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log('Zenith: Auth state changed:', _event, session?.user?.id);
       setSession(session);
       if (session?.user) {
         fetchUserData(session.user.id);
+        // Step 3: Force redirect after login
+        setActiveTab('home');
       } else {
         setUserData(null);
         setLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchUserData = async (userId?: string) => {

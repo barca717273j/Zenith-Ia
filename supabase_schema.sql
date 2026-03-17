@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS posts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  content TEXT,
+  caption TEXT,
   image_url TEXT,
   likes_count INTEGER DEFAULT 0,
   comments_count INTEGER DEFAULT 0,
@@ -99,3 +99,40 @@ CREATE TABLE IF NOT EXISTS transactions (
 -- Storage Buckets (Run these in Supabase Dashboard or via API)
 -- insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true);
 -- insert into storage.buckets (id, name, public) values ('posts', 'posts', true);
+
+-- RPC Functions
+CREATE OR REPLACE FUNCTION increment_likes(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE posts
+  SET likes_count = likes_count + 1
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION decrement_likes(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE posts
+  SET likes_count = GREATEST(0, likes_count - 1)
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION increment_comments(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE posts
+  SET comments_count = comments_count + 1
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION decrement_comments(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE posts
+  SET comments_count = GREATEST(0, comments_count - 1)
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql;

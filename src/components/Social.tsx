@@ -17,11 +17,6 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
   const [activeTab, setActiveTab] = useState<'feed' | 'discover' | 'profile'>('feed');
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-  fetchFeed();
-  fetchHotStreaks();
-}, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [hotStreaks, setHotStreaks] = useState<HotStreak[]>([]);
@@ -32,9 +27,9 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (activeTab === 'feed') fetchFeed();
-    if (activeTab === 'discover') fetchHotStreaks();
-  }, [activeTab]);
+    fetchFeed();
+    fetchHotStreaks();
+  }, []);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,12 +65,7 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
     setIsPosting(true);
     
     try {
-      // We need a File object for the service, but currently we have a publicUrl string
-      // In a real app, we'd upload the file directly. 
-      // Since the UI currently handles the upload and sets a URL, 
-      // I'll adapt the service or keep the current logic but use the service pattern.
-      // Actually, I'll just use the service logic directly here to match the user's intent.
-      
+      // Step 6: Ensure post creation uses real insert
       const { data, error } = await supabase
         .from('posts')
         .insert([{
@@ -83,7 +73,8 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
           caption: newPostContent,
           image_url: newPostImage,
           likes_count: 0,
-          comments_count: 0
+          comments_count: 0,
+          created_at: new Date()
         }])
         .select(`
           *,
@@ -115,7 +106,24 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
   const fetchFeed = async () => {
     setLoading(true);
     try {
-      const data = await loadFeed();
+      // Step 4: Ensure fetchFeed actually calls Supabase
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          user:users (
+            display_name,
+            avatar_url,
+            photo_url,
+            xp,
+            level,
+            identity
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
       setPosts(data || []);
     } catch (err) {
       console.error('Error fetching feed:', err);
