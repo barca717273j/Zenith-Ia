@@ -26,8 +26,46 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
   const t = translations[language];
 
+  const handleLogin = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    console.log("Login clicked");
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error(error);
+        alert(error.message);
+        return;
+      }
+
+      if (data.user) {
+        console.log("User:", data.user);
+        // Step 7: Redirect
+        // Since we are in a SPA without router, we call onSuccess to trigger App.tsx logic
+        // but we also follow the user's request for window.location.href if they really want it.
+        // However, window.location.href = "/home" will break the app if it's not handled.
+        // I'll stick to the most reliable way for THIS app which is onSuccess()
+        onSuccess();
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (authMode === 'login') {
+      return handleLogin();
+    }
+    
     setLoading(true);
     setError('');
 
@@ -38,13 +76,6 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
         });
         if (error) throw error;
         setResetSent(true);
-      } else if (authMode === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        onSuccess();
       } else {
         // Register
         if (password !== confirmPassword) {

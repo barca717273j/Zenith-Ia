@@ -23,7 +23,7 @@ import { translations, Language } from './translations';
 import { GamificationProvider } from './components/GamificationContext';
 
 export default function App() {
-  const [session, setSession] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
@@ -33,27 +33,25 @@ export default function App() {
   const t = translations[lang];
 
   useEffect(() => {
-    console.log('Zenith: Initializing App...');
+    // Step 3 & 8: Fix session persistence and add logs
+    console.log("Zenith: Initializing Auth...");
     
-    // Step 2: Ensure session persistence
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Zenith: Initial session:', session?.user?.id);
-      setSession(session);
+      console.log("Zenith: Session retrieved:", session?.user?.id);
+      setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserData(session.user.id);
-        // Step 3: Force redirect after login (simulated by setting active tab)
-        setActiveTab('home');
       } else {
         setLoading(false);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Zenith: Auth state changed:', _event, session?.user?.id);
-      setSession(session);
+      console.log("Zenith: Auth state changed:", _event, session?.user?.id);
+      setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserData(session.user.id);
-        // Step 3: Force redirect after login
+        // Step 7: Ensure redirect after login
         setActiveTab('home');
       } else {
         setUserData(null);
@@ -67,7 +65,7 @@ export default function App() {
   }, []);
 
   const fetchUserData = async (userId?: string) => {
-    const id = userId || session?.user?.id;
+    const id = userId || user?.id;
     if (!id || !isSupabaseConfigured) {
       setLoading(false);
       return;
@@ -98,12 +96,12 @@ export default function App() {
           .from('users')
           .insert([{
             id: id,
-            email: session?.user?.email || '',
-            username: session?.user?.email?.split('@')[0] || 'user',
-            full_name: session?.user?.user_metadata?.full_name || '',
-            display_name: session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || 'User',
-            avatar_url: session?.user?.user_metadata?.avatar_url || session?.user?.user_metadata?.picture || '',
-            photo_url: session?.user?.user_metadata?.avatar_url || session?.user?.user_metadata?.picture || '',
+            email: user?.email || '',
+            username: user?.email?.split('@')[0] || 'user',
+            full_name: user?.user_metadata?.full_name || '',
+            display_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
+            avatar_url: user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '',
+            photo_url: user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '',
             language: 'pt-BR',
             subscription_tier: 'free',
             energy_level: 100,
@@ -130,7 +128,7 @@ export default function App() {
   };
 
   const handleOnboardingComplete = async () => {
-    if (!session?.user || !isSupabaseConfigured) {
+    if (!user || !isSupabaseConfigured) {
       setShowOnboarding(false);
       return;
     }
@@ -142,12 +140,12 @@ export default function App() {
           onboarding_completed: true,
           updated_at: new Date().toISOString()
         })
-        .eq('id', session.user.id);
+        .eq('id', user.id);
         
       if (error) throw error;
       
       setShowOnboarding(false);
-      await fetchUserData(session.user.id);
+      await fetchUserData(user.id);
     } catch (err) {
       console.error('Error saving onboarding:', err);
       setShowOnboarding(false);
@@ -203,7 +201,7 @@ export default function App() {
     );
   }
 
-  if (!session) {
+  if (!user) {
     return <Auth onSuccess={() => setLoading(true)} />;
   }
 

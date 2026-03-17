@@ -244,41 +244,43 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
+            className="space-y-8"
           >
             {/* Create Post */}
-            <div className="glass-card p-6 border-white/5 bg-white/[0.01] space-y-6">
-              <div className="flex space-x-4">
-                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
+            <div className="glass-card p-8 border-white/10 bg-white/[0.02] space-y-6 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zenith-electric-blue/50 to-transparent opacity-30" />
+              <div className="flex space-x-6">
+                <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0 shadow-inner">
                   <img src={userData.avatar_url || userData.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.id}`} alt="Avatar" className="w-full h-full object-cover" />
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="flex-1 space-y-6">
                   <textarea
-                    placeholder={t.social.whatsOnYourMind || "O que você conquistou hoje?"}
+                    placeholder={t.social.whatsOnYourMind || "O que você conquistou hoje? 🚀"}
                     value={newPostContent}
                     onChange={(e) => setNewPostContent(e.target.value)}
-                    className="w-full bg-transparent border-none text-lg font-medium focus:outline-none placeholder:text-white/10 resize-none min-h-[100px]"
+                    className="w-full bg-transparent border-none text-xl font-medium focus:outline-none placeholder:text-white/10 resize-none min-h-[120px] leading-relaxed"
                   />
                   
                   {newPostImage && (
-                    <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-video group">
-                      <img src={newPostImage} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="relative rounded-3xl overflow-hidden border border-white/10 aspect-video group shadow-2xl">
+                      <img src={newPostImage} alt="Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
                       <button 
                         onClick={() => setNewPostImage(null)}
-                        className="absolute top-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/80 transition-all backdrop-blur-md"
+                        className="absolute top-4 right-4 p-3 bg-black/60 rounded-full text-white hover:bg-zenith-scarlet transition-all backdrop-blur-xl border border-white/10"
                       >
-                        <X size={16} />
+                        <X size={18} />
                       </button>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                    <div className="flex items-center space-x-3">
                       <button 
                         onClick={() => fileInputRef.current?.click()}
-                        className="p-3 rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                        className="p-4 rounded-2xl bg-white/5 text-white/40 hover:text-zenith-electric-blue hover:bg-white/10 transition-all border border-transparent hover:border-zenith-electric-blue/20"
                       >
-                        <Camera size={20} />
+                        <Camera size={22} />
                       </button>
                       <input 
                         type="file" 
@@ -291,7 +293,7 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
                     <button
                       onClick={handleCreatePost}
                       disabled={isPosting || (!newPostContent.trim() && !newPostImage)}
-                      className="bg-zenith-electric-blue text-white px-8 py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(0,112,243,0.3)] hover:shadow-[0_0_30px_rgba(0,112,243,0.5)]"
+                      className="bg-zenith-electric-blue text-white px-10 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] disabled:opacity-50 transition-all shadow-[0_0_30px_rgba(0,112,243,0.4)] hover:shadow-[0_0_40px_rgba(0,112,243,0.6)] active:scale-95"
                     >
                       {isPosting ? t.common.loading : t.social.post || "Publicar"}
                     </button>
@@ -300,33 +302,35 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
               </div>
             </div>
 
-            {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="w-8 h-8 border-2 border-zenith-electric-blue border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : posts.length === 0 ? (
-              <div className="text-center py-20 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto border border-white/10">
-                  <Share2 size={24} className="text-white/20" />
+            <div className="space-y-8">
+              {loading ? (
+                <div className="flex justify-center py-20">
+                  <div className="w-10 h-10 border-2 border-zenith-electric-blue border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(0,112,243,0.3)]" />
                 </div>
-                <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">{t.social.noPosts}</p>
-              </div>
-            ) : (
-              posts.map((post) => (
-                <PostCard 
-                  key={post.id} 
-                  post={post} 
-                  onBoost={() => handleBoost(post.id, post.user_id)} 
-                  onViewProfile={() => {
-                    setSelectedUserId(post.user_id);
-                    setActiveTab('profile');
-                  }}
-                  t={t} 
-                  currentUserId={userData.id} 
-                  currentUserData={userData} 
-                />
-              ))
-            )}
+              ) : posts.length === 0 ? (
+                <div className="text-center py-24 space-y-6">
+                  <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center mx-auto border border-white/10 shadow-inner">
+                    <Share2 size={32} className="text-white/10" />
+                  </div>
+                  <p className="text-white/30 text-[11px] uppercase font-bold tracking-[0.3em]">{t.social.noPosts}</p>
+                </div>
+              ) : (
+                posts.map((post) => (
+                  <PostCard 
+                    key={post.id} 
+                    post={post} 
+                    onBoost={() => handleBoost(post.id, post.user_id)} 
+                    onViewProfile={() => {
+                      setSelectedUserId(post.user_id);
+                      setActiveTab('profile');
+                    }}
+                    t={t} 
+                    currentUserId={userData.id} 
+                    currentUserData={userData} 
+                  />
+                ))
+              )}
+            </div>
           </motion.div>
         )}
 
@@ -338,14 +342,17 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-6"
           >
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+            <div className="relative group">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center space-x-2 pointer-events-none">
+                <Search className="text-white/20 group-focus-within:text-zenith-electric-blue transition-colors" size={18} />
+                <span className="text-lg">🔍</span>
+              </div>
               <input
                 type="text"
-                placeholder={t.social.search}
+                placeholder={t.social.search || "Buscar exploradores..."}
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-zenith-electric-blue transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm focus:outline-none focus:border-zenith-electric-blue transition-all shadow-inner focus:bg-white/[0.07]"
               />
             </div>
 
