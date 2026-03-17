@@ -17,6 +17,11 @@ export const Social: React.FC<SocialProps> = ({ userData, t, onUpdate }) => {
   const [activeTab, setActiveTab] = useState<'feed' | 'discover' | 'profile'>('feed');
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+  fetchFeed();
+  fetchHotStreaks();
+}, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [hotStreaks, setHotStreaks] = useState<HotStreak[]>([]);
