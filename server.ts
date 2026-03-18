@@ -4,7 +4,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
-import { GoogleGenAI } from '@google/genai';
 import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
@@ -13,8 +12,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- SUPABASE SERVICE CLIENT ---
-const supabaseAdmin = process.env.VITE_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
-  ? createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+const rawUrl = process.env.VITE_SUPABASE_URL || "";
+const rawKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const supabaseUrl = rawUrl.trim();
+const supabaseKey = rawKey.trim();
+
+const supabaseAdmin = supabaseUrl && supabaseKey
+  ? createClient(supabaseUrl, supabaseKey)
   : null;
 
 async function startServer() {
@@ -113,27 +117,6 @@ async function startServer() {
       res.json({ id: session.id, url: session.url });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
-    }
-  });
-
-  // --- AI PROXY (GEMINI) ---
-  const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
-
-  app.post('/api/ai/chat', async (req, res) => {
-    if (!ai) return res.status(500).json({ error: 'AI not configured' });
-    const { prompt, systemInstruction, model = 'gemini-3-flash-preview' } = req.body;
-
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          systemInstruction: systemInstruction || "Você é o Zenith, um mentor de alta performance."
-        }
-      });
-      res.json({ text: response.text });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
     }
   });
 

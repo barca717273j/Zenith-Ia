@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, CreditCard, PiggyBank, TrendingUp, TrendingDown, Sparkles, Zap, MessageSquare, X, Send, Bot, Activity, Timer, BarChart3 } from 'lucide-react';
+import { GoogleGenAI } from '@google/genai';
 import { supabase } from '../supabase';
 import { Language } from '../translations';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -164,24 +165,25 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ userData, t, lan
     if (!aiMessage) return;
     setIsAiLoading(true);
     try {
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: `Analise as seguintes transações financeiras e orçamentos e responda à pergunta do usuário: "${aiMessage}". 
+      const apiKey = process.env.GEMINI_API_KEY?.trim();
+      if (!apiKey) throw new Error('AI not configured: Missing API Key');
+
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: `Analise as seguintes transações financeiras e orçamentos e responda à pergunta do usuário: "${aiMessage}". 
           Transações: ${JSON.stringify(transactions)}. 
           Orçamentos: ${JSON.stringify(budgets)}.
           Responda de forma curta, profissional e útil, como um mentor financeiro premium. Dê dicas práticas de economia baseada nos gastos.`,
+        config: {
           systemInstruction: "Você é o Mentor Financeiro do Zenith IA. Sua missão é ajudar o usuário a atingir a liberdade financeira com dicas de alta performance."
-        })
+        }
       });
       
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
-      setAiResponse(data.text || 'Desculpe, não consegui analisar seus dados agora.');
-    } catch (err) {
+      setAiResponse(response.text || 'Desculpe, não consegui analisar seus dados agora.');
+    } catch (err: any) {
       console.error('AI Error:', err);
-      setAiResponse('Erro ao conectar com o Mentor Financeiro. Verifique sua conexão.');
+      setAiResponse(`Erro ao conectar com o Mentor Financeiro: ${err.message}`);
     } finally {
       setIsAiLoading(false);
     }
