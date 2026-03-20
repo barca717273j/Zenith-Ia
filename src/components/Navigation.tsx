@@ -14,10 +14,10 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => 
     onClick={onClick}
     className="flex flex-col items-center justify-center w-full py-2 relative group outline-none"
   >
-    <div className={`transition-all duration-300 ${isActive ? 'text-zenith-scarlet scale-110' : 'text-white/40 group-hover:text-white/60'}`}>
+    <div className={`transition-all duration-300 ${isActive ? 'text-zenith-scarlet scale-110' : 'text-zenith-text-tertiary group-hover:text-zenith-text-secondary'}`}>
       {icon}
     </div>
-    <span className={`text-[8px] mt-1.5 font-bold uppercase tracking-[0.1em] transition-all duration-300 ${isActive ? 'text-zenith-scarlet' : 'text-white/40'}`}>
+    <span className={`text-[8px] mt-1.5 font-bold uppercase tracking-[0.1em] transition-all duration-300 ${isActive ? 'text-zenith-scarlet' : 'text-zenith-text-tertiary'}`}>
       {label}
     </span>
     {isActive && (
@@ -29,16 +29,18 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => 
   </button>
 );
 
+import { useUser } from '../contexts/UserContext';
+
 interface NavigationProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   t: any;
-  userData?: any;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, t, userData }) => {
+export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, t }) => {
+  const { userData } = useUser();
   return (
-    <nav className="fixed bottom-0 left-0 right-0 nav-blur px-6 pb-8 pt-4 z-50 border-t border-white/5">
+    <nav className="fixed bottom-0 left-0 right-0 nav-blur px-6 pb-8 pt-4 z-50 border-t border-zenith-border-primary">
       <div className="flex justify-between items-center max-w-lg mx-auto">
         <NavItem
           icon={<Home size={20} />}
@@ -76,7 +78,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab,
           isActive={activeTab === 'profile'}
           onClick={() => setActiveTab('profile')}
         />
-        {userData?.isAdmin && (
+        {userData?.is_admin && (
           <NavItem
             icon={<ShieldCheck size={20} />}
             label={t.nav.admin}

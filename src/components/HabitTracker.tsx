@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Plus, Check, Flame, Trophy, Trash2, X, Sparkles, 
   Zap, Calendar, TrendingUp, Award, ChevronRight,
-  Target, Info, Star
+  Target, Info, Star, Clock, Activity
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useGamification } from './GamificationContext';
+import { useUser } from '../contexts/UserContext';
+import { TIER_LIMITS } from '../types';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, AreaChart, Area 
@@ -23,6 +25,8 @@ interface Habit {
   frequency: 'daily' | 'weekly' | 'monthly';
   target: number;
   current_progress: number;
+  target_value: number;
+  target_unit: string;
   completion_history?: string[]; // Array of ISO dates
   reminder_time?: string; // HH:mm format
 }
@@ -38,11 +42,11 @@ interface Achievement {
 }
 
 interface HabitTrackerProps {
-  userData: any;
   t: any;
 }
 
-export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
+export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
+  const { userData, checkLimit, incrementUsage } = useUser();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [activeView, setActiveView] = useState<'habits' | 'tasks' | 'stats'>('habits');
@@ -92,7 +96,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
       .select('*')
       .eq('user_id', userData.id);
 
-    if (data) {
+    if (Array.isArray(data)) {
       const today = new Date().toDateString();
       const updatedHabits = data.map(h => {
         const lastDate = h.last_completed ? new Date(h.last_completed).toDateString() : null;
@@ -114,7 +118,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
       .eq('user_id', userData.id)
       .order('created_at', { ascending: false });
 
-    if (data) {
+    if (Array.isArray(data)) {
       setTasks(data);
     }
   };
@@ -123,6 +127,12 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
     if (!newHabitName.trim() || !userData?.id) return;
 
     if (activeView === 'habits') {
+      const limitCheck = await checkLimit('habits');
+      if (!limitCheck.allowed) {
+        alert(limitCheck.message || 'Limite de hábitos atingido. Faça upgrade para continuar.');
+        return;
+      }
+
       const newHabit = {
         title: newHabitName,
         description: '',
@@ -147,6 +157,12 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
         setIsAdding(false);
       }
     } else {
+      const limitCheck = await checkLimit('actions');
+      if (!limitCheck.allowed) {
+        alert(limitCheck.message || 'Limite de ações diárias atingido. Faça upgrade para continuar.');
+        return;
+      }
+
       const newTask = {
         title: newHabitName,
         description: '',
@@ -161,10 +177,24 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
         .select();
 
       if (data) {
+        await incrementUsage('actions');
         setTasks([data[0], ...tasks]);
         setNewHabitName('');
         setIsAdding(false);
       }
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      setTasks(tasks.filter(t => t.id !== id));
+    } catch (error) {
+      console.error('Error deleting task:', error);
     }
   };
 
@@ -173,6 +203,14 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
     const todayStr = new Date().toDateString();
     const isCompleting = !habit.completed_today;
     
+    if (isCompleting) {
+      const limitCheck = await checkLimit('actions');
+      if (!limitCheck.allowed) {
+        alert(limitCheck.message || 'Limite de ações diárias atingido. Faça upgrade para continuar.');
+        return;
+      }
+    }
+
     let newStreak = habit.streak;
     let newHistory = habit.completion_history || [];
 
@@ -194,7 +232,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
       })
       .eq('id', habit.id);
 
-    if (!error) {
+    if (!error && Array.isArray(habits)) {
       setHabits(habits.map(h => 
         h.id === habit.id ? { 
           ...h, 
@@ -204,6 +242,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
         } : h
       ));
       if (isCompleting) {
+        await incrementUsage('actions');
         addXP(20);
       }
     }
@@ -211,14 +250,26 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
 
   const toggleTask = async (task: any) => {
     const isCompleting = !task.completed;
+    
+    if (isCompleting) {
+      const limitCheck = await checkLimit('actions');
+      if (!limitCheck.allowed) {
+        alert(limitCheck.message || 'Limite de ações diárias atingido. Faça upgrade para continuar.');
+        return;
+      }
+    }
+
     const { error } = await supabase
       .from('tasks')
       .update({ completed: isCompleting })
       .eq('id', task.id);
 
-    if (!error) {
+    if (Array.isArray(tasks)) {
       setTasks(tasks.map(t => t.id === task.id ? { ...t, completed: isCompleting } : t));
-      if (isCompleting) addXP(30);
+      if (isCompleting) {
+        await incrementUsage('actions');
+        addXP(30);
+      }
     }
   };
 
@@ -238,8 +289,8 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
     }
   };
 
-  const isPro = userData?.subscription_tier && userData.subscription_tier !== 'free';
-  const habitLimit = isPro ? 100 : 3;
+  const tier = userData?.subscription_tier || 'free';
+  const habitLimit = TIER_LIMITS[tier].habits;
 
   // Stats Data
   const chartData = [
@@ -253,22 +304,22 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
   ];
 
   const achievements: Achievement[] = [
-    { id: '1', title: 'Fogo Eterno', description: 'Mantenha um streak de 7 dias', icon: <Flame size={16} />, unlocked: habits.some(h => h.streak >= 7), progress: Math.max(...habits.map(h => h.streak), 0), total: 7 },
+    { id: '1', title: 'Fogo Eterno', description: 'Mantenha um streak de 7 dias', icon: <Flame size={16} />, unlocked: Array.isArray(habits) && habits.some(h => h.streak >= 7), progress: Math.max(...(Array.isArray(habits) ? habits.map(h => h.streak) : [0]), 0), total: 7 },
     { id: '2', title: 'Mestre da Rotina', description: 'Complete 50 hábitos totais', icon: <Trophy size={16} />, unlocked: false, progress: 12, total: 50 },
-    { id: '3', title: 'Foco Absoluto', description: 'Complete todas as tarefas do dia', icon: <Target size={16} />, unlocked: tasks.length > 0 && tasks.every(t => t.completed), progress: tasks.filter(t => t.completed).length, total: tasks.length || 1 },
+    { id: '3', title: 'Foco Absoluto', description: 'Complete todas as tarefas do dia', icon: <Target size={16} />, unlocked: Array.isArray(tasks) && tasks.length > 0 && tasks.every(t => t.completed), progress: Array.isArray(tasks) ? tasks.filter(t => t.completed).length : 0, total: Array.isArray(tasks) ? tasks.length || 1 : 1 },
   ];
 
   return (
-    <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
-      <header className="flex justify-between items-center">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold font-display tracking-tighter uppercase leading-none text-white">
-            Protocolos <span className="text-zenith-scarlet">IA</span>
+    <div className="flex flex-col gap-4 p-4 pb-32 max-w-2xl mx-auto min-h-screen">
+      <header className="flex justify-between items-end mb-4">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenith-text-primary">
+            Sincronia <span className="text-zenith-scarlet">Neural</span>
           </h1>
-          <div className="flex items-center space-x-2">
-            <div className="h-1 w-12 bg-zenith-scarlet rounded-full" />
-            <p className="text-white/30 text-[10px] font-bold uppercase tracking-[0.2em]">
-              {activeView === 'habits' ? `${habits.length}/${habitLimit} Hábitos` : activeView === 'tasks' ? `${tasks.length} Tarefas` : 'Análise Neural'}
+          <div className="flex items-center space-x-3">
+            <div className="h-1 w-16 bg-gradient-to-r from-zenith-scarlet to-transparent rounded-full" />
+            <p className="text-zenith-text-tertiary text-[10px] font-bold uppercase tracking-[0.3em]">
+              {activeView === 'habits' ? `${habits.length}/${habitLimit} Protocolos Ativos` : activeView === 'tasks' ? `${tasks.length} Diretrizes Pendentes` : 'Análise de Performance'}
             </p>
           </div>
         </div>
@@ -277,107 +328,147 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsAdding(true)}
           disabled={activeView === 'habits' && habits.length >= habitLimit}
-          className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-zenith-scarlet transition-all disabled:opacity-50 group"
+          className="w-16 h-16 rounded-[24px] bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center hover:bg-zenith-surface-2 hover:border-zenith-scarlet/50 transition-all duration-500 disabled:opacity-50 group shadow-2xl"
         >
-          <Plus size={28} className="text-white/60 group-hover:text-zenith-scarlet transition-colors" />
+          <Plus size={32} className="text-zenith-text-tertiary group-hover:text-zenith-scarlet transition-colors" />
         </motion.button>
       </header>
 
       {/* View Switcher */}
-      <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
-        <button
-          onClick={() => setActiveView('habits')}
-          className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all ${activeView === 'habits' ? 'bg-zenith-scarlet text-white shadow-lg' : 'text-white/40 hover:text-white/60'}`}
-        >
-          Hábitos
-        </button>
-        <button
-          onClick={() => setActiveView('tasks')}
-          className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all ${activeView === 'tasks' ? 'bg-zenith-scarlet text-white shadow-lg' : 'text-white/40 hover:text-white/60'}`}
-        >
-          Tarefas
-        </button>
-        <button
-          onClick={() => setActiveView('stats')}
-          className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all ${activeView === 'stats' ? 'bg-zenith-scarlet text-white shadow-lg' : 'text-white/40 hover:text-white/60'}`}
-        >
-          Análise
-        </button>
+      <div className="flex bg-zenith-surface-1 p-1.5 rounded-[24px] border border-zenith-border-primary backdrop-blur-xl">
+        {(['habits', 'tasks', 'stats'] as const).map((view) => (
+          <button
+            key={view}
+            onClick={() => setActiveView(view)}
+            className={`flex-1 py-4 text-[10px] uppercase tracking-[0.2em] font-black rounded-[18px] transition-all duration-500 relative overflow-hidden ${
+              activeView === view 
+                ? 'text-white' 
+                : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'
+            }`}
+          >
+            {activeView === view && (
+              <motion.div 
+                layoutId="active-view-bg"
+                className="absolute inset-0 bg-gradient-to-br from-zenith-scarlet to-zenith-crimson shadow-lg"
+              />
+            )}
+            <span className="relative z-10">{view === 'habits' ? 'Hábitos' : view === 'tasks' ? 'Tarefas' : 'Análise'}</span>
+          </button>
+        ))}
       </div>
 
       <AnimatePresence mode="wait">
         {activeView === 'habits' && (
           <motion.div 
             key="habits"
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="space-y-6"
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-8"
           >
             {/* Stats Summary */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="glass-card p-6 flex flex-col items-center justify-center space-y-3 border-white/5 bg-white/[0.02] relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-zenith-scarlet/20" />
-                <Flame className="text-zenith-scarlet drop-shadow-[0_0_8px_rgba(255,38,33,0.5)]" size={28} />
+              <div className="glass-card p-8 flex flex-col items-center justify-center space-y-4 border-zenith-border-primary bg-zenith-surface-1 group hover:bg-zenith-surface-2">
+                <div className="w-12 h-12 rounded-2xl bg-zenith-scarlet/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                  <Flame className="text-zenith-scarlet drop-shadow-[0_0_15px_rgba(255,26,26,0.6)]" size={28} />
+                </div>
                 <div className="text-center">
-                  <p className="text-4xl font-display font-bold tracking-tighter text-white">
+                  <p className="text-5xl font-display font-bold tracking-tighter text-zenith-text-primary">
                     {Math.max(0, ...habits.map(h => h.streak), 0)}
                   </p>
-                  <p className="text-[9px] text-white/30 font-bold uppercase tracking-[0.2em] mt-1">Recorde Neural</p>
+                  <p className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Recorde de Streak</p>
                 </div>
               </div>
-              <div className="glass-card p-6 flex flex-col items-center justify-center space-y-3 border-white/5 bg-white/[0.02] relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-white/10" />
-                <Trophy className="text-white/60" size={28} />
+              <div className="glass-card p-8 flex flex-col items-center justify-center space-y-4 border-zenith-border-primary bg-zenith-surface-1 group hover:bg-zenith-surface-2">
+                <div className="w-12 h-12 rounded-2xl bg-zenith-surface-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                  <Trophy className="text-zenith-text-tertiary" size={28} />
+                </div>
                 <div className="text-center">
-                  <p className="text-4xl font-display font-bold tracking-tighter text-white">
+                  <p className="text-5xl font-display font-bold tracking-tighter text-zenith-text-primary">
                     {habits.length > 0 ? Math.round((habits.filter(h => h.completed_today).length / habits.length) * 100) : 0}%
                   </p>
-                  <p className="text-[9px] text-white/30 font-bold uppercase tracking-[0.2em] mt-1">Sincronia Hoje</p>
+                  <p className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Sincronia Diária</p>
                 </div>
               </div>
             </div>
 
             {/* Habits List */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {habits.map((habit) => (
                 <motion.div
                   key={habit.id}
                   layout
-                  className="glass-card p-6 flex items-center justify-between group border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all"
+                  className={`glass-card p-8 flex items-center justify-between group border-zenith-border-primary transition-all duration-700 relative overflow-hidden ${
+                    habit.completed_today ? 'bg-zenith-surface-1 opacity-60' : 'bg-gradient-to-br from-zenith-surface-1 to-transparent hover:bg-zenith-surface-2 hover:border-zenith-scarlet/30 shadow-2xl'
+                  }`}
                 >
-                  <div className="flex items-center space-x-6">
+                  {!habit.completed_today && (
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-zenith-scarlet/5 blur-[60px] rounded-full group-hover:bg-zenith-scarlet/10 transition-all duration-700" />
+                  )}
+                  
+                  <div className="flex items-center space-x-8 flex-1 relative z-10">
                     <button
                       onClick={() => toggleHabit(habit)}
-                      className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 relative ${
+                      className={`w-20 h-20 rounded-[28px] flex items-center justify-center transition-all duration-700 relative group/btn border-2 ${
                         habit.completed_today 
-                          ? 'bg-zenith-scarlet text-white shadow-[0_0_25px_rgba(255,38,33,0.5)]' 
-                          : 'bg-white/5 text-white/10 border border-white/10 hover:border-white/20'
+                          ? 'bg-zenith-scarlet border-zenith-scarlet text-white shadow-[0_0_40px_rgba(255,26,26,0.6)] scale-110' 
+                          : 'bg-zenith-surface-2 text-zenith-text-tertiary border-zenith-border-primary hover:border-zenith-scarlet/50 hover:scale-110'
                       }`}
                     >
                       {habit.completed_today ? (
-                        <Check size={28} strokeWidth={3} />
+                        <Check size={40} strokeWidth={3.5} />
                       ) : (
-                        <Sparkles size={20} className="opacity-20" />
+                        <Sparkles size={32} className="opacity-20 group-hover/btn:opacity-100 group-hover/btn:text-zenith-scarlet transition-all duration-500" />
+                      )}
+                      {habit.completed_today && (
+                        <motion.div 
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1.8, opacity: 0 }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="absolute inset-0 bg-zenith-scarlet rounded-[28px] -z-10"
+                        />
                       )}
                     </button>
-                    <div className="space-y-1">
-                      <p className={`text-lg font-bold tracking-tight transition-all ${habit.completed_today ? 'text-white/20 line-through' : 'text-white'}`}>
-                        {habit.title}
-                      </p>
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1.5 text-[10px] text-zenith-scarlet font-bold uppercase tracking-widest">
-                          <Flame size={14} />
-                          <span>{habit.streak} DIAS</span>
+
+                    <div className="space-y-4 flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className={`text-2xl font-display font-bold tracking-tight transition-all duration-700 ${habit.completed_today ? 'text-zenith-text-tertiary line-through italic' : 'text-zenith-text-primary'}`}>
+                            {habit.title}
+                          </p>
+                          <div className="flex items-center space-x-3 text-[9px] font-black uppercase tracking-[0.2em] text-zenith-text-tertiary">
+                            <span className="px-2 py-0.5 bg-zenith-surface-2 rounded-md border border-zenith-border-primary">{habit.frequency}</span>
+                            <span className="w-1 h-1 bg-zenith-border-primary rounded-full" />
+                            <span>Meta: {habit.target_value} {habit.target_unit}</span>
+                          </div>
                         </div>
-                        <div className="h-1 w-1 bg-white/10 rounded-full" />
-                        <span className="text-[9px] text-white/20 font-bold uppercase tracking-widest">{habit.frequency}</span>
+                        <div className="flex flex-col items-end space-y-2">
+                          <div className="flex items-center space-x-2 bg-zenith-surface-2 px-3 py-1.5 rounded-xl border border-zenith-border-primary">
+                            <Flame size={16} className={habit.streak > 0 ? 'text-zenith-scarlet drop-shadow-[0_0_8px_rgba(255,26,26,0.5)]' : 'text-zenith-text-tertiary'} />
+                            <span className={`text-xs font-black font-mono ${habit.streak > 0 ? 'text-zenith-text-primary' : 'text-zenith-text-tertiary'}`}>{habit.streak}</span>
+                          </div>
+                          <p className="text-[8px] font-bold uppercase tracking-widest text-zenith-text-tertiary">Streak Atual</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
+                          <span className="text-zenith-text-tertiary">Progresso Mensal</span>
+                          <span className="text-zenith-scarlet">{Math.round((habit.streak / 30) * 100)}%</span>
+                        </div>
+                        <div className="h-2 bg-zenith-surface-2 rounded-full overflow-hidden border border-zenith-border-primary">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min((habit.streak / 30) * 100, 100)}%` }}
+                            className="h-full bg-gradient-to-r from-zenith-crimson via-zenith-scarlet to-zenith-scarlet shadow-[0_0_15px_rgba(255,26,26,0.3)]"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
                   <button 
                     onClick={() => deleteHabit(habit.id)}
-                    className="opacity-0 group-hover:opacity-100 p-3 rounded-xl hover:bg-red-500/10 text-white/10 hover:text-red-500 transition-all"
+                    className="ml-6 opacity-0 group-hover:opacity-100 w-12 h-12 rounded-2xl bg-red-500/5 flex items-center justify-center text-zenith-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all duration-500"
                   >
                     <Trash2 size={20} />
                   </button>
@@ -390,93 +481,140 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
         {activeView === 'tasks' && (
           <motion.div 
             key="tasks"
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="space-y-4"
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-8"
           >
-            {tasks.map((task) => (
-              <motion.div
-                key={task.id}
-                layout
-                className="glass-card p-6 flex items-center justify-between group border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all"
-              >
-                <div className="flex items-center space-x-6">
-                  <button
-                    onClick={() => toggleTask(task)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${
-                      task.completed 
-                        ? 'bg-zenith-scarlet text-white shadow-[0_0_15px_rgba(255,38,33,0.3)]' 
-                        : 'bg-white/5 text-white/10 border border-white/10'
-                    }`}
-                  >
-                    {task.completed && <Check size={18} strokeWidth={3} />}
-                  </button>
-                  <div className="space-y-1">
-                    <p className={`text-base font-bold tracking-tight transition-all ${task.completed ? 'text-white/20 line-through' : 'text-white'}`}>
-                      {task.title}
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-zenith-scarlet' : task.priority === 'medium' ? 'bg-orange-500' : 'bg-white/20'}`} />
-                      <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest">{task.priority} Priority</span>
+            {/* Task Stats */}
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: 'Pendentes', value: tasks.filter(t => !t.completed).length, color: 'text-zenith-text-primary' },
+                { label: 'Concluídas', value: tasks.filter(t => t.completed).length, color: 'text-zenith-scarlet' },
+                { label: 'Total', value: tasks.length, color: 'text-zenith-text-tertiary' }
+              ].map((stat, i) => (
+                <div key={i} className="glass-card p-4 text-center border-zenith-border-primary bg-zenith-surface-1">
+                  <p className={`text-2xl font-display font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest mt-1">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              {tasks.map((task) => (
+                <motion.div
+                  key={task.id}
+                  layout
+                  className={`glass-card p-6 flex items-center justify-between group border-zenith-border-primary transition-all duration-700 relative overflow-hidden ${
+                    task.completed ? 'bg-zenith-surface-1 opacity-40 grayscale' : 'bg-gradient-to-br from-zenith-surface-1 to-transparent hover:bg-zenith-surface-2 hover:border-zenith-scarlet/30 shadow-xl'
+                  }`}
+                >
+                  {!task.completed && (
+                    <div className="absolute -top-10 -right-10 w-20 h-20 bg-zenith-scarlet/5 blur-[40px] rounded-full group-hover:bg-zenith-scarlet/10 transition-all duration-700" />
+                  )}
+                  
+                  <div className="flex items-center space-x-6 flex-1 relative z-10">
+                    <button
+                      onClick={() => toggleTask(task)}
+                      className={`w-14 h-14 rounded-[20px] flex items-center justify-center transition-all duration-500 border-2 ${
+                        task.completed 
+                          ? 'bg-zenith-scarlet border-zenith-scarlet text-white shadow-[0_0_20px_rgba(255,38,33,0.4)]' 
+                          : 'bg-zenith-surface-2 text-zenith-text-tertiary border-zenith-border-primary hover:border-zenith-scarlet/50 hover:scale-110'
+                      }`}
+                    >
+                      {task.completed ? <Check size={28} strokeWidth={3} /> : <div className="w-2 h-2 rounded-full bg-zenith-border-primary group-hover:bg-zenith-scarlet transition-colors" />}
+                    </button>
+                    <div className="space-y-1.5">
+                      <p className={`text-lg font-bold tracking-tight transition-all duration-500 ${task.completed ? 'text-zenith-text-tertiary line-through italic' : 'text-zenith-text-primary'}`}>
+                        {task.title}
+                      </p>
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-zenith-scarlet shadow-[0_0_8px_rgba(255,26,26,0.5)]' : task.priority === 'medium' ? 'bg-orange-500' : 'bg-zenith-border-primary'}`} />
+                        <span className="text-[9px] text-zenith-text-tertiary font-black uppercase tracking-widest">{task.priority} Priority</span>
+                        {task.due_date && (
+                          <>
+                            <span className="w-1 h-1 bg-zenith-border-primary rounded-full" />
+                            <div className="flex items-center space-x-1.5 text-[9px] font-black uppercase tracking-widest text-zenith-text-tertiary">
+                              <Clock size={10} />
+                              <span>{task.due_date}</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <button 
-                  onClick={() => deleteHabit(task.id)}
-                  className="opacity-0 group-hover:opacity-100 p-3 rounded-xl hover:bg-red-500/10 text-white/10 hover:text-red-500 transition-all"
-                >
-                  <Trash2 size={20} />
-                </button>
-              </motion.div>
-            ))}
+                  <button 
+                    onClick={() => deleteTask(task.id)}
+                    className="ml-4 opacity-0 group-hover:opacity-100 w-10 h-10 rounded-xl bg-red-500/5 flex items-center justify-center text-zenith-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all duration-500"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
 
         {activeView === 'stats' && (
           <motion.div 
             key="stats"
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -20 }}
             className="space-y-8"
           >
             {/* Performance Chart */}
-            <div className="glass-card p-8 border-white/5 bg-white/[0.02]">
-              <div className="flex justify-between items-center mb-8">
-                <div className="space-y-1">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-white">Eficiência Semanal</h3>
-                  <p className="text-[10px] text-white/30 uppercase tracking-widest">Volume de conclusão neural</p>
+            <div className="glass-card p-8 border-zenith-border-primary bg-zenith-surface-1 space-y-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary">Ciclo de Performance</h3>
+                  <p className="text-2xl font-display font-bold text-zenith-text-primary mt-1">Eficiência Neural</p>
                 </div>
-                <TrendingUp size={20} className="text-zenith-scarlet" />
+                <div className="w-12 h-12 rounded-2xl bg-zenith-scarlet/10 flex items-center justify-center">
+                  <Activity size={24} className="text-zenith-scarlet" />
+                </div>
               </div>
-              <div className="h-48 w-full">
+              
+              <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <defs>
-                      <linearGradient id="colorComp" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FF2621" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#FF2621" stopOpacity={0}/>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ff1a1a" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#ff1a1a" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-zenith-border-primary opacity-20" vertical={false} />
                     <XAxis 
                       dataKey="name" 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 'bold' }}
+                      tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 'bold' }}
+                      className="text-zenith-text-tertiary"
+                      dy={10}
                     />
+                    <YAxis hide />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#050505', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                      itemStyle={{ color: '#FF2621' }}
+                      contentStyle={{ 
+                        backgroundColor: 'var(--surface-1)', 
+                        border: '1px solid var(--border-primary)',
+                        borderRadius: '16px',
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        color: 'var(--text-primary)'
+                      }}
+                      itemStyle={{ color: '#ff1a1a' }}
                     />
                     <Area 
                       type="monotone" 
                       dataKey="completed" 
-                      stroke="#FF2621" 
-                      strokeWidth={3}
+                      stroke="#ff1a1a" 
+                      strokeWidth={4}
                       fillOpacity={1} 
-                      fill="url(#colorComp)" 
+                      fill="url(#colorValue)" 
+                      animationDuration={2000}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -484,32 +622,29 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
             </div>
 
             {/* Achievements */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <Award size={16} className="text-zenith-scarlet" />
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Conquistas Desbloqueadas</h3>
-              </div>
+            <div className="space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary px-2">Conquistas Desbloqueadas</h3>
               <div className="grid grid-cols-1 gap-4">
                 {achievements.map((ach) => (
-                  <div key={ach.id} className={`glass-card p-5 border-white/5 flex items-center justify-between ${ach.unlocked ? 'bg-zenith-scarlet/5 border-zenith-scarlet/20' : 'bg-white/[0.01]'}`}>
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${ach.unlocked ? 'bg-zenith-scarlet text-white shadow-[0_0_15px_rgba(255,38,33,0.3)]' : 'bg-white/5 text-white/20'}`}>
-                        {ach.icon}
+                  <div key={ach.id} className={`glass-card p-6 border-zenith-border-primary flex items-center justify-between group transition-all duration-500 ${ach.unlocked ? 'bg-zenith-scarlet/5 border-zenith-scarlet/20' : 'bg-zenith-surface-1'}`}>
+                    <div className="flex items-center space-x-6">
+                      <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-500 ${ach.unlocked ? 'bg-zenith-scarlet text-white shadow-[0_0_30px_rgba(255,26,26,0.4)] scale-110 rotate-6' : 'bg-zenith-surface-2 text-zenith-text-tertiary'}`}>
+                        <span className="text-3xl">{ach.icon}</span>
                       </div>
                       <div className="space-y-1">
-                        <h4 className={`text-sm font-bold tracking-tight ${ach.unlocked ? 'text-white' : 'text-white/40'}`}>{ach.title}</h4>
-                        <p className="text-[9px] text-white/20 uppercase tracking-widest">{ach.description}</p>
+                        <h4 className={`text-lg font-bold tracking-tight ${ach.unlocked ? 'text-zenith-text-primary' : 'text-zenith-text-tertiary'}`}>{ach.title}</h4>
+                        <p className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-widest">{ach.description}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className={`text-xs font-bold font-mono ${ach.unlocked ? 'text-zenith-scarlet' : 'text-white/20'}`}>
+                    <div className="text-right space-y-3">
+                      <p className={`text-sm font-black font-mono ${ach.unlocked ? 'text-zenith-scarlet' : 'text-zenith-text-tertiary'}`}>
                         {ach.progress}/{ach.total}
                       </p>
-                      <div className="w-20 h-1 bg-white/5 rounded-full mt-2 overflow-hidden">
+                      <div className="w-24 h-1.5 bg-zenith-surface-2 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${(ach.progress / ach.total) * 100}%` }}
-                          className={`h-full ${ach.unlocked ? 'bg-zenith-scarlet' : 'bg-white/20'}`}
+                          className={`h-full transition-all duration-1000 ${ach.unlocked ? 'bg-zenith-scarlet shadow-[0_0_10px_rgba(255,26,26,0.5)]' : 'bg-zenith-border-primary'}`}
                         />
                       </div>
                     </div>
@@ -519,34 +654,35 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
             </div>
 
             {/* Calendar View (Simple Grid) */}
-            <div className="glass-card p-8 border-white/5 bg-white/[0.02]">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-2">
-                  <Calendar size={16} className="text-zenith-scarlet" />
-                  <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Mapa de Calor Neural</h3>
+            <div className="glass-card p-10 border-zenith-border-primary bg-zenith-surface-1 space-y-8">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary">Mapa de Calor Neural</h3>
+                  <p className="text-2xl font-display font-bold text-zenith-text-primary">Consistência</p>
                 </div>
-                <span className="text-[9px] text-white/20 font-bold uppercase tracking-widest">Março 2026</span>
+                <div className="w-12 h-12 rounded-2xl bg-zenith-surface-2 flex items-center justify-center">
+                  <Calendar size={24} className="text-zenith-text-tertiary" />
+                </div>
               </div>
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-3">
                 {Array.from({ length: 31 }).map((_, i) => {
                   const date = new Date();
                   date.setDate(i + 1);
                   const dateStr = date.toISOString().split('T')[0];
-                  
-                  // Check if any habit was completed on this day
                   const hasActivity = habits.some(h => h.completion_history?.includes(dateStr));
                   const isToday = new Date().getDate() === i + 1 && new Date().getMonth() === date.getMonth();
                   
                   return (
-                    <div 
+                    <motion.div 
                       key={i} 
-                      className={`aspect-square rounded-md flex items-center justify-center text-[8px] font-bold transition-all ${
-                        isToday ? 'border border-zenith-scarlet text-zenith-scarlet' :
-                        hasActivity ? 'bg-zenith-scarlet/40 text-white' : 'bg-white/5 text-white/10'
+                      whileHover={{ scale: 1.2, zIndex: 10 }}
+                      className={`aspect-square rounded-lg flex items-center justify-center text-[9px] font-black transition-all duration-500 ${
+                        isToday ? 'bg-zenith-text-primary text-zenith-black shadow-[0_0_20px_rgba(255,255,255,0.3)]' :
+                        hasActivity ? 'bg-zenith-scarlet text-white shadow-[0_0_15px_rgba(255,26,26,0.4)]' : 'bg-zenith-surface-2 text-zenith-text-tertiary'
                       }`}
                     >
                       {i + 1}
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -555,31 +691,44 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
         )}
       </AnimatePresence>
 
-      {/* Add Modal */}
+      {/* Add Modal -> Bottom Sheet */}
       <AnimatePresence>
         {isAdding && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-zenith-black/90 backdrop-blur-xl"
-          >
+          <div className="fixed inset-0 z-[100] flex items-end justify-center">
             <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              className="glass-card p-10 w-full max-w-sm space-y-8 border-white/10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAdding(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative w-full max-w-lg bg-zenith-surface-1 rounded-t-[2.5rem] border-t border-zenith-border-primary p-8 pb-12 shadow-2xl overflow-hidden"
             >
-              <div className="flex justify-between items-center">
+              {/* Drag Handle */}
+              <div className="flex justify-center mb-6">
+                <div className="w-12 h-1.5 bg-zenith-border-primary rounded-full opacity-50" />
+              </div>
+
+              <div className="flex justify-between items-center mb-8">
                 <div className="space-y-1">
-                  <h3 className="text-2xl font-display font-bold uppercase tracking-tight text-white">
-                    {activeView === 'habits' ? 'Novo Hábito' : 'Nova Tarefa'}
+                  <h3 className="text-2xl font-display font-bold uppercase tracking-tight text-zenith-text-primary italic">
+                    Novo <span className="text-zenith-scarlet">{activeView === 'habits' ? 'Hábito' : 'Protocolo'}</span>
                   </h3>
-                  <p className="text-[10px] text-white/30 uppercase tracking-widest">Defina sua próxima diretriz</p>
+                  <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-bold">Defina sua próxima diretriz</p>
                 </div>
-                <button onClick={() => setIsAdding(false)} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
-                  <X size={20} />
+                <button 
+                  onClick={() => setIsAdding(false)} 
+                  className="w-10 h-10 rounded-xl bg-zenith-surface-2 flex items-center justify-center text-zenith-text-tertiary hover:text-zenith-text-primary transition-all border border-zenith-border-primary"
+                >
+                  <X size={18} />
                 </button>
               </div>
+
               <div className="space-y-6">
                 <div className="relative">
                   <input
@@ -587,44 +736,44 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
                     value={newHabitName}
                     onChange={(e) => setNewHabitName(e.target.value)}
                     placeholder={activeView === 'habits' ? "Nome do Hábito..." : "O que precisa ser feito?"}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-zenith-scarlet transition-all placeholder:text-white/10"
+                    className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl px-6 py-4 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all placeholder:text-zenith-text-tertiary"
                   />
-                  <Zap size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-white/10" />
+                  <Zap size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-zenith-text-tertiary opacity-20" />
                 </div>
 
                 {activeView === 'habits' && (
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Frequência</label>
+                        <label className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Frequência</label>
                         <select
                           value={newFrequency}
                           onChange={(e) => setNewFrequency(e.target.value as any)}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-zenith-scarlet transition-all appearance-none"
+                          className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all appearance-none"
                         >
-                          <option value="daily">Diário</option>
-                          <option value="weekly">Semanal</option>
-                          <option value="monthly">Mensal</option>
+                          <option value="daily" className="bg-zenith-surface-1">Diário</option>
+                          <option value="weekly" className="bg-zenith-surface-1">Semanal</option>
+                          <option value="monthly" className="bg-zenith-surface-1">Mensal</option>
                         </select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Meta (Vezes)</label>
+                        <label className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Meta (Vezes)</label>
                         <input
                           type="number"
                           min="1"
                           value={newTarget}
                           onChange={(e) => setNewTarget(parseInt(e.target.value) || 1)}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                          className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[8px] text-white/30 font-bold uppercase tracking-widest ml-1">Lembrete (Opcional)</label>
+                      <label className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Lembrete (Opcional)</label>
                       <input
                         type="time"
                         value={newReminderTime}
                         onChange={(e) => setNewReminderTime(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                        className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
                       />
                     </div>
                   </>
@@ -638,17 +787,17 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ userData, t }) => {
                 </button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
       {/* Empty State */}
       {(activeView === 'habits' ? habits.length : activeView === 'tasks' ? tasks.length : 0) === 0 && activeView !== 'stats' && (
         <div className="py-24 text-center space-y-6">
-          <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto opacity-10">
-            <Plus size={40} />
+          <div className="w-20 h-20 rounded-3xl bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center mx-auto opacity-10">
+            <Plus size={40} className="text-zenith-text-tertiary" />
           </div>
-          <p className="text-white/20 text-xs font-bold uppercase tracking-[0.3em]">Nenhum item ativo</p>
+          <p className="text-zenith-text-tertiary text-xs font-bold uppercase tracking-[0.3em]">Nenhum item ativo</p>
         </div>
       )}
     </div>

@@ -3,8 +3,10 @@ import { motion } from 'motion/react';
 import { Play, Pause, RotateCcw, Zap, Sparkles, Timer, Brain } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 import { supabase } from '../supabase';
+import { useUser } from '../contexts/UserContext';
 
-export const FocusTimer: React.FC<{ t: any; userData: any; isFullPage?: boolean }> = ({ t, userData, isFullPage = false }) => {
+export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFullPage = false }) => {
+  const { userData } = useUser();
   const [mode, setMode] = useState<'focus' | 'break'>('focus');
   const [focusDuration, setFocusDuration] = useState(25 * 60);
   const [timeLeft, setTimeLeft] = useState(25 * 60);

@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'pro' | 'elite' | 'master';
+export type SubscriptionTier = 'basic' | 'free' | 'weekly' | 'monthly' | 'annual' | 'pro' | 'elite' | 'master';
 
 export type UserIdentity = 'discipline_warrior' | 'strategic_mind' | 'mental_athlete' | 'wealth_builder' | 'focus_monk';
 
@@ -12,6 +12,7 @@ export interface UserProfile {
   display_name: string;
   language: 'en' | 'pt-BR' | 'pt-PT' | 'fr' | 'es' | 'ja';
   subscription_tier: SubscriptionTier;
+  plan_expires_at?: string;
   energy_level: number;
   xp: number;
   level: number;
@@ -30,6 +31,14 @@ export interface UserProfile {
   habits_count?: number;
   missions_completed?: number;
   finance_goals_reached?: number;
+  ai_messages_count?: number;
+  last_message_date?: string;
+  ai_generations_count?: number;
+  last_generation_date?: string;
+  actions_count?: number;
+  last_action_date?: string;
+  posts_count?: number;
+  last_post_date?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -47,7 +56,7 @@ export interface SocialPost {
   id: string;
   user_id: string;
   caption: string;
-  type?: 'achievement' | 'routine' | 'photo' | 'text';
+  type?: 'thought' | 'achievement' | 'routine' | 'reflection' | 'photo' | 'text';
   image_url?: string;
   likes_count: number;
   comments_count?: number;
@@ -58,6 +67,7 @@ export interface SocialPost {
     username?: string;
     photo_url: string;
     avatar_url?: string;
+    level?: number;
   };
 }
 
@@ -113,9 +123,13 @@ export interface Routine {
 
 export interface TierLimits {
   aiMessagesPerDay: number;
-  hasFullRoutines: boolean;
-  hasExercises: boolean;
-  hasYoga: boolean;
+  aiGenerationsPerDay: number;
+  routinesPerDay: number;
+  actionsPerDay: number;
+  habits: number;
+  posts: number;
+  hasFullSocial: boolean;
+  hasPremiumExercises: boolean;
   hasAdvancedAnalytics: boolean;
   hasFinanceTracking: boolean;
   hasCustomRoutines: boolean;
@@ -125,39 +139,112 @@ export interface TierLimits {
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   free: {
     aiMessagesPerDay: 5,
-    hasFullRoutines: false,
-    hasExercises: false,
-    hasYoga: false,
+    aiGenerationsPerDay: 1,
+    routinesPerDay: 3,
+    actionsPerDay: 5,
+    habits: 3,
+    posts: 1,
+    hasFullSocial: false,
+    hasPremiumExercises: false,
+    hasAdvancedAnalytics: false,
+    hasFinanceTracking: false,
+    hasCustomRoutines: false,
+    hasPrioritySupport: false,
+  },
+  weekly: {
+    aiMessagesPerDay: 20,
+    aiGenerationsPerDay: 3,
+    routinesPerDay: 10,
+    actionsPerDay: 15,
+    habits: 10,
+    posts: 3,
+    hasFullSocial: false,
+    hasPremiumExercises: true,
+    hasAdvancedAnalytics: false,
+    hasFinanceTracking: true,
+    hasCustomRoutines: false,
+    hasPrioritySupport: false,
+  },
+  monthly: {
+    aiMessagesPerDay: 100,
+    aiGenerationsPerDay: 10,
+    routinesPerDay: 30,
+    actionsPerDay: 50,
+    habits: 30,
+    posts: 10,
+    hasFullSocial: true,
+    hasPremiumExercises: true,
+    hasAdvancedAnalytics: true,
+    hasFinanceTracking: true,
+    hasCustomRoutines: true,
+    hasPrioritySupport: false,
+  },
+  annual: {
+    aiMessagesPerDay: Infinity,
+    aiGenerationsPerDay: Infinity,
+    routinesPerDay: Infinity,
+    actionsPerDay: Infinity,
+    habits: Infinity,
+    posts: Infinity,
+    hasFullSocial: true,
+    hasPremiumExercises: true,
+    hasAdvancedAnalytics: true,
+    hasFinanceTracking: true,
+    hasCustomRoutines: true,
+    hasPrioritySupport: true,
+  },
+  master: {
+    aiMessagesPerDay: Infinity,
+    aiGenerationsPerDay: Infinity,
+    routinesPerDay: Infinity,
+    actionsPerDay: Infinity,
+    habits: Infinity,
+    posts: Infinity,
+    hasFullSocial: true,
+    hasPremiumExercises: true,
+    hasAdvancedAnalytics: true,
+    hasFinanceTracking: true,
+    hasCustomRoutines: true,
+    hasPrioritySupport: true,
+  },
+  // Legacy/Other tiers mapping to closest new tier
+  basic: {
+    aiMessagesPerDay: 5,
+    aiGenerationsPerDay: 1,
+    routinesPerDay: 3,
+    actionsPerDay: 5,
+    habits: 3,
+    posts: 1,
+    hasFullSocial: false,
+    hasPremiumExercises: false,
     hasAdvancedAnalytics: false,
     hasFinanceTracking: false,
     hasCustomRoutines: false,
     hasPrioritySupport: false,
   },
   pro: {
-    aiMessagesPerDay: 50,
-    hasFullRoutines: true,
-    hasExercises: true,
-    hasYoga: true,
-    hasAdvancedAnalytics: false,
-    hasFinanceTracking: false,
-    hasCustomRoutines: false,
-    hasPrioritySupport: false,
-  },
-  elite: {
-    aiMessagesPerDay: Infinity,
-    hasFullRoutines: true,
-    hasExercises: true,
-    hasYoga: true,
+    aiMessagesPerDay: 100,
+    aiGenerationsPerDay: 10,
+    routinesPerDay: 30,
+    actionsPerDay: 50,
+    habits: 30,
+    posts: 10,
+    hasFullSocial: true,
+    hasPremiumExercises: true,
     hasAdvancedAnalytics: true,
     hasFinanceTracking: true,
     hasCustomRoutines: true,
     hasPrioritySupport: false,
   },
-  master: {
+  elite: {
     aiMessagesPerDay: Infinity,
-    hasFullRoutines: true,
-    hasExercises: true,
-    hasYoga: true,
+    aiGenerationsPerDay: Infinity,
+    routinesPerDay: Infinity,
+    actionsPerDay: Infinity,
+    habits: Infinity,
+    posts: Infinity,
+    hasFullSocial: true,
+    hasPremiumExercises: true,
     hasAdvancedAnalytics: true,
     hasFinanceTracking: true,
     hasCustomRoutines: true,

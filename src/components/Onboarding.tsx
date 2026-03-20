@@ -4,6 +4,8 @@ import { ChevronRight, Sparkles, Target, Clock, Dumbbell, Brain, Check, Zap, Moo
 import { supabase } from '../supabase';
 import { translations, Language } from '../translations';
 
+import { useUser } from '../contexts/UserContext';
+
 interface OnboardingProps {
   onComplete: () => void;
 }
@@ -11,9 +13,9 @@ interface OnboardingProps {
 type OnboardingStep = 'welcome' | 'objective' | 'energy' | 'schedule' | 'identity' | 'focus' | 'finalizing';
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
+  const { userData } = useUser();
   const [step, setStep] = useState<OnboardingStep>('welcome');
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
   
   // Form State
   const [objective, setObjective] = useState('');
@@ -22,16 +24,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [sleepTime, setSleepTime] = useState('22:00');
   const [identity, setIdentity] = useState('');
   const [focus, setFocus] = useState('');
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        supabase.from('users').select('*').eq('id', user.id).single().then(({ data }) => {
-          if (data) setUserData(data);
-        });
-      }
-    });
-  }, []);
 
   const lang: Language = userData?.language || 'pt-BR';
   const t = translations[lang];

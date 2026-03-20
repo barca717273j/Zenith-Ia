@@ -1,70 +1,133 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
+:root {
+  --bg-color: #ffffff;
+  --text-primary: #0a0a0a;
+  --text-secondary: #4b5563;
+  --text-tertiary: #9ca3af;
+  --surface-1: #f9fafb;
+  --surface-2: #f3f4f6;
+  --border-primary: #e5e7eb;
+  --border-secondary: #f3f4f6;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --scrollbar-thumb: #d1d5db;
+}
+
+.dark {
+  --bg-color: #050505;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.2);
+  --surface-1: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.1);
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --nav-bg: rgba(0, 0, 0, 0.8);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+}
+
 @theme {
   --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-zenith-black: #050000;
-  --color-zenith-dark: #0a0000;
+  --color-zenith-black: var(--bg-color);
+  --color-zenith-dark: var(--bg-color);
+  --color-zenith-text-primary: var(--text-primary);
+  --color-zenith-text-secondary: var(--text-secondary);
+  --color-zenith-text-tertiary: var(--text-tertiary);
+  --color-zenith-surface-1: var(--surface-1);
+  --color-zenith-surface-2: var(--surface-2);
+  --color-zenith-border-primary: var(--border-primary);
+  --color-zenith-border-secondary: var(--border-secondary);
+  --color-zenith-nav: var(--nav-bg);
   --color-zenith-deep-red: #1a0000;
-  --color-zenith-crimson: #8b0000;
-  --color-zenith-scarlet: #ff2400;
-  --color-zenith-neon-red: #ff0000;
-  --color-zenith-gray: #1a1a1a;
+  --color-zenith-crimson: #cc0000;
+  --color-zenith-scarlet: #ff0000;
+  --color-zenith-neon-red: #ff3333;
+  --color-zenith-gray: var(--bg-color);
   
   /* Red Theme Colors */
-  --color-zenith-electric-red: #8b0000;
-  --color-zenith-cyan-red: #ff2400;
+  --color-zenith-electric-red: #ff0000;
+  --color-zenith-cyan-red: #ff3333;
   --color-zenith-neon-red-glow: #ff0000;
 
   /* Compatibility with old blue names - now Red */
-  --color-zenith-electric-blue: #8b0000;
-  --color-zenith-cyan: #ff2400;
+  --color-zenith-electric-blue: #ff0000;
+  --color-zenith-cyan: #ff3333;
   --color-zenith-neon-blue: #ff0000;
-  --color-zenith-neon-purple: #8b0000;
+  --color-zenith-neon-purple: #cc0000;
 }
 
 @layer base {
   body {
-    @apply bg-zenith-black text-white font-sans antialiased overflow-x-hidden selection:bg-zenith-crimson/30;
+    @apply bg-zenith-black text-zenith-text-primary font-sans antialiased overflow-x-hidden selection:bg-zenith-scarlet/30;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-color: var(--bg-color);
+    color: var(--text-primary);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight;
+    @apply font-display tracking-tight text-zenith-text-primary;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-zenith-dark/40 backdrop-blur-3xl border border-white/[0.05] rounded-[1.5rem] shadow-2xl relative overflow-hidden;
+    @apply backdrop-blur-3xl rounded-[2rem] shadow-2xl relative overflow-hidden transition-all duration-500;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-primary);
   }
 
   .glass-card-hover {
-    @apply transition-all duration-300 hover:bg-zenith-deep-red/50 hover:border-white/[0.1] hover:shadow-zenith-crimson/10;
+    @apply transition-all duration-500 hover:shadow-zenith-scarlet/5;
+    &:hover {
+      background-color: var(--surface-2);
+      border-color: var(--border-primary);
+    }
   }
   
   .btn-primary {
-    @apply bg-gradient-to-r from-zenith-crimson to-zenith-scarlet text-white font-bold py-4 px-8 rounded-xl transition-all active:scale-95 disabled:opacity-50 hover:shadow-[0_0_20px_rgba(139,0,0,0.4)];
+    @apply bg-zenith-scarlet text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 active:scale-95 disabled:opacity-50 hover:shadow-[0_0_40px_rgba(255,0,0,0.4)] hover:brightness-110;
   }
 
   .btn-secondary {
-    @apply bg-white/[0.05] border border-white/[0.1] text-white font-medium py-4 px-8 rounded-xl hover:bg-white/[0.08] transition-all active:scale-95;
+    @apply font-medium py-4 px-8 rounded-2xl transition-all active:scale-95;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    &:hover {
+      background-color: var(--surface-2);
+    }
   }
 
   .nav-blur {
-    @apply bg-zenith-black/80 backdrop-blur-2xl border-t border-white/[0.05];
+    @apply backdrop-blur-3xl;
+    background-color: var(--nav-bg);
+    border-top: 1px solid var(--border-primary);
   }
 
   .neon-text {
     @apply text-transparent bg-clip-text bg-gradient-to-r from-zenith-scarlet via-zenith-crimson to-zenith-neon-red;
   }
+
+  .input-field {
+    @apply rounded-2xl px-6 py-4 transition-all duration-300
+           focus:outline-none focus:border-zenith-scarlet/30
+           placeholder:text-zenith-text-tertiary;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    &:focus {
+      background-color: var(--surface-2);
+    }
+  }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -72,12 +135,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 26, 26, 0.3);
 }
 
 /* Animations */
@@ -92,11 +155,15 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+  0%, 100% { opacity: 0.5; transform: scale(1); filter: blur(20px); }
+  50% { opacity: 0.8; transform: scale(1.05); filter: blur(30px); }
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 3s infinite ease-in-out;
+}
+
+.text-gradient-scarlet {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-zenith-scarlet to-[#ff5e5e];
 }
 

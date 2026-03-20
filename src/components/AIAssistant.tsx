@@ -6,15 +6,16 @@ import ReactMarkdown from 'react-markdown';
 import { TIER_LIMITS } from '../types';
 import { supabase } from '../supabase';
 
+import { useUser } from '../contexts/UserContext';
+
 interface AIAssistantProps {
   isOpen: boolean;
   onClose: () => void;
   t: any;
-  userData: any;
-  onUpdate: () => void;
 }
 
-export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, userData, onUpdate }) => {
+export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) => {
+  const { userData, refreshUserData, checkLimit, incrementUsage } = useUser();
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
     { role: 'assistant', content: "Saudações. Sou o Infinity Core. Como posso otimizar sua jornada rumo ao ápice hoje?" }
   ]);
@@ -39,14 +40,14 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
           .from('users')
           .update({ ai_messages_count: 0 })
           .eq('id', userData.id);
-        onUpdate();
+        await refreshUserData();
       }
     };
 
     if (isOpen) {
       checkAndResetLimits();
     }
-  }, [isOpen, userData, onUpdate]);
+  }, [isOpen, userData, refreshUserData]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -55,7 +56,14 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
   }, [messages, isTyping]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLimitReached) return;
+    if (!input.trim()) return;
+
+    // Check limits
+    const limitCheck = await checkLimit('ai_messages');
+    if (!limitCheck.allowed) {
+      alert(limitCheck.message);
+      return;
+    }
 
     const userMessage = input;
     setInput('');
@@ -63,19 +71,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
     setIsTyping(true);
 
     try {
-      // Update message count in Supabase
-      const newCount = (userData?.ai_messages_count || 0) + 1;
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ 
-          ai_messages_count: newCount,
-          last_message_date: new Date().toISOString()
-        })
-        .eq('id', userData.id);
-      
-      if (updateError) throw updateError;
-      
-      onUpdate();
+      // Increment usage
+      await incrementUsage('ai_messages');
 
       const response = await generateLifeStrategy(userData, userMessage);
       setMessages(prev => [...prev, { role: 'assistant', content: response || "Estou processando as melhores estratégias para você..." }]);
@@ -100,15 +97,15 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="fixed inset-0 z-[100] bg-zenith-black flex flex-col"
+          className="fixed inset-0 z-[100] bg-zenith-black flex flex-col transition-colors duration-500"
         >
           {/* Header */}
-          <header className="p-6 border-b border-white/5 flex justify-between items-center bg-zenith-black/90 backdrop-blur-3xl relative">
+          <header className="p-6 border-b border-zenith-border-primary flex justify-between items-center bg-zenith-surface-1/90 backdrop-blur-3xl relative">
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zenith-scarlet to-transparent opacity-50" />
             
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-zenith-scarlet shadow-[0_0_20px_rgba(255,36,0,0.3)] relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-zenith-surface-2 border border-zenith-border-primary flex items-center justify-center text-zenith-scarlet shadow-lg shadow-zenith-scarlet/20 relative z-10">
                   <Brain size={24} />
                 </div>
                 <motion.div 
@@ -118,31 +115,31 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
                 />
               </div>
               <div>
-                <h2 className="font-display font-bold text-xl tracking-tighter uppercase text-white">AI Mentor Strategist</h2>
+                <h2 className="font-display font-bold text-xl tracking-tighter uppercase text-zenith-text-primary">AI Mentor Strategist</h2>
                 <div className="flex items-center space-x-2 mt-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-zenith-scarlet animate-pulse shadow-[0_0_8px_#ff2400]" />
-                  <span className="text-[8px] text-white/40 font-bold uppercase tracking-widest">Neural Link Active</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-zenith-scarlet animate-pulse shadow-sm shadow-zenith-scarlet/50" />
+                  <span className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest">Neural Link Active</span>
                 </div>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-right hidden sm:block">
-                <div className="text-[8px] text-white/40 font-bold uppercase tracking-widest">Messages Left</div>
+                <div className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest">Messages Left</div>
                 <div className="text-xs font-bold text-zenith-scarlet">{messagesLeft}</div>
               </div>
               <motion.button 
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose} 
-                className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
+                className="w-10 h-10 flex items-center justify-center bg-zenith-surface-2 rounded-xl border border-zenith-border-primary hover:bg-zenith-surface-3 transition-all"
               >
-                <X size={20} className="text-white/40" />
+                <X size={20} className="text-zenith-text-tertiary" />
               </motion.button>
             </div>
           </header>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-hide bg-white/[0.01]">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-hide bg-zenith-black/50">
             {messages.map((msg, i) => (
               <motion.div
                 key={i}
@@ -153,7 +150,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
                 <div className={`max-w-[85%] flex space-x-3 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
                   <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center border ${
                     msg.role === 'user' 
-                      ? 'bg-white/5 border-white/10 text-white/30' 
+                      ? 'bg-zenith-surface-2 border-zenith-border-primary text-zenith-text-tertiary' 
                       : 'bg-zenith-scarlet/10 border-zenith-scarlet/20 text-zenith-scarlet'
                   }`}>
                     {msg.role === 'user' ? <User size={14} /> : <Sparkles size={14} />}
@@ -161,9 +158,9 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
                   <div className={`p-4 rounded-2xl text-sm leading-relaxed font-medium ${
                     msg.role === 'user' 
                       ? 'bg-zenith-crimson text-white rounded-tr-none' 
-                      : 'bg-white/[0.03] text-white/90 rounded-tl-none border border-white/5'
+                      : 'bg-zenith-surface-1 text-zenith-text-secondary rounded-tl-none border border-zenith-border-primary shadow-sm'
                   }`}>
-                    <div className="prose prose-invert prose-sm max-w-none">
+                    <div className="max-w-none">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   </div>
@@ -172,7 +169,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
             ))}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-white/[0.02] p-4 rounded-2xl rounded-tl-none border border-white/5 flex space-x-2">
+                <div className="bg-zenith-surface-1 p-4 rounded-2xl rounded-tl-none border border-zenith-border-primary flex space-x-2">
                   <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2 h-2 bg-zenith-scarlet rounded-full" />
                   <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2 h-2 bg-zenith-scarlet rounded-full" />
                   <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2 h-2 bg-zenith-scarlet rounded-full" />
@@ -182,7 +179,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
           </div>
 
           {/* Footer */}
-          <footer className="p-6 border-t border-white/5 bg-zenith-black/90 backdrop-blur-3xl space-y-4">
+          <footer className="p-6 border-t border-zenith-border-primary bg-zenith-surface-1/90 backdrop-blur-3xl space-y-4">
             {/* Suggestions */}
             <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
               {suggestions.map((s, i) => (
@@ -190,7 +187,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
                   key={i}
                   onClick={() => { setInput(s.label); handleSend(); }}
                   disabled={isLimitReached}
-                  className="flex-shrink-0 flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-white/60 hover:bg-white/10 hover:text-white transition-all disabled:opacity-50"
+                  className="flex-shrink-0 flex items-center space-x-2 bg-zenith-surface-2 border border-zenith-border-primary px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-zenith-text-tertiary hover:bg-zenith-surface-3 hover:text-zenith-text-primary transition-all disabled:opacity-50"
                 >
                   {s.icon}
                   <span>{s.label}</span>
@@ -206,7 +203,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t, us
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                 disabled={isLimitReached}
                 placeholder={isLimitReached ? "Daily message limit reached" : "Ask the neural core..."}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-16 focus:outline-none focus:border-zenith-scarlet/40 transition-all font-medium text-white placeholder:text-white/20 disabled:opacity-50"
+                className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-4 pl-6 pr-16 focus:outline-none focus:border-zenith-scarlet/40 transition-all font-medium text-zenith-text-primary placeholder:text-zenith-text-tertiary disabled:opacity-50"
               />
               <motion.button
                 whileHover={{ scale: 1.05 }}

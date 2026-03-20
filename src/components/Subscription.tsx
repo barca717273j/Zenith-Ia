@@ -3,12 +3,14 @@ import { motion } from 'motion/react';
 import { Check, Zap, Shield, Crown, Star, ArrowRight, Sparkles } from 'lucide-react';
 import { supabase } from '../supabase';
 
+import { useUser } from '../contexts/UserContext';
+
 interface SubscriptionProps {
-  userData: any;
   t: any;
 }
 
-export const Subscription: React.FC<SubscriptionProps> = ({ userData, t }) => {
+export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
+  const { userData, refreshUserData } = useUser();
   const [loading, setLoading] = useState<string | null>(null);
 
   const plans = [
@@ -80,11 +82,9 @@ export const Subscription: React.FC<SubscriptionProps> = ({ userData, t }) => {
         type: 'achievement'
       }]);
 
-      alert(`Parabéns! Você agora é um membro ${planId.toUpperCase()}!`);
-      window.location.reload(); // Refresh to update all limits
+      await refreshUserData();
     } catch (error) {
       console.error('Subscription error:', error);
-      alert('Erro ao processar assinatura. Tente novamente.');
     } finally {
       setLoading(null);
     }
@@ -103,12 +103,12 @@ export const Subscription: React.FC<SubscriptionProps> = ({ userData, t }) => {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="flex overflow-x-auto pb-8 -mx-6 px-6 space-x-6 snap-x snap-mandatory no-scrollbar">
         {plans.map((plan) => (
           <motion.div
             key={plan.id}
             whileHover={{ y: -4 }}
-            className={`glass-card p-8 border ${plan.color} ${plan.bg} relative overflow-hidden group`}
+            className={`flex-shrink-0 w-[300px] snap-center glass-card p-8 border ${plan.color} ${plan.bg} relative overflow-hidden group`}
           >
             {plan.popular && (
               <div className="absolute top-0 right-0 bg-zenith-scarlet text-white text-[8px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-widest">

@@ -2,6 +2,9 @@ import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { motion } from 'motion/react';
 import { supabase } from '../supabase';
+import { useUser } from '../contexts/UserContext';
+import { TIER_LIMITS } from '../types';
+import { Lock } from 'lucide-react';
 
 const productivityData = [
   { day: 'Mon', score: 65 },
@@ -20,12 +23,16 @@ const categoryData = [
   { name: 'Finance', value: 10 },
 ];
 
-export const Stats: React.FC<{ userData: any }> = ({ userData }) => {
+export const Stats: React.FC = () => {
+  const { userData } = useUser();
+  const tier = userData?.subscription_tier || 'free';
+  const hasAccess = TIER_LIMITS[tier]?.hasAdvancedAnalytics || false;
+
   const [productivityData, setProductivityData] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const fetchStats = async () => {
-    if (!userData?.id) return;
+    if (!userData?.id || !hasAccess) return;
 
     // Fetch last 7 days of activity
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -73,8 +80,27 @@ export const Stats: React.FC<{ userData: any }> = ({ userData }) => {
   };
 
   React.useEffect(() => {
-    fetchStats();
-  }, [userData]);
+    if (hasAccess) {
+      fetchStats();
+    }
+  }, [userData, hasAccess]);
+
+  if (!hasAccess) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6 min-h-[400px]">
+        <div className="w-20 h-20 bg-zenith-electric-blue/10 rounded-full flex items-center justify-center">
+          <Lock className="text-zenith-electric-blue" size={40} />
+        </div>
+        <h2 className="text-2xl font-bold text-white">Advanced Analytics is Premium</h2>
+        <p className="text-white/60 max-w-md">
+          Upgrade your plan to unlock deep insights into your productivity patterns, habit consistency, and long-term progress tracking.
+        </p>
+        <button className="px-8 py-3 bg-zenith-electric-blue text-white rounded-xl font-bold hover:bg-opacity-80 transition-all">
+          Upgrade Now
+        </button>
+      </div>
+    );
+  }
 
   const categoryData = [
     { name: 'Trabalho', value: 45 },

@@ -5,14 +5,16 @@ import { TetrisGame } from './TetrisGame';
 import { useGamification } from './GamificationContext';
 import { supabase } from '../supabase';
 
+import { useUser } from '../contexts/UserContext';
+
 interface MentalGymProps {
   t: any;
-  userData: any;
 }
 
 type GymMode = 'menu' | 'memory' | 'focus' | 'logic' | 'tetris';
 
-export const MentalGym: React.FC<MentalGymProps> = ({ t, userData }) => {
+export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
+  const { userData } = useUser();
   const [mode, setMode] = useState<GymMode>('menu');
   const { addXP } = useGamification();
 

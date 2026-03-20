@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useGamification } from './GamificationContext';
+import { useUser } from '../contexts/UserContext';
+import { TIER_LIMITS } from '../types';
 
 interface Exercise {
   id: string;
@@ -30,10 +32,10 @@ interface ExerciseHistory {
 
 interface ExercisesProps {
   t: any;
-  userData: any;
 }
 
-export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
+export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
+  const { userData } = useUser();
   const [activeTab, setActiveTab] = useState<'browse' | 'history'>('browse');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -41,9 +43,10 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { addXP } = useGamification();
+  const { checkLimit, incrementUsage } = useUser();
 
-  const tier = userData?.subscription_tier || 'basic';
-  const hasAccessToPremium = ['pro', 'elite', 'master'].includes(tier);
+  const tier = userData?.subscription_tier || 'free';
+  const hasAccessToPremium = TIER_LIMITS[tier]?.hasPremiumExercises || false;
 
   useEffect(() => {
     fetchExercises();
@@ -109,24 +112,24 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
     : exercises.filter(ex => ex.category === activeCategory);
 
   return (
-    <div className="p-6 space-y-8 pb-32 max-w-2xl mx-auto min-h-screen">
-      <header className="flex justify-between items-end">
+    <div className="flex flex-col gap-4 p-4 pb-32 max-w-2xl mx-auto min-h-screen">
+      <header className="flex justify-between items-end mb-4">
         <div className="space-y-2">
-          <h2 className="text-3xl font-display font-bold tracking-tighter uppercase text-white">
+          <h2 className="text-3xl font-display font-bold tracking-tighter uppercase text-zenith-text-primary">
             Bio <span className="text-zenith-scarlet">Hacking</span>
           </h2>
-          <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.3em]">Otimize seu hardware biológico</p>
+          <p className="text-zenith-text-secondary text-[10px] font-bold uppercase tracking-[0.3em]">Otimize seu hardware biológico</p>
         </div>
-        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+        <div className="flex bg-zenith-surface-1 p-1 rounded-xl border border-zenith-border-primary">
           <button 
             onClick={() => setActiveTab('browse')}
-            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-zenith-scarlet text-white' : 'text-white/40 hover:text-white/60'}`}
+            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-zenith-scarlet text-white' : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'}`}
           >
             Explorar
           </button>
           <button 
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-zenith-scarlet text-white' : 'text-white/40 hover:text-white/60'}`}
+            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-zenith-scarlet text-white' : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'}`}
           >
             Histórico
           </button>
@@ -151,7 +154,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
                   className={`flex items-center space-x-2 px-5 py-3 rounded-2xl border whitespace-nowrap transition-all ${
                     activeCategory === cat.id 
                       ? 'bg-zenith-scarlet text-white border-zenith-scarlet shadow-[0_0_20px_rgba(255,38,33,0.3)]' 
-                      : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'
+                      : 'bg-zenith-surface-1 border-zenith-border-primary text-zenith-text-tertiary hover:bg-zenith-surface-2'
                   }`}
                 >
                   {cat.icon}
@@ -174,7 +177,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
                       key={ex.id}
                       layoutId={`ex-${ex.id}`}
                       onClick={() => !isLocked && setSelectedExercise(ex)}
-                      className={`glass-card group cursor-pointer overflow-hidden border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all relative ${isLocked ? 'opacity-60 grayscale' : ''}`}
+                      className={`glass-card group cursor-pointer overflow-hidden border-zenith-border-secondary bg-zenith-surface-1 hover:bg-zenith-surface-2 transition-all relative ${isLocked ? 'opacity-60 grayscale' : ''}`}
                     >
                       <div className="aspect-video relative overflow-hidden">
                         <img 
@@ -206,13 +209,13 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
                           )}
                         </div>
                       </div>
-                      <div className="p-6 flex items-center justify-between bg-white/[0.01]">
+                      <div className="p-6 flex items-center justify-between bg-zenith-surface-1 border-t border-zenith-border-primary/50">
                         <div className="flex items-center space-x-6">
-                          <div className="flex items-center space-x-2 text-white/40">
+                          <div className="flex items-center space-x-2 text-zenith-text-secondary">
                             <Clock size={14} className="text-zenith-scarlet" />
                             <span className="text-[10px] font-bold uppercase tracking-widest">{ex.duration}</span>
                           </div>
-                          <div className="flex items-center space-x-2 text-white/40">
+                          <div className="flex items-center space-x-2 text-zenith-text-secondary">
                             <Award size={14} className="text-zenith-scarlet" />
                             <span className="text-[10px] font-bold uppercase tracking-widest">{ex.difficulty}</span>
                           </div>
@@ -241,14 +244,14 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
             className="space-y-6"
           >
             {history.length > 0 ? history.map((item) => (
-              <div key={item.id} className="glass-card p-6 border-white/5 bg-white/[0.02] flex items-center justify-between">
+              <div key={item.id} className="glass-card p-6 border-zenith-border-secondary bg-zenith-surface-1 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 rounded-xl bg-zenith-scarlet/10 flex items-center justify-center text-zenith-scarlet">
                     <CheckCircle2 size={24} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">{item.exercises?.title || 'Exercício Concluído'}</h4>
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest">
+                    <h4 className="text-sm font-bold text-zenith-text-primary">{item.exercises?.title || 'Exercício Concluído'}</h4>
+                    <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest">
                       {new Date(item.completed_at).toLocaleDateString()} às {new Date(item.completed_at).toLocaleTimeString()}
                     </p>
                   </div>
@@ -269,21 +272,26 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
         )}
       </AnimatePresence>
 
-      {/* Exercise Detail Modal */}
+      {/* Exercise Detail Modal (Bottom Sheet) */}
       <AnimatePresence>
         {selectedExercise && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[100] flex items-end justify-center">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedExercise(null)}
-              className="absolute inset-0 bg-black/95 backdrop-blur-2xl"
+              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
             />
             <motion.div
-              layoutId={`ex-${selectedExercise.id}`}
-              className="glass-card w-full max-w-lg overflow-hidden bg-zenith-black border-white/10 flex flex-col max-h-[90vh] shadow-2xl"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="bg-zenith-surface-1 w-full max-w-lg rounded-t-[2.5rem] border-t border-zenith-border-primary flex flex-col max-h-[95vh] shadow-2xl z-10 overflow-hidden"
             >
+              <div className="w-12 h-1.5 bg-zenith-border-primary rounded-full mx-auto my-3 opacity-50" />
+              
               <div className="relative aspect-video bg-black">
                 <iframe 
                   src={selectedExercise.video_url.replace('watch?v=', 'embed/')} 
@@ -293,52 +301,46 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, userData }) => {
                 />
                 <button 
                   onClick={() => setSelectedExercise(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-10 hover:bg-zenith-scarlet transition-colors"
+                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-zenith-border-primary flex items-center justify-center text-white z-10 hover:bg-zenith-scarlet transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="p-10 space-y-10 overflow-y-auto">
+              <div className="p-8 space-y-8 overflow-y-auto scrollbar-hide">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 text-zenith-scarlet">
-                    <span className="text-[11px] font-bold uppercase tracking-[0.4em]">{selectedExercise.category}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.4em]">{selectedExercise.category}</span>
                   </div>
-                  <h3 className="text-4xl font-display font-bold text-white tracking-tighter uppercase leading-none">{selectedExercise.title}</h3>
-                  <div className="flex items-center space-x-8 pt-2">
-                    <div className="flex items-center space-x-2 text-white/60">
-                      <Clock size={18} className="text-zenith-scarlet" />
-                      <span className="text-xs font-bold uppercase tracking-widest">{selectedExercise.duration}</span>
+                  <h3 className="text-3xl font-display font-bold text-zenith-text-primary tracking-tighter uppercase leading-none">{selectedExercise.title}</h3>
+                  <div className="flex items-center space-x-6 pt-2">
+                    <div className="flex items-center space-x-2 text-zenith-text-secondary">
+                      <Clock size={16} className="text-zenith-scarlet" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{selectedExercise.duration}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-white/60">
-                      <Award size={18} className="text-zenith-scarlet" />
-                      <span className="text-xs font-bold uppercase tracking-widest">{selectedExercise.difficulty}</span>
+                    <div className="flex items-center space-x-2 text-zenith-text-secondary">
+                      <Award size={16} className="text-zenith-scarlet" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{selectedExercise.difficulty}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-zenith-scarlet">
-                      <Zap size={18} />
-                      <span className="text-xs font-bold uppercase tracking-widest">+{selectedExercise.xp_reward || 50} XP</span>
+                      <Zap size={16} />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">+{selectedExercise.xp_reward || 50} XP</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="text-[11px] text-white/30 font-bold uppercase tracking-[0.4em]">Protocolo de Execução</h4>
-                  <p className="text-base text-white/70 leading-relaxed font-light">{selectedExercise.description}</p>
+                <div className="space-y-3">
+                  <h4 className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.4em]">Protocolo de Execução</h4>
+                  <p className="text-sm text-zenith-text-secondary leading-relaxed font-light">{selectedExercise.description}</p>
                 </div>
 
-                <div className="flex space-x-4">
+                <div className="flex space-x-4 pt-4">
                   <button 
                     onClick={() => completeExercise(selectedExercise)}
-                    className="flex-1 bg-zenith-scarlet text-white py-5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(255,38,33,0.3)] hover:shadow-[0_0_50px_rgba(255,38,33,0.5)] transition-all flex items-center justify-center space-x-3"
+                    className="flex-1 bg-zenith-scarlet text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(255,38,33,0.3)] hover:shadow-[0_0_50px_rgba(255,38,33,0.5)] transition-all flex items-center justify-center space-x-3"
                   >
-                    <CheckCircle2 size={18} />
+                    <CheckCircle2 size={16} />
                     <span>Concluir Treino</span>
-                  </button>
-                  <button 
-                    onClick={() => setSelectedExercise(null)}
-                    className="px-8 bg-white/5 border border-white/10 text-white/40 py-5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.4em] hover:bg-white/10 hover:text-white transition-all"
-                  >
-                    Sair
                   </button>
                 </div>
               </div>

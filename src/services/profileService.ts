@@ -6,11 +6,11 @@ export async function uploadAvatar(file: File){
 
   if(!user) return
 
-  const path = `${user.id}-${Date.now()}`
+  const path = `${user.id}/${Date.now()}`
 
   await supabase.storage
     .from("avatars")
-    .upload(path,file)
+    .upload(path, file)
 
   const { data: url } = supabase.storage
     .from("avatars")

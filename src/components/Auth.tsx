@@ -3,19 +3,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../supabase';
 import { LogIn, UserPlus, Globe, Mail, Lock, AlertTriangle, Sparkles, Shield } from 'lucide-react';
 import { ZenithLogo } from './ZenithLogo';
-
-interface AuthProps {
-  onSuccess: () => void;
-}
-
+import { useUser } from '../contexts/UserContext';
 import { translations, Language } from '../translations';
 
-export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
+export const Auth: React.FC = () => {
+  const { refreshUserData } = useUser();
   const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [language, setLanguage] = useState<Language>('pt-BR');
@@ -32,8 +30,6 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
     setError('');
 
     try {
-      await supabase.auth.signOut();
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -41,14 +37,18 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
       if (error) {
         console.error("LOGIN ERROR:", error);
-        alert(error.message);
+        if (error.message === 'Invalid login credentials') {
+          setError('Credenciais inválidas. Verifique seu e-mail e senha ou crie uma conta se for novo.');
+        } else {
+          setError(error.message);
+        }
         return;
       }
 
       console.log("USER LOGGED:", data.user);
 
       if (data.user) {
-        window.location.href = "/home";
+        await refreshUserData();
       }
     } catch (err: any) {
       setError(err.message);
@@ -80,6 +80,11 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
           setLoading(false);
           return;
         }
+        if (!username.trim()) {
+          setError('Nome de usuário é obrigatório');
+          setLoading(false);
+          return;
+        }
         if (!acceptTerms) {
           setError(t.common.mustAcceptTerms);
           setLoading(false);
@@ -92,35 +97,17 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
           options: {
             data: {
               full_name: fullName,
-              username: email.split('@')[0],
+              username: username.toLowerCase().trim(),
             }
           }
         });
         if (error) throw error;
         
         if (user) {
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert([
-              { 
-                id: user.id, 
-                email: user.email, 
-                username: email.split('@')[0],
-                full_name: fullName,
-                display_name: fullName,
-                language, 
-                subscription_tier: 'free',
-                energy_level: 100,
-                photo_url: user.user_metadata?.avatar_url || '',
-                avatar_url: user.user_metadata?.avatar_url || '',
-                onboarding_completed: false
-              }
-            ]);
-          if (profileError) console.error('Profile creation error:', profileError);
-          
+          // UserProvider handles profile creation via fetchUserData on auth change
           const { data: { session } } = await supabase.auth.getSession();
           if (session) {
-            onSuccess();
+            await refreshUserData();
           } else {
             setSuccess(true);
           }
@@ -155,6 +142,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
     if (authMode === 'login') return email.length > 0 && password.length >= 6;
     return (
       fullName.length > 0 &&
+      username.length >= 3 &&
       email.length > 0 &&
       password.length >= 6 &&
       password === confirmPassword &&
@@ -163,10 +151,10 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
   };
 
   const getPasswordStrength = (pass: string) => {
-    if (pass.length === 0) return { label: '', color: 'bg-white/10', text: '' };
-    if (pass.length < 6) return { label: t.common.weak, color: 'bg-red-500 shadow-[0_0_8px_#ef4444]', text: 'text-red-400' };
-    if (pass.length < 10) return { label: t.common.medium, color: 'bg-orange-500 shadow-[0_0_8px_#f97316]', text: 'text-orange-400' };
-    return { label: t.common.strong, color: 'bg-green-500 shadow-[0_0_8px_#22c55e]', text: 'text-green-400' };
+    if (pass.length === 0) return { label: '', color: 'bg-zenith-surface-2', text: '' };
+    if (pass.length < 6) return { label: t.common.weak, color: 'bg-red-500 shadow-sm shadow-red-500/50', text: 'text-red-400' };
+    if (pass.length < 10) return { label: t.common.medium, color: 'bg-orange-500 shadow-sm shadow-orange-500/50', text: 'text-orange-400' };
+    return { label: t.common.strong, color: 'bg-green-500 shadow-sm shadow-green-500/50', text: 'text-green-400' };
   };
 
   const strength = getPasswordStrength(password);
@@ -181,14 +169,14 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md p-10 space-y-8 relative z-10 glass-card border-white/5 bg-black/40 backdrop-blur-3xl rounded-3xl"
+        className="w-full max-w-md p-10 space-y-8 relative z-10 glass-card border-zenith-border-primary bg-zenith-black/40 backdrop-blur-3xl rounded-3xl"
       >
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <ZenithLogo size={60} className="text-white" />
+            <ZenithLogo size={60} className="text-zenith-text-primary" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-4xl font-display font-bold tracking-tighter uppercase leading-none">Zenith</h1>
+            <h1 className="text-4xl font-display font-bold tracking-tighter uppercase leading-none text-zenith-text-primary">Zenith</h1>
             <div className="flex items-center justify-center space-x-2 text-zenith-neon-red">
               <Sparkles size={12} />
               <span className="text-[9px] font-bold uppercase tracking-[0.4em]">Life Operating System</span>
@@ -204,12 +192,12 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center space-y-6 py-8"
             >
-              <div className="w-20 h-20 bg-zenith-scarlet/20 rounded-full flex items-center justify-center mx-auto border border-zenith-scarlet/30 shadow-[0_0_30px_rgba(255,36,0,0.2)]">
+              <div className="w-20 h-20 bg-zenith-scarlet/20 rounded-full flex items-center justify-center mx-auto border border-zenith-scarlet/30 shadow-lg shadow-zenith-scarlet/20">
                 <Sparkles className="text-zenith-scarlet w-10 h-10" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-white uppercase tracking-tight">{t.common.accountCreated}</h2>
-                <p className="text-white/60 text-sm leading-relaxed">
+                <h2 className="text-2xl font-bold text-zenith-text-primary uppercase tracking-tight">{t.common.accountCreated}</h2>
+                <p className="text-zenith-text-secondary text-sm leading-relaxed">
                   {t.common.confirmationEmailSent}
                 </p>
               </div>
@@ -230,12 +218,12 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center space-y-6 py-8"
             >
-              <div className="w-20 h-20 bg-zenith-scarlet/20 rounded-full flex items-center justify-center mx-auto border border-zenith-scarlet/30 shadow-[0_0_30px_rgba(255,36,0,0.2)]">
+              <div className="w-20 h-20 bg-zenith-scarlet/20 rounded-full flex items-center justify-center mx-auto border border-zenith-scarlet/30 shadow-lg shadow-zenith-scarlet/20">
                 <Mail className="text-zenith-scarlet w-10 h-10" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-white uppercase tracking-tight">{t.common.emailSent}</h2>
-                <p className="text-white/60 text-sm leading-relaxed">
+                <h2 className="text-2xl font-bold text-zenith-text-primary uppercase tracking-tight">{t.common.emailSent}</h2>
+                <p className="text-zenith-text-secondary text-sm leading-relaxed">
                   {t.common.resetLinkSent}
                 </p>
               </div>
@@ -258,14 +246,14 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
               className="space-y-6"
             >
               <div className="space-y-2 text-center">
-                <h2 className="text-xl font-bold text-white uppercase tracking-tight">{t.common.recoverPassword}</h2>
-                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">{t.common.enterEmailToReset}</p>
+                <h2 className="text-xl font-bold text-zenith-text-primary uppercase tracking-tight">{t.common.recoverPassword}</h2>
+                <p className="text-zenith-text-tertiary text-[10px] uppercase tracking-widest font-bold">{t.common.enterEmailToReset}</p>
               </div>
               <form onSubmit={handleAuth} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
+                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-neon-red transition-colors">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-neon-red transition-colors">
                       <Mail size={18} />
                     </div>
                     <input
@@ -275,7 +263,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium text-zenith-text-primary"
                       placeholder="seu@email.com"
                     />
                   </div>
@@ -299,7 +287,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
               <div className="text-center">
                 <button
                   onClick={() => setAuthMode('login')}
-                  className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                  className="text-[10px] text-zenith-text-tertiary hover:text-zenith-text-primary uppercase tracking-widest font-bold transition-colors"
                 >
                   {t.common.backToLogin}
                 </button>
@@ -315,9 +303,9 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
             >
               <form onSubmit={handleAuth} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
+                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-neon-red transition-colors">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-neon-red transition-colors">
                       <Mail size={18} />
                     </div>
                     <input
@@ -327,7 +315,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium text-zenith-text-primary"
                       placeholder="seu@email.com"
                     />
                   </div>
@@ -335,7 +323,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
+                    <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
                     <button 
                       type="button" 
                       onClick={() => setAuthMode('forgot')}
@@ -345,7 +333,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     </button>
                   </div>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-4 flex items-center text-white/20 group-focus-within:text-zenith-neon-red transition-colors">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-neon-red transition-colors">
                       <Lock size={18} />
                     </div>
                     <input
@@ -355,13 +343,13 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl py-4 pl-12 pr-12 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium text-zenith-text-primary"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-4 flex items-center text-white/20 hover:text-white/40 transition-colors"
+                      className="absolute inset-y-0 right-4 flex items-center text-zenith-text-tertiary hover:text-zenith-text-secondary transition-colors"
                     >
                       {showPassword ? <Shield size={18} /> : <Sparkles size={18} />}
                     </button>
@@ -388,7 +376,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
               <div className="text-center">
                 <button
                   onClick={() => setAuthMode('register')}
-                  className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                  className="text-[10px] text-zenith-text-tertiary hover:text-zenith-text-primary uppercase tracking-widest font-bold transition-colors"
                 >
                   {t.common.dontHaveAccount}
                 </button>
@@ -404,7 +392,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
             >
               <form onSubmit={handleAuth} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.fullName}</label>
+                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">{t.common.fullName}</label>
                   <input
                     type="text"
                     name="name"
@@ -412,13 +400,32 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                    className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium text-zenith-text-primary"
                     placeholder={t.common.fullNamePlaceholder}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
+                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">Nome de Usuário</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-neon-red transition-colors">
+                      <span className="text-sm font-bold">@</span>
+                    </div>
+                    <input
+                      type="text"
+                      name="username"
+                      autoComplete="username"
+                      required
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
+                      className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl py-4 pl-10 pr-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium text-zenith-text-primary"
+                      placeholder="ex: warrior_zenith"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">{t.common.email}</label>
                   <input
                     type="email"
                     name="email"
@@ -426,13 +433,13 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                    className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl py-4 px-4 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium text-zenith-text-primary"
                     placeholder="seu@email.com"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
+                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">{t.common.password}</label>
                   <div className="relative group">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -441,13 +448,13 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 pr-12 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium"
+                      className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl py-4 px-4 pr-12 focus:outline-none focus:border-zenith-neon-red transition-all text-sm font-medium text-zenith-text-primary"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-4 flex items-center text-white/20 hover:text-white/40 transition-colors"
+                      className="absolute inset-y-0 right-4 flex items-center text-zenith-text-tertiary hover:text-zenith-text-secondary transition-colors"
                     >
                       {showPassword ? <Shield size={18} /> : <Sparkles size={18} />}
                     </button>
@@ -456,20 +463,20 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                   {password.length > 0 && (
                     <div className="space-y-2 px-1">
                       <div className="flex justify-between items-center text-[8px] uppercase tracking-widest font-bold">
-                        <span className="text-white/40">{t.common.passwordStrength}</span>
+                        <span className="text-zenith-text-tertiary">{t.common.passwordStrength}</span>
                         <span className={strength.text}>{strength.label}</span>
                       </div>
                       <div className="flex space-x-1 h-1">
-                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length > 0 ? strength.color : 'bg-white/10'}`} />
-                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 6 ? strength.color : 'bg-white/10'}`} />
-                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 10 ? strength.color : 'bg-white/10'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length > 0 ? strength.color : 'bg-zenith-surface-2'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 6 ? strength.color : 'bg-zenith-surface-2'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 10 ? strength.color : 'bg-zenith-surface-2'}`} />
                       </div>
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold ml-1">{t.common.confirmPassword}</label>
+                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold ml-1">{t.common.confirmPassword}</label>
                   <input
                     type="password"
                     name="confirm-password"
@@ -477,7 +484,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full bg-white/5 border rounded-2xl py-4 px-4 focus:outline-none transition-all text-sm font-medium ${password && confirmPassword && password !== confirmPassword ? 'border-red-500' : 'border-white/10 focus:border-zenith-neon-red'}`}
+                    className={`w-full bg-zenith-surface-1 border rounded-2xl py-4 px-4 focus:outline-none transition-all text-sm font-medium text-zenith-text-primary ${password && confirmPassword && password !== confirmPassword ? 'border-red-500' : 'border-zenith-border-primary focus:border-zenith-neon-red'}`}
                     placeholder="••••••••"
                   />
                 </div>
@@ -490,10 +497,10 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
                         id="terms"
                         checked={acceptTerms}
                         onChange={(e) => setAcceptTerms(e.target.checked)}
-                        className="w-4 h-4 rounded border-white/10 bg-white/5 text-zenith-crimson focus:ring-zenith-crimson"
+                        className="w-4 h-4 rounded border-zenith-border-primary bg-zenith-surface-1 text-zenith-crimson focus:ring-zenith-crimson"
                       />
                     </div>
-                    <label htmlFor="terms" className="text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white/60 transition-colors leading-relaxed">
+                    <label htmlFor="terms" className="text-[9px] text-zenith-text-tertiary uppercase tracking-widest font-bold cursor-pointer hover:text-zenith-text-secondary transition-colors leading-relaxed">
                       {t.common.iAgreeTo} <a href="#" className="text-zenith-neon-red hover:underline">{t.common.termsOfUse}</a> {t.common.and} <a href="#" className="text-zenith-neon-red hover:underline">{t.common.privacyPolicy}</a>
                     </label>
                   </div>
@@ -518,7 +525,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
               <div className="text-center">
                 <button
                   onClick={() => setAuthMode('login')}
-                  className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                  className="text-[10px] text-zenith-text-tertiary hover:text-zenith-text-primary uppercase tracking-widest font-bold transition-colors"
                 >
                   {t.common.alreadyHaveAccount}
                 </button>
@@ -528,14 +535,14 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
         </AnimatePresence>
 
         <div className="relative py-2">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-          <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em]"><span className="bg-zenith-black px-4 text-white/20">{t.common.orContinueWith}</span></div>
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zenith-border-primary"></div></div>
+          <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em]"><span className="bg-zenith-black px-4 text-zenith-text-tertiary/20">{t.common.orContinueWith}</span></div>
         </div>
 
         <button
           onClick={handleGoogle}
           disabled={loading}
-          className="w-full bg-white/5 border border-white/10 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 transition-all flex items-center justify-center space-x-4"
+          className="w-full bg-zenith-surface-1 border border-zenith-border-primary py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-zenith-surface-2 transition-all flex items-center justify-center space-x-4 text-zenith-text-primary"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -546,7 +553,7 @@ export const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
           <span>{t.common.googleNeuralLink}</span>
         </button>
 
-        <div className="flex items-center justify-center space-x-2 text-white/20">
+        <div className="flex items-center justify-center space-x-2 text-zenith-text-tertiary">
           <Shield size={12} />
           <span className="text-[8px] font-bold uppercase tracking-widest">{t.common.endToEndEncryption}</span>
         </div>

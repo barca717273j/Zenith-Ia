@@ -5,12 +5,14 @@ import { generateLifeStrategy } from '../services/gemini';
 import { supabase } from '../supabase';
 import { AnimatePresence } from 'motion/react';
 
+import { useUser } from '../contexts/UserContext';
+
 interface JournalProps {
-  userData: any;
   t: any;
 }
 
-export const Journal: React.FC<JournalProps> = ({ userData, t }) => {
+export const Journal: React.FC<JournalProps> = ({ t }) => {
+  const { userData, checkLimit, incrementUsage } = useUser();
   const [entry, setEntry] = useState('');
   const [feedback, setFeedback] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -53,10 +55,18 @@ export const Journal: React.FC<JournalProps> = ({ userData, t }) => {
 
   const handleAnalyze = async () => {
     if (!entry.trim()) return;
+
+    const limitCheck = await checkLimit('ai_messages');
+    if (!limitCheck.allowed) {
+      alert(limitCheck.message || 'Limite de mensagens de IA atingido.');
+      return;
+    }
+
     setIsAnalyzing(true);
     try {
       const response = await generateLifeStrategy({ context: 'journal' }, `Analyze this journal entry and provide constructive feedback for growth: ${entry}`);
       setFeedback(response || t.journal.aiReflecting);
+      await incrementUsage('ai_messages');
     } catch (error) {
       setFeedback(t.journal.connectionLost);
     } finally {
@@ -70,7 +80,7 @@ export const Journal: React.FC<JournalProps> = ({ userData, t }) => {
         <h1 className="text-2xl font-bold font-display tracking-tight uppercase">{t.journal.title}</h1>
         <div className="flex items-center space-x-2 text-white/40 text-[10px] font-bold uppercase tracking-widest">
           <Calendar size={14} />
-          <span>{new Date().toLocaleDateString(userData?.language === 'pt' ? 'pt-BR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          <span>{new Date().toLocaleDateString(userData?.language?.startsWith('pt') ? 'pt-BR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
         </div>
       </header>
 
@@ -135,7 +145,7 @@ export const Journal: React.FC<JournalProps> = ({ userData, t }) => {
             pastEntries.map((entry) => (
               <PastEntry 
                 key={entry.id} 
-                date={new Date(entry.created_at).toLocaleDateString(userData?.language === 'pt' ? 'pt-BR' : 'en-US', { month: 'short', day: 'numeric' })} 
+                date={new Date(entry.created_at).toLocaleDateString(userData?.language?.startsWith('pt') ? 'pt-BR' : 'en-US', { month: 'short', day: 'numeric' })} 
                 preview={entry.content} 
               />
             ))
