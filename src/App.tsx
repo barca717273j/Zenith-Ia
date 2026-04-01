@@ -14,6 +14,7 @@ import { MentalGym } from './components/MentalGym';
 import { Social } from './components/Social';
 import { AdminPanel } from './components/AdminPanel';
 import { Journal } from './components/Journal';
+import { NewProtocolModal } from './components/NewProtocolModal';
 import { Stats } from './components/Stats';
 import { SubscriptionScreen } from './components/SubscriptionScreen';
 import { supabase } from './supabase';
@@ -40,6 +41,7 @@ function AppContent() {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState('home');
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isNewProtocolOpen, setIsNewProtocolOpen] = useState(false);
 
   const lang: Language = userData?.language || 'pt-BR';
   const t = translations[lang] || translations['pt-BR'];
@@ -113,7 +115,7 @@ function AppContent() {
       case 'finance':
         return <FinanceTracker key="finance" t={t} language={lang} setAppTab={setActiveTab} />;
       case 'profile':
-        return <Profile key="profile" t={t} />;
+        return <Profile key="profile" t={t} setActiveTab={setActiveTab} />;
       case 'social':
         return <Social key="social" t={t} />;
       case 'journal':
@@ -123,7 +125,7 @@ function AppContent() {
       case 'map':
         return <Axis key="map" t={t} />;
       case 'admin':
-        return userData?.is_admin ? <AdminPanel key="admin" t={t} /> : null;
+        return userData?.is_admin ? <AdminPanel key="admin" t={t} onBack={() => setActiveTab('profile')} /> : null;
       case 'break':
         return <MentalGym key="break" t={t} />;
       case 'subscription':
@@ -150,17 +152,45 @@ function AppContent() {
         </AnimatePresence>
 
         {!showOnboarding && <FloatingThemeToggle />}
-        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} t={t} />
+        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} onPlusClick={() => setIsNewProtocolOpen(true)} t={t} />
+        <NewProtocolModal isOpen={isNewProtocolOpen} onClose={() => setIsNewProtocolOpen(false)} t={t} />
 
         {/* Background Ambience */}
-        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-full bg-zenith-black transition-colors duration-1000" />
-          <div className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(255,0,0,0.05),transparent_70%)]" />
-          </div>
-          <div className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(255,0,0,0.02),transparent_70%)]" />
-          </div>
+        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zenith-black">
+          <div className="absolute inset-0 bg-fluid-marble opacity-50" />
+          
+          {/* Animated Marble Blobs */}
+          <motion.div 
+            animate={{ 
+              x: [0, 100, -50, 0],
+              y: [0, -100, 50, 0],
+              scale: [1, 1.2, 0.8, 1],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            className="marble-blob w-[600px] h-[600px] bg-zenith-scarlet/20 -top-20 -left-20"
+          />
+          <motion.div 
+            animate={{ 
+              x: [0, -150, 100, 0],
+              y: [0, 150, -100, 0],
+              scale: [1, 0.9, 1.1, 1],
+              opacity: [0.1, 0.3, 0.1]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+            className="marble-blob w-[500px] h-[500px] bg-white/5 bottom-20 right-20"
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.5, 1],
+              opacity: [0.1, 0.2, 0.1]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="marble-blob w-[800px] h-[800px] bg-zenith-crimson/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          />
+          
+          {/* Grain Overlay for Texture */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
         </div>
       </div>
     </GamificationProvider>

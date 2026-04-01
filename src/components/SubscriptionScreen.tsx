@@ -66,6 +66,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ tier, title, price, period, feature
   </motion.div>
 );
 
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
+
 export const SubscriptionScreen: React.FC = () => {
   const { userData, refreshUserData } = useUser();
   const [loading, setLoading] = useState<SubscriptionTier | null>(null);
@@ -75,36 +79,26 @@ export const SubscriptionScreen: React.FC = () => {
     setLoading(tier);
     
     try {
-      // In a real app, this would redirect to Stripe/Checkout
-      // For now, we'll simulate a successful subscription
-      const expiresAt = new Date();
-      if (tier === 'weekly') expiresAt.setDate(expiresAt.getDate() + 7);
-      else if (tier === 'monthly') expiresAt.setMonth(expiresAt.getMonth() + 1);
-      else if (tier === 'annual') expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      else if (tier === 'master') expiresAt.setFullYear(expiresAt.getFullYear() + 100); // Lifetime-ish
-      
-      const { error } = await supabase
-        .from('users')
-        .update({
-          subscription_tier: tier,
-          plan_expires_at: expiresAt.toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userData.id);
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: tier,
+          userId: userData.id,
+          email: userData.email
+        }),
+      });
 
-      if (error) throw error;
-      
-      // Notification
-      await supabase.from('notifications').insert([{
-        user_id: userData.id,
-        title: 'Assinatura Ativada!',
-        message: `Parabéns! Você agora é um membro ${tier.toUpperCase()}. Seu potencial foi desbloqueado.`,
-        type: 'achievement'
-      }]);
+      const session = await response.json();
 
-      await refreshUserData();
+      if (session.url) {
+        window.location.href = session.url;
+      } else {
+        throw new Error('Falha ao criar sessão de pagamento.');
+      }
     } catch (err) {
       console.error('Subscription error:', err);
+      alert('Erro ao processar assinatura. Verifique sua conexão.');
     } finally {
       setLoading(null);
     }
@@ -135,7 +129,7 @@ export const SubscriptionScreen: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <PlanCard
-            tier="weekly"
+            tier="basic"
             title="Semanal"
             price="R$ 19,90"
             period="semana"
@@ -147,10 +141,10 @@ export const SubscriptionScreen: React.FC = () => {
               'Controle financeiro'
             ]}
             onSelect={handleSubscribe}
-            loading={loading === 'weekly'}
+            loading={loading === 'basic'}
           />
           <PlanCard
-            tier="monthly"
+            tier="pro"
             title="Mensal"
             price="R$ 49,90"
             period="mês"
@@ -164,10 +158,10 @@ export const SubscriptionScreen: React.FC = () => {
               'Mentoria Financeira'
             ]}
             onSelect={handleSubscribe}
-            loading={loading === 'monthly'}
+            loading={loading === 'pro'}
           />
           <PlanCard
-            tier="annual"
+            tier="pro"
             title="Anual"
             price="R$ 399,90"
             period="ano"
@@ -180,7 +174,7 @@ export const SubscriptionScreen: React.FC = () => {
               'Acesso antecipado'
             ]}
             onSelect={handleSubscribe}
-            loading={loading === 'annual'}
+            loading={loading === 'pro'}
           />
           <PlanCard
             tier="master"

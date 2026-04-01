@@ -23,20 +23,20 @@ export const ZenithLogo: React.FC<ZenithLogoProps> = ({ size = 40, className = "
       >
         <defs>
           <linearGradient id="zenith-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8b0000" />
-            <stop offset="100%" stopColor="#ff2400" />
+            <stop offset="0%" stopColor="#ff0000" />
+            <stop offset="100%" stopColor="#8b0000" />
           </linearGradient>
           <filter id="zenith-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feGaussianBlur stdDeviation="5" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
         
-        {/* Modern Z Logo */}
+        {/* Personalized Stylized Z Logo */}
         <motion.path
-          d="M 30 30 L 70 30 L 30 70 L 70 70"
+          d="M 25 25 L 75 25 L 25 75 L 75 75"
           stroke="url(#zenith-grad)"
-          strokeWidth="12"
+          strokeWidth="16"
           strokeLinecap="round"
           strokeLinejoin="round"
           filter="url(#zenith-glow)"
@@ -44,13 +44,42 @@ export const ZenithLogo: React.FC<ZenithLogoProps> = ({ size = 40, className = "
           animate={{ 
             pathLength: 1, 
             opacity: 1,
-            filter: ["drop-shadow(0 0 2px #ff2400)", "drop-shadow(0 0 8px #ff2400)", "drop-shadow(0 0 2px #ff2400)"]
+            filter: ["drop-shadow(0 0 4px #ff0000)", "drop-shadow(0 0 20px #ff0000)", "drop-shadow(0 0 4px #ff0000)"]
           }}
           transition={{ 
             pathLength: { duration: 1.5, ease: "easeInOut" },
             opacity: { duration: 0.5 },
-            filter: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+            filter: { duration: 2, repeat: Infinity, ease: "easeInOut" }
           }}
+        />
+        <motion.path
+          d="M 40 40 L 60 40 L 40 60 L 60 60"
+          stroke="white"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity="0.3"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 2, delay: 1 }}
+        />
+        <motion.circle
+          cx="25"
+          cy="25"
+          r="4"
+          fill="#ff2400"
+          initial={{ scale: 0 }}
+          animate={{ scale: [0, 1.5, 1] }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+        />
+        <motion.circle
+          cx="75"
+          cy="75"
+          r="4"
+          fill="#8b0000"
+          initial={{ scale: 0 }}
+          animate={{ scale: [0, 1.5, 1] }}
+          transition={{ delay: 1.8, duration: 0.5 }}
         />
       </svg>
     </motion.div>

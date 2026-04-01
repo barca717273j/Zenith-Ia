@@ -2,22 +2,33 @@ import { supabase } from '../supabase';
 
 export const ensureBucketExists = async (bucketName: string) => {
   try {
+    // First check if it exists
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    
+    if (listError) {
+      console.error('Error listing buckets:', listError);
+      // If we can't even list buckets, we might have a connection issue or major permission issue
+    } else {
+      const exists = buckets?.some(b => b.id === bucketName);
+      if (exists) return true;
+    }
+
+    // If not found or couldn't list, try to get it directly
     const { data, error } = await supabase.storage.getBucket(bucketName);
     
     if (error) {
-      // If bucket is not found, try to create it silently
+      // If bucket is not found, try to create it
       if (error.message.toLowerCase().includes('not found') || (error as any).status === 404) {
         console.log(`Bucket ${bucketName} not found, attempting to create...`);
         
+        // Try with minimal options first
         const { error: createError } = await supabase.storage.createBucket(bucketName, {
-          public: true,
-          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
-          fileSizeLimit: 5242880 // 5MB
+          public: true
         });
         
         if (createError) {
           // If creation fails (likely due to RLS), throw a helpful, localized error
-          console.warn(`Could not create bucket ${bucketName} automatically (RLS).`);
+          console.warn(`Could not create bucket ${bucketName} automatically (RLS).`, createError);
           throw new Error(`A pasta de armazenamento '${bucketName}' não existe. Por favor, crie-a no seu Painel Supabase (Storage -> New Bucket) com o nome '${bucketName}' e defina como 'Public'.`);
         }
         

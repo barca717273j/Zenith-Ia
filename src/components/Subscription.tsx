@@ -30,10 +30,10 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
       name: t.subscription.pro.name,
       price: t.subscription.pro.price,
       features: t.subscription.pro.features,
-      icon: <Shield className="text-zenith-scarlet" />,
-      color: 'border-zenith-scarlet/30',
-      bg: 'bg-zenith-scarlet/5',
-      button: 'btn-primary',
+      icon: <Shield className="text-zenith-accent" />,
+      color: 'border-zenith-accent/30',
+      bg: 'bg-zenith-accent/5',
+      button: 'bg-zenith-accent text-white shadow-lg shadow-zenith-accent/20',
       popular: true
     },
     {
@@ -41,10 +41,10 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
       name: t.subscription.elite.name,
       price: t.subscription.elite.price,
       features: t.subscription.elite.features,
-      icon: <Crown className="text-zenith-neon-red" />,
-      color: 'border-zenith-neon-red/30',
-      bg: 'bg-zenith-neon-red/5',
-      button: 'bg-zenith-neon-red text-white shadow-[0_0_20px_rgba(255,36,0,0.4)]',
+      icon: <Crown className="text-zenith-crimson" />,
+      color: 'border-zenith-crimson/30',
+      bg: 'bg-zenith-crimson/5',
+      button: 'bg-zenith-crimson text-white shadow-lg shadow-zenith-crimson/20',
       popular: false
     },
     {
@@ -91,27 +91,30 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
   };
 
   return (
-    <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto">
-      <header className="text-center space-y-4">
-        <div className="inline-flex items-center space-x-2 bg-zenith-scarlet/10 px-4 py-2 rounded-full border border-zenith-scarlet/20 mb-4">
-          <Sparkles size={14} className="text-zenith-scarlet" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zenith-scarlet">Premium Access</span>
+    <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto relative">
+      {/* Background Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenith-accent/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <header className="text-center space-y-4 relative z-10">
+        <div className="inline-flex items-center space-x-2 bg-zenith-accent/10 px-4 py-2 rounded-full border border-zenith-accent/20 mb-4">
+          <Sparkles size={14} className="text-zenith-accent" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zenith-accent">Premium Access</span>
         </div>
-        <h2 className="text-4xl font-display font-bold tracking-tighter uppercase text-white">{t.subscription.title}</h2>
-        <p className="text-white/40 text-xs font-bold uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+        <h2 className="text-4xl font-display font-bold tracking-tighter uppercase text-zenith-text-primary italic">{t.subscription.title}</h2>
+        <p className="text-zenith-text-tertiary text-xs font-bold uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
           {t.subscription.choosePlan}
         </p>
       </header>
 
-      <div className="flex overflow-x-auto pb-8 -mx-6 px-6 space-x-6 snap-x snap-mandatory no-scrollbar">
+      <div className="flex overflow-x-auto pb-8 -mx-6 px-6 space-x-6 snap-x snap-mandatory no-scrollbar relative z-10">
         {plans.map((plan) => (
           <motion.div
             key={plan.id}
             whileHover={{ y: -4 }}
-            className={`flex-shrink-0 w-[300px] snap-center glass-card p-8 border ${plan.color} ${plan.bg} relative overflow-hidden group`}
+            className={`flex-shrink-0 w-[300px] snap-center premium-card p-8 border ${plan.color} ${plan.bg} relative overflow-hidden group`}
           >
             {plan.popular && (
-              <div className="absolute top-0 right-0 bg-zenith-scarlet text-white text-[8px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-widest">
+              <div className="absolute top-0 right-0 bg-zenith-accent text-white text-[8px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-widest">
                 {t.common.mostPopular}
               </div>
             )}
@@ -119,23 +122,23 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
             <div className="flex justify-between items-start mb-8">
               <div className="space-y-2">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-xl bg-white/5 border border-white/10">
+                  <div className="p-2 rounded-xl bg-zenith-surface-1 border border-zenith-border-primary">
                     {plan.icon}
                   </div>
-                  <h3 className="text-2xl font-display font-bold text-white tracking-tighter uppercase">{plan.name}</h3>
+                  <h3 className="text-2xl font-display font-bold text-zenith-text-primary tracking-tighter uppercase italic">{plan.name}</h3>
                 </div>
                 <div className="flex items-baseline space-x-1">
-                  <span className="text-3xl font-bold text-white">{plan.price}</span>
-                  {plan.id !== 'basic' && <span className="text-[10px] text-white/20 font-bold uppercase tracking-widest">{plan.id === 'master' ? '/yr' : '/mo'}</span>}
+                  <span className="text-3xl font-bold text-zenith-text-primary">{plan.price}</span>
+                  {plan.id !== 'basic' && <span className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-widest">{plan.id === 'master' ? '/yr' : '/mo'}</span>}
                 </div>
               </div>
             </div>
 
             <ul className="space-y-4 mb-10">
               {plan.features.map((feature: string, i: number) => (
-                <li key={i} className="flex items-center space-x-3 text-white/60 group-hover:text-white/80 transition-colors">
-                  <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
-                    <Check size={12} className={plan.id !== 'basic' ? 'text-zenith-scarlet' : 'text-white/20'} />
+                <li key={i} className="flex items-center space-x-3 text-zenith-text-secondary group-hover:text-zenith-text-primary transition-colors">
+                  <div className="w-5 h-5 rounded-full bg-zenith-surface-1 flex items-center justify-center flex-shrink-0">
+                    <Check size={12} className={plan.id !== 'basic' ? 'text-zenith-accent' : 'text-zenith-text-tertiary/20'} />
                   </div>
                   <span className="text-xs font-medium tracking-tight">{feature}</span>
                 </li>
@@ -145,7 +148,7 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
             <button
               onClick={() => handleSubscribe(plan.id)}
               disabled={loading !== null || userData?.subscription_tier?.toLowerCase() === plan.id.toLowerCase()}
-              className={`w-full py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center space-x-3 ${plan.button} disabled:opacity-50`}
+              className={`w-full py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center space-x-3 ${plan.button} disabled:opacity-50 active:scale-[0.98]`}
             >
               {loading === plan.id ? (
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />

@@ -311,14 +311,14 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
 
   return (
     <div className="flex flex-col gap-4 p-4 pb-32 max-w-2xl mx-auto min-h-screen">
-      <header className="flex justify-between items-end mb-4">
+      <header className="flex justify-between items-end mb-6">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenith-text-primary">
-            Sincronia <span className="text-zenith-scarlet">Neural</span>
+          <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenith-text-primary italic">
+            Sincronia <span className="text-zenith-accent">Neural</span>
           </h1>
           <div className="flex items-center space-x-3">
-            <div className="h-1 w-16 bg-gradient-to-r from-zenith-scarlet to-transparent rounded-full" />
-            <p className="text-zenith-text-tertiary text-[10px] font-bold uppercase tracking-[0.3em]">
+            <div className="h-1 w-16 bg-gradient-to-r from-zenith-accent to-transparent rounded-full shadow-[0_0_10px_var(--accent-glow)]" />
+            <p className="text-zenith-text-tertiary text-[11px] font-bold uppercase tracking-[0.3em]">
               {activeView === 'habits' ? `${habits.length}/${habitLimit} Protocolos Ativos` : activeView === 'tasks' ? `${tasks.length} Diretrizes Pendentes` : 'Análise de Performance'}
             </p>
           </div>
@@ -328,19 +328,19 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsAdding(true)}
           disabled={activeView === 'habits' && habits.length >= habitLimit}
-          className="w-16 h-16 rounded-[24px] bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center hover:bg-zenith-surface-2 hover:border-zenith-scarlet/50 transition-all duration-500 disabled:opacity-50 group shadow-2xl"
+          className="neon-button w-16 h-16 !p-0"
         >
-          <Plus size={32} className="text-zenith-text-tertiary group-hover:text-zenith-scarlet transition-colors" />
+          <Plus size={32} />
         </motion.button>
       </header>
 
       {/* View Switcher */}
-      <div className="flex bg-zenith-surface-1 p-1.5 rounded-[24px] border border-zenith-border-primary backdrop-blur-xl">
+      <div className="flex glass-nav p-1.5 rounded-[2rem] border border-zenith-border-primary">
         {(['habits', 'tasks', 'stats'] as const).map((view) => (
           <button
             key={view}
             onClick={() => setActiveView(view)}
-            className={`flex-1 py-4 text-[10px] uppercase tracking-[0.2em] font-black rounded-[18px] transition-all duration-500 relative overflow-hidden ${
+            className={`flex-1 py-4 text-[11px] uppercase tracking-[0.2em] font-black rounded-[1.5rem] transition-all duration-500 relative overflow-hidden ${
               activeView === view 
                 ? 'text-white' 
                 : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'
@@ -349,7 +349,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
             {activeView === view && (
               <motion.div 
                 layoutId="active-view-bg"
-                className="absolute inset-0 bg-gradient-to-br from-zenith-scarlet to-zenith-crimson shadow-lg"
+                className="absolute inset-0 bg-gradient-to-br from-zenith-accent to-zenith-crimson shadow-lg"
               />
             )}
             <span className="relative z-10">{view === 'habits' ? 'Hábitos' : view === 'tasks' ? 'Tarefas' : 'Análise'}</span>
@@ -368,26 +368,26 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
           >
             {/* Stats Summary */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="glass-card p-8 flex flex-col items-center justify-center space-y-4 border-zenith-border-primary bg-zenith-surface-1 group hover:bg-zenith-surface-2">
-                <div className="w-12 h-12 rounded-2xl bg-zenith-scarlet/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                  <Flame className="text-zenith-scarlet drop-shadow-[0_0_15px_rgba(255,26,26,0.6)]" size={28} />
+              <div className="premium-card premium-card-hover flex flex-col items-center justify-center space-y-4 group">
+                <div className="w-14 h-14 rounded-2xl bg-zenith-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 border border-zenith-accent/20">
+                  <Flame className="text-zenith-accent drop-shadow-[0_0_15px_var(--accent-glow)]" size={32} />
                 </div>
                 <div className="text-center">
                   <p className="text-5xl font-display font-bold tracking-tighter text-zenith-text-primary">
                     {Math.max(0, ...habits.map(h => h.streak), 0)}
                   </p>
-                  <p className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Recorde de Streak</p>
+                  <p className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Recorde de Streak</p>
                 </div>
               </div>
-              <div className="glass-card p-8 flex flex-col items-center justify-center space-y-4 border-zenith-border-primary bg-zenith-surface-1 group hover:bg-zenith-surface-2">
-                <div className="w-12 h-12 rounded-2xl bg-zenith-surface-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                  <Trophy className="text-zenith-text-tertiary" size={28} />
+              <div className="premium-card premium-card-hover flex flex-col items-center justify-center space-y-4 group">
+                <div className="w-14 h-14 rounded-2xl bg-zenith-surface-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 border border-zenith-border-primary">
+                  <Trophy className="text-zenith-text-tertiary group-hover:text-zenith-accent transition-colors" size={32} />
                 </div>
                 <div className="text-center">
                   <p className="text-5xl font-display font-bold tracking-tighter text-zenith-text-primary">
                     {habits.length > 0 ? Math.round((habits.filter(h => h.completed_today).length / habits.length) * 100) : 0}%
                   </p>
-                  <p className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Sincronia Diária</p>
+                  <p className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Sincronia Diária</p>
                 </div>
               </div>
             </div>
@@ -398,12 +398,12 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                 <motion.div
                   key={habit.id}
                   layout
-                  className={`glass-card p-8 flex items-center justify-between group border-zenith-border-primary transition-all duration-700 relative overflow-hidden ${
-                    habit.completed_today ? 'bg-zenith-surface-1 opacity-60' : 'bg-gradient-to-br from-zenith-surface-1 to-transparent hover:bg-zenith-surface-2 hover:border-zenith-scarlet/30 shadow-2xl'
+                  className={`premium-card premium-card-hover flex items-center justify-between group transition-all duration-700 relative overflow-hidden ${
+                    habit.completed_today ? 'opacity-60 grayscale' : ''
                   }`}
                 >
                   {!habit.completed_today && (
-                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-zenith-scarlet/5 blur-[60px] rounded-full group-hover:bg-zenith-scarlet/10 transition-all duration-700" />
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-zenith-accent/5 blur-[60px] rounded-full group-hover:bg-zenith-accent/10 transition-all duration-700" />
                   )}
                   
                   <div className="flex items-center space-x-8 flex-1 relative z-10">
@@ -411,21 +411,21 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                       onClick={() => toggleHabit(habit)}
                       className={`w-20 h-20 rounded-[28px] flex items-center justify-center transition-all duration-700 relative group/btn border-2 ${
                         habit.completed_today 
-                          ? 'bg-zenith-scarlet border-zenith-scarlet text-white shadow-[0_0_40px_rgba(255,26,26,0.6)] scale-110' 
-                          : 'bg-zenith-surface-2 text-zenith-text-tertiary border-zenith-border-primary hover:border-zenith-scarlet/50 hover:scale-110'
+                          ? 'bg-zenith-accent border-zenith-accent text-white shadow-[0_0_40px_var(--accent-glow)] scale-110' 
+                          : 'bg-zenith-surface-2 text-zenith-text-tertiary border-zenith-border-primary hover:border-zenith-accent/50 hover:scale-110'
                       }`}
                     >
                       {habit.completed_today ? (
                         <Check size={40} strokeWidth={3.5} />
                       ) : (
-                        <Sparkles size={32} className="opacity-20 group-hover/btn:opacity-100 group-hover/btn:text-zenith-scarlet transition-all duration-500" />
+                        <Sparkles size={32} className="opacity-20 group-hover/btn:opacity-100 group-hover/btn:text-zenith-accent transition-all duration-500" />
                       )}
                       {habit.completed_today && (
                         <motion.div 
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1.8, opacity: 0 }}
                           transition={{ duration: 1.5, repeat: Infinity }}
-                          className="absolute inset-0 bg-zenith-scarlet rounded-[28px] -z-10"
+                          className="absolute inset-0 bg-zenith-accent rounded-[28px] -z-10"
                         />
                       )}
                     </button>
@@ -436,31 +436,31 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                           <p className={`text-2xl font-display font-bold tracking-tight transition-all duration-700 ${habit.completed_today ? 'text-zenith-text-tertiary line-through italic' : 'text-zenith-text-primary'}`}>
                             {habit.title}
                           </p>
-                          <div className="flex items-center space-x-3 text-[9px] font-black uppercase tracking-[0.2em] text-zenith-text-tertiary">
+                          <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.2em] text-zenith-text-tertiary">
                             <span className="px-2 py-0.5 bg-zenith-surface-2 rounded-md border border-zenith-border-primary">{habit.frequency}</span>
                             <span className="w-1 h-1 bg-zenith-border-primary rounded-full" />
                             <span>Meta: {habit.target_value} {habit.target_unit}</span>
                           </div>
                         </div>
                         <div className="flex flex-col items-end space-y-2">
-                          <div className="flex items-center space-x-2 bg-zenith-surface-2 px-3 py-1.5 rounded-xl border border-zenith-border-primary">
-                            <Flame size={16} className={habit.streak > 0 ? 'text-zenith-scarlet drop-shadow-[0_0_8px_rgba(255,26,26,0.5)]' : 'text-zenith-text-tertiary'} />
+                          <div className="flex items-center space-x-2 bg-zenith-surface-2 px-3 py-1.5 rounded-xl border border-zenith-border-primary group-hover:border-zenith-accent/30 transition-colors">
+                            <Flame size={16} className={habit.streak > 0 ? 'text-zenith-accent drop-shadow-[0_0_8px_var(--accent-glow)]' : 'text-zenith-text-tertiary'} />
                             <span className={`text-xs font-black font-mono ${habit.streak > 0 ? 'text-zenith-text-primary' : 'text-zenith-text-tertiary'}`}>{habit.streak}</span>
                           </div>
-                          <p className="text-[8px] font-bold uppercase tracking-widest text-zenith-text-tertiary">Streak Atual</p>
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-zenith-text-tertiary">Streak Atual</p>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
+                        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
                           <span className="text-zenith-text-tertiary">Progresso Mensal</span>
-                          <span className="text-zenith-scarlet">{Math.round((habit.streak / 30) * 100)}%</span>
+                          <span className="text-zenith-accent">{Math.round((habit.streak / 30) * 100)}%</span>
                         </div>
                         <div className="h-2 bg-zenith-surface-2 rounded-full overflow-hidden border border-zenith-border-primary">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min((habit.streak / 30) * 100, 100)}%` }}
-                            className="h-full bg-gradient-to-r from-zenith-crimson via-zenith-scarlet to-zenith-scarlet shadow-[0_0_15px_rgba(255,26,26,0.3)]"
+                            className="h-full bg-gradient-to-r from-zenith-crimson via-zenith-accent to-zenith-accent shadow-[0_0_15px_var(--accent-glow)]"
                           />
                         </div>
                       </div>
@@ -468,7 +468,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                   </div>
                   <button 
                     onClick={() => deleteHabit(habit.id)}
-                    className="ml-6 opacity-0 group-hover:opacity-100 w-12 h-12 rounded-2xl bg-red-500/5 flex items-center justify-center text-zenith-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all duration-500"
+                    className="ml-6 opacity-0 group-hover:opacity-100 w-12 h-12 rounded-2xl bg-zenith-accent/5 flex items-center justify-center text-zenith-text-tertiary hover:text-zenith-accent hover:bg-zenith-accent/10 transition-all duration-500"
                   >
                     <Trash2 size={20} />
                   </button>
@@ -490,12 +490,12 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
             <div className="grid grid-cols-3 gap-4">
               {[
                 { label: 'Pendentes', value: tasks.filter(t => !t.completed).length, color: 'text-zenith-text-primary' },
-                { label: 'Concluídas', value: tasks.filter(t => t.completed).length, color: 'text-zenith-scarlet' },
+                { label: 'Concluídas', value: tasks.filter(t => t.completed).length, color: 'text-zenith-accent' },
                 { label: 'Total', value: tasks.length, color: 'text-zenith-text-tertiary' }
               ].map((stat, i) => (
-                <div key={i} className="glass-card p-4 text-center border-zenith-border-primary bg-zenith-surface-1">
+                <div key={i} className="premium-card p-4 text-center">
                   <p className={`text-2xl font-display font-bold ${stat.color}`}>{stat.value}</p>
-                  <p className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest mt-1">{stat.label}</p>
+                  <p className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-widest mt-1">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -505,12 +505,12 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                 <motion.div
                   key={task.id}
                   layout
-                  className={`glass-card p-6 flex items-center justify-between group border-zenith-border-primary transition-all duration-700 relative overflow-hidden ${
-                    task.completed ? 'bg-zenith-surface-1 opacity-40 grayscale' : 'bg-gradient-to-br from-zenith-surface-1 to-transparent hover:bg-zenith-surface-2 hover:border-zenith-scarlet/30 shadow-xl'
+                  className={`premium-card premium-card-hover flex items-center justify-between group transition-all duration-700 relative overflow-hidden ${
+                    task.completed ? 'opacity-40 grayscale' : ''
                   }`}
                 >
                   {!task.completed && (
-                    <div className="absolute -top-10 -right-10 w-20 h-20 bg-zenith-scarlet/5 blur-[40px] rounded-full group-hover:bg-zenith-scarlet/10 transition-all duration-700" />
+                    <div className="absolute -top-10 -right-10 w-20 h-20 bg-zenith-accent/5 blur-[40px] rounded-full group-hover:bg-zenith-accent/10 transition-all duration-700" />
                   )}
                   
                   <div className="flex items-center space-x-6 flex-1 relative z-10">
@@ -518,24 +518,24 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                       onClick={() => toggleTask(task)}
                       className={`w-14 h-14 rounded-[20px] flex items-center justify-center transition-all duration-500 border-2 ${
                         task.completed 
-                          ? 'bg-zenith-scarlet border-zenith-scarlet text-white shadow-[0_0_20px_rgba(255,38,33,0.4)]' 
-                          : 'bg-zenith-surface-2 text-zenith-text-tertiary border-zenith-border-primary hover:border-zenith-scarlet/50 hover:scale-110'
+                          ? 'bg-zenith-accent border-zenith-accent text-white shadow-[0_0_20px_var(--accent-glow)]' 
+                          : 'bg-zenith-surface-2 text-zenith-text-tertiary border-zenith-border-primary hover:border-zenith-accent/50 hover:scale-110'
                       }`}
                     >
-                      {task.completed ? <Check size={28} strokeWidth={3} /> : <div className="w-2 h-2 rounded-full bg-zenith-border-primary group-hover:bg-zenith-scarlet transition-colors" />}
+                      {task.completed ? <Check size={28} strokeWidth={3} /> : <div className="w-2 h-2 rounded-full bg-zenith-border-primary group-hover:bg-zenith-accent transition-colors" />}
                     </button>
                     <div className="space-y-1.5">
                       <p className={`text-lg font-bold tracking-tight transition-all duration-500 ${task.completed ? 'text-zenith-text-tertiary line-through italic' : 'text-zenith-text-primary'}`}>
                         {task.title}
                       </p>
                       <div className="flex items-center space-x-3">
-                        <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-zenith-scarlet shadow-[0_0_8px_rgba(255,26,26,0.5)]' : task.priority === 'medium' ? 'bg-orange-500' : 'bg-zenith-border-primary'}`} />
-                        <span className="text-[9px] text-zenith-text-tertiary font-black uppercase tracking-widest">{task.priority} Priority</span>
+                        <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-zenith-accent shadow-[0_0_8px_var(--accent-glow)]' : task.priority === 'medium' ? 'bg-orange-500' : 'bg-zenith-border-primary'}`} />
+                        <span className="text-[10px] text-zenith-text-tertiary font-black uppercase tracking-widest">{task.priority} Priority</span>
                         {task.due_date && (
                           <>
                             <span className="w-1 h-1 bg-zenith-border-primary rounded-full" />
-                            <div className="flex items-center space-x-1.5 text-[9px] font-black uppercase tracking-widest text-zenith-text-tertiary">
-                              <Clock size={10} />
+                            <div className="flex items-center space-x-1.5 text-[10px] font-black uppercase tracking-widest text-zenith-text-tertiary">
+                              <Clock size={12} />
                               <span>{task.due_date}</span>
                             </div>
                           </>
@@ -545,7 +545,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                   </div>
                   <button 
                     onClick={() => deleteTask(task.id)}
-                    className="ml-4 opacity-0 group-hover:opacity-100 w-10 h-10 rounded-xl bg-red-500/5 flex items-center justify-center text-zenith-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-all duration-500"
+                    className="ml-4 opacity-0 group-hover:opacity-100 w-10 h-10 rounded-xl bg-zenith-accent/5 flex items-center justify-center text-zenith-text-tertiary hover:text-zenith-accent hover:bg-zenith-accent/10 transition-all duration-500"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -564,14 +564,14 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
             className="space-y-8"
           >
             {/* Performance Chart */}
-            <div className="glass-card p-8 border-zenith-border-primary bg-zenith-surface-1 space-y-8">
+            <div className="premium-card border-zenith-border-primary bg-zenith-surface-1 space-y-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary">Ciclo de Performance</h3>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary">Ciclo de Performance</h3>
                   <p className="text-2xl font-display font-bold text-zenith-text-primary mt-1">Eficiência Neural</p>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-zenith-scarlet/10 flex items-center justify-center">
-                  <Activity size={24} className="text-zenith-scarlet" />
+                <div className="w-14 h-14 rounded-2xl bg-zenith-accent/10 flex items-center justify-center border border-zenith-accent/20">
+                  <Activity size={28} className="text-zenith-accent" />
                 </div>
               </div>
               
@@ -580,8 +580,8 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ff1a1a" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#ff1a1a" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="var(--accent-color)" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="var(--accent-color)" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-zenith-border-primary opacity-20" vertical={false} />
@@ -589,7 +589,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                       dataKey="name" 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: 'currentColor', fontSize: 10, fontWeight: 'bold' }}
+                      tick={{ fill: 'currentColor', fontSize: 11, fontWeight: 'bold' }}
                       className="text-zenith-text-tertiary"
                       dy={10}
                     />
@@ -599,18 +599,18 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                         backgroundColor: 'var(--surface-1)', 
                         border: '1px solid var(--border-primary)',
                         borderRadius: '16px',
-                        fontSize: '10px',
+                        fontSize: '11px',
                         fontWeight: 'bold',
                         textTransform: 'uppercase',
                         letterSpacing: '1px',
                         color: 'var(--text-primary)'
                       }}
-                      itemStyle={{ color: '#ff1a1a' }}
+                      itemStyle={{ color: 'var(--accent-color)' }}
                     />
                     <Area 
                       type="monotone" 
                       dataKey="completed" 
-                      stroke="#ff1a1a" 
+                      stroke="var(--accent-color)" 
                       strokeWidth={4}
                       fillOpacity={1} 
                       fill="url(#colorValue)" 
@@ -623,28 +623,28 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
 
             {/* Achievements */}
             <div className="space-y-6">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary px-2">Conquistas Desbloqueadas</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary px-2">Conquistas Desbloqueadas</h3>
               <div className="grid grid-cols-1 gap-4">
                 {achievements.map((ach) => (
-                  <div key={ach.id} className={`glass-card p-6 border-zenith-border-primary flex items-center justify-between group transition-all duration-500 ${ach.unlocked ? 'bg-zenith-scarlet/5 border-zenith-scarlet/20' : 'bg-zenith-surface-1'}`}>
+                  <div key={ach.id} className={`premium-card flex items-center justify-between group transition-all duration-500 ${ach.unlocked ? 'border-zenith-accent/30' : ''}`}>
                     <div className="flex items-center space-x-6">
-                      <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-500 ${ach.unlocked ? 'bg-zenith-scarlet text-white shadow-[0_0_30px_rgba(255,26,26,0.4)] scale-110 rotate-6' : 'bg-zenith-surface-2 text-zenith-text-tertiary'}`}>
+                      <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-500 ${ach.unlocked ? 'bg-zenith-accent text-white shadow-[0_0_30px_var(--accent-glow)] scale-110 rotate-6' : 'bg-zenith-surface-2 text-zenith-text-tertiary'}`}>
                         <span className="text-3xl">{ach.icon}</span>
                       </div>
                       <div className="space-y-1">
                         <h4 className={`text-lg font-bold tracking-tight ${ach.unlocked ? 'text-zenith-text-primary' : 'text-zenith-text-tertiary'}`}>{ach.title}</h4>
-                        <p className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-widest">{ach.description}</p>
+                        <p className="text-[11px] text-zenith-text-tertiary font-bold uppercase tracking-widest">{ach.description}</p>
                       </div>
                     </div>
                     <div className="text-right space-y-3">
-                      <p className={`text-sm font-black font-mono ${ach.unlocked ? 'text-zenith-scarlet' : 'text-zenith-text-tertiary'}`}>
+                      <p className={`text-sm font-black font-mono ${ach.unlocked ? 'text-zenith-accent' : 'text-zenith-text-tertiary'}`}>
                         {ach.progress}/{ach.total}
                       </p>
                       <div className="w-24 h-1.5 bg-zenith-surface-2 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${(ach.progress / ach.total) * 100}%` }}
-                          className={`h-full transition-all duration-1000 ${ach.unlocked ? 'bg-zenith-scarlet shadow-[0_0_10px_rgba(255,26,26,0.5)]' : 'bg-zenith-border-primary'}`}
+                          className={`h-full transition-all duration-1000 ${ach.unlocked ? 'bg-zenith-accent shadow-[0_0_10px_var(--accent-glow)]' : 'bg-zenith-border-primary'}`}
                         />
                       </div>
                     </div>
@@ -654,14 +654,14 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
             </div>
 
             {/* Calendar View (Simple Grid) */}
-            <div className="glass-card p-10 border-zenith-border-primary bg-zenith-surface-1 space-y-8">
+            <div className="premium-card space-y-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary">Mapa de Calor Neural</h3>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-zenith-text-tertiary">Mapa de Calor Neural</h3>
                   <p className="text-2xl font-display font-bold text-zenith-text-primary">Consistência</p>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-zenith-surface-2 flex items-center justify-center">
-                  <Calendar size={24} className="text-zenith-text-tertiary" />
+                <div className="w-14 h-14 rounded-2xl bg-zenith-surface-2 flex items-center justify-center border border-zenith-border-primary">
+                  <Calendar size={28} className="text-zenith-text-tertiary" />
                 </div>
               </div>
               <div className="grid grid-cols-7 gap-3">
@@ -676,9 +676,9 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                     <motion.div 
                       key={i} 
                       whileHover={{ scale: 1.2, zIndex: 10 }}
-                      className={`aspect-square rounded-lg flex items-center justify-center text-[9px] font-black transition-all duration-500 ${
+                      className={`aspect-square rounded-lg flex items-center justify-center text-[10px] font-black transition-all duration-500 ${
                         isToday ? 'bg-zenith-text-primary text-zenith-black shadow-[0_0_20px_rgba(255,255,255,0.3)]' :
-                        hasActivity ? 'bg-zenith-scarlet text-white shadow-[0_0_15px_rgba(255,26,26,0.4)]' : 'bg-zenith-surface-2 text-zenith-text-tertiary'
+                        hasActivity ? 'bg-zenith-accent text-white shadow-[0_0_15px_var(--accent-glow)]' : 'bg-zenith-surface-2 text-zenith-text-tertiary'
                       }`}
                     >
                       {i + 1}
@@ -707,7 +707,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-lg bg-zenith-surface-1 rounded-t-[2.5rem] border-t border-zenith-border-primary p-8 pb-12 shadow-2xl overflow-hidden"
+              className="relative w-full max-w-lg glass-nav rounded-t-[2.5rem] border-t border-zenith-border-primary p-8 pb-12 shadow-2xl overflow-hidden"
             >
               {/* Drag Handle */}
               <div className="flex justify-center mb-6">
@@ -717,9 +717,9 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
               <div className="flex justify-between items-center mb-8">
                 <div className="space-y-1">
                   <h3 className="text-2xl font-display font-bold uppercase tracking-tight text-zenith-text-primary italic">
-                    Novo <span className="text-zenith-scarlet">{activeView === 'habits' ? 'Hábito' : 'Protocolo'}</span>
+                    Novo <span className="text-zenith-accent">{activeView === 'habits' ? 'Hábito' : 'Protocolo'}</span>
                   </h3>
-                  <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-bold">Defina sua próxima diretriz</p>
+                  <p className="text-[11px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-bold">Defina sua próxima diretriz</p>
                 </div>
                 <button 
                   onClick={() => setIsAdding(false)} 
@@ -736,7 +736,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                     value={newHabitName}
                     onChange={(e) => setNewHabitName(e.target.value)}
                     placeholder={activeView === 'habits' ? "Nome do Hábito..." : "O que precisa ser feito?"}
-                    className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl px-6 py-4 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all placeholder:text-zenith-text-tertiary"
+                    className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl px-6 py-4 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-accent transition-all placeholder:text-zenith-text-tertiary"
                   />
                   <Zap size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-zenith-text-tertiary opacity-20" />
                 </div>
@@ -745,11 +745,11 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Frequência</label>
+                        <label className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Frequência</label>
                         <select
                           value={newFrequency}
                           onChange={(e) => setNewFrequency(e.target.value as any)}
-                          className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all appearance-none"
+                          className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-accent transition-all appearance-none"
                         >
                           <option value="daily" className="bg-zenith-surface-1">Diário</option>
                           <option value="weekly" className="bg-zenith-surface-1">Semanal</option>
@@ -757,23 +757,23 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                         </select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Meta (Vezes)</label>
+                        <label className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Meta (Vezes)</label>
                         <input
                           type="number"
                           min="1"
                           value={newTarget}
                           onChange={(e) => setNewTarget(parseInt(e.target.value) || 1)}
-                          className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
+                          className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-accent transition-all"
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Lembrete (Opcional)</label>
+                      <label className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-widest ml-1">Lembrete (Opcional)</label>
                       <input
                         type="time"
                         value={newReminderTime}
                         onChange={(e) => setNewReminderTime(e.target.value)}
-                        className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
+                        className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-xl px-4 py-3 text-xs text-zenith-text-primary focus:outline-none focus:border-zenith-accent transition-all"
                       />
                     </div>
                   </>
@@ -781,7 +781,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
 
                 <button 
                   onClick={addHabit}
-                  className="w-full py-5 rounded-2xl bg-zenith-scarlet text-white text-[10px] font-bold uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(255,38,33,0.2)] hover:shadow-[0_0_40px_rgba(255,38,33,0.4)] transition-all"
+                  className="neon-button w-full py-5 rounded-2xl text-[11px] uppercase tracking-[0.3em]"
                 >
                   {activeView === 'habits' ? 'Inicializar Hábito' : 'Criar Tarefa'}
                 </button>

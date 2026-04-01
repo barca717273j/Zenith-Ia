@@ -84,9 +84,9 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
   };
 
   const suggestions = [
-    { label: 'Create routine', icon: <Zap size={14} /> },
-    { label: 'Analyze productivity', icon: <TrendingUp size={14} /> },
-    { label: 'Suggest goals', icon: <Target size={14} /> },
+    { label: 'Criar rotina', icon: <Zap size={14} /> },
+    { label: 'Analisar produtividade', icon: <TrendingUp size={14} /> },
+    { label: 'Sugerir metas', icon: <Target size={14} /> },
   ];
 
   return (
@@ -100,67 +100,70 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
           className="fixed inset-0 z-[100] bg-zenith-black flex flex-col transition-colors duration-500"
         >
           {/* Header */}
-          <header className="p-6 border-b border-zenith-border-primary flex justify-between items-center bg-zenith-surface-1/90 backdrop-blur-3xl relative">
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zenith-scarlet to-transparent opacity-50" />
+          <header className="p-6 border-b border-zenith-border-primary flex justify-between items-center bg-zenith-surface-1/95 backdrop-blur-3xl relative z-20 shadow-2xl">
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-zenith-accent to-transparent opacity-80 shadow-[0_0_15px_var(--accent-glow)]" />
             
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="w-12 h-12 rounded-2xl bg-zenith-surface-2 border border-zenith-border-primary flex items-center justify-center text-zenith-scarlet shadow-lg shadow-zenith-scarlet/20 relative z-10">
-                  <Brain size={24} />
+            <div className="flex items-center space-x-5">
+              <div className="relative group">
+                <div className="w-14 h-14 rounded-2xl bg-zenith-surface-2 border border-zenith-border-primary flex items-center justify-center text-zenith-accent shadow-xl shadow-zenith-accent/10 relative z-10 group-hover:border-zenith-accent/50 transition-all duration-500">
+                  <Brain size={28} className="drop-shadow-[0_0_8px_var(--accent-glow)]" />
                 </div>
                 <motion.div 
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="absolute inset-0 bg-zenith-scarlet blur-xl -z-10"
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.3, 0.1] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute inset-0 bg-zenith-accent blur-2xl -z-10"
                 />
               </div>
               <div>
-                <h2 className="font-display font-bold text-xl tracking-tighter uppercase text-zenith-text-primary">AI Mentor Strategist</h2>
-                <div className="flex items-center space-x-2 mt-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-zenith-scarlet animate-pulse shadow-sm shadow-zenith-scarlet/50" />
-                  <span className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest">Neural Link Active</span>
+                <h2 className="font-display font-bold text-2xl tracking-tighter uppercase text-zenith-text-primary italic">Infinity Core <span className="text-zenith-accent">v2.0</span></h2>
+                <div className="flex items-center space-x-2.5 mt-1">
+                  <div className="w-2 h-2 rounded-full bg-zenith-accent animate-pulse shadow-[0_0_8px_var(--accent-glow)]" />
+                  <span className="text-[9px] text-zenith-text-tertiary font-black uppercase tracking-[0.25em]">Sincronização Neural Ativa</span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-5">
               <div className="text-right hidden sm:block">
-                <div className="text-[8px] text-zenith-text-tertiary font-bold uppercase tracking-widest">Messages Left</div>
-                <div className="text-xs font-bold text-zenith-scarlet">{messagesLeft}</div>
+                <div className="text-[9px] text-zenith-text-tertiary font-black uppercase tracking-widest opacity-60">Mensagens Restantes</div>
+                <div className="text-sm font-black text-zenith-accent drop-shadow-[0_0_5px_var(--accent-glow)]">{messagesLeft}</div>
               </div>
               <motion.button 
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose} 
-                className="w-10 h-10 flex items-center justify-center bg-zenith-surface-2 rounded-xl border border-zenith-border-primary hover:bg-zenith-surface-3 transition-all"
+                className="w-12 h-12 flex items-center justify-center bg-zenith-surface-2 rounded-2xl border border-zenith-border-primary hover:bg-zenith-surface-3 hover:border-zenith-accent/30 transition-all shadow-lg"
               >
-                <X size={20} className="text-zenith-text-tertiary" />
+                <X size={24} className="text-zenith-text-tertiary" />
               </motion.button>
             </div>
           </header>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-hide bg-zenith-black/50">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-10 scrollbar-hide bg-zenith-black relative">
+            {/* Subtle Grid Background */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,59,59,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,59,59,0.02)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
+            
             {messages.map((msg, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} relative z-10`}
               >
-                <div className={`max-w-[85%] flex space-x-3 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center border ${
+                <div className={`max-w-[85%] flex space-x-4 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                  <div className={`w-10 h-10 rounded-2xl flex-shrink-0 flex items-center justify-center border shadow-lg ${
                     msg.role === 'user' 
                       ? 'bg-zenith-surface-2 border-zenith-border-primary text-zenith-text-tertiary' 
-                      : 'bg-zenith-scarlet/10 border-zenith-scarlet/20 text-zenith-scarlet'
+                      : 'bg-zenith-accent/10 border-zenith-accent/20 text-zenith-accent'
                   }`}>
-                    {msg.role === 'user' ? <User size={14} /> : <Sparkles size={14} />}
+                    {msg.role === 'user' ? <User size={18} /> : <Sparkles size={18} className="drop-shadow-[0_0_5px_var(--accent-glow)]" />}
                   </div>
-                  <div className={`p-4 rounded-2xl text-sm leading-relaxed font-medium ${
+                  <div className={`p-5 rounded-3xl text-sm leading-relaxed font-medium shadow-2xl ${
                     msg.role === 'user' 
-                      ? 'bg-zenith-crimson text-white rounded-tr-none' 
-                      : 'bg-zenith-surface-1 text-zenith-text-secondary rounded-tl-none border border-zenith-border-primary shadow-sm'
+                      ? 'bg-gradient-to-br from-zenith-accent to-zenith-crimson text-white rounded-tr-none border border-white/10' 
+                      : 'bg-zenith-surface-1 text-zenith-text-primary rounded-tl-none border border-zenith-border-primary'
                   }`}>
-                    <div className="max-w-none">
+                    <div className="max-w-none prose prose-invert prose-sm prose-p:leading-relaxed prose-strong:text-zenith-accent">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   </div>
@@ -168,28 +171,28 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
               </motion.div>
             ))}
             {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-zenith-surface-1 p-4 rounded-2xl rounded-tl-none border border-zenith-border-primary flex space-x-2">
-                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2 h-2 bg-zenith-scarlet rounded-full" />
-                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2 h-2 bg-zenith-scarlet rounded-full" />
-                  <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2 h-2 bg-zenith-scarlet rounded-full" />
+              <div className="flex justify-start relative z-10">
+                <div className="bg-zenith-surface-1 p-5 rounded-3xl rounded-tl-none border border-zenith-border-primary flex space-x-2.5 shadow-xl">
+                  <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2.5 h-2.5 bg-zenith-accent rounded-full shadow-[0_0_8px_var(--accent-glow)]" />
+                  <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2.5 h-2.5 bg-zenith-accent rounded-full shadow-[0_0_8px_var(--accent-glow)]" />
+                  <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2.5 h-2.5 bg-zenith-accent rounded-full shadow-[0_0_8px_var(--accent-glow)]" />
                 </div>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <footer className="p-6 border-t border-zenith-border-primary bg-zenith-surface-1/90 backdrop-blur-3xl space-y-4">
+          <footer className="p-6 border-t border-zenith-border-primary bg-zenith-surface-1/95 backdrop-blur-3xl space-y-5 relative z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
             {/* Suggestions */}
-            <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
+            <div className="flex space-x-3 overflow-x-auto scrollbar-hide pb-2">
               {suggestions.map((s, i) => (
                 <button
                   key={i}
                   onClick={() => { setInput(s.label); handleSend(); }}
                   disabled={isLimitReached}
-                  className="flex-shrink-0 flex items-center space-x-2 bg-zenith-surface-2 border border-zenith-border-primary px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-zenith-text-tertiary hover:bg-zenith-surface-3 hover:text-zenith-text-primary transition-all disabled:opacity-50"
+                  className="flex-shrink-0 flex items-center space-x-2.5 bg-zenith-surface-2 border border-zenith-border-primary px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest text-zenith-text-tertiary hover:bg-zenith-surface-3 hover:text-zenith-accent hover:border-zenith-accent/30 transition-all disabled:opacity-50 shadow-sm"
                 >
-                  {s.icon}
+                  <span className="text-zenith-accent">{s.icon}</span>
                   <span>{s.label}</span>
                 </button>
               ))}
@@ -202,26 +205,27 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                 disabled={isLimitReached}
-                placeholder={isLimitReached ? "Daily message limit reached" : "Ask the neural core..."}
-                className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-4 pl-6 pr-16 focus:outline-none focus:border-zenith-scarlet/40 transition-all font-medium text-zenith-text-primary placeholder:text-zenith-text-tertiary disabled:opacity-50"
+                placeholder={isLimitReached ? "LIMITE DIÁRIO ATINGIDO" : "Transmita sua consulta ao núcleo..."}
+                className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 pl-7 pr-20 focus:outline-none focus:border-zenith-accent/50 transition-all font-medium text-zenith-text-primary placeholder:text-zenith-text-tertiary disabled:opacity-50 shadow-inner"
               />
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, x: -5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSend}
                 disabled={!input.trim() || isTyping || isLimitReached}
-                className="absolute right-2 p-3 bg-zenith-crimson text-white rounded-xl shadow-lg disabled:opacity-50"
+                className="absolute right-3 p-4 bg-zenith-accent text-white rounded-xl shadow-[0_0_20px_var(--accent-glow)] disabled:opacity-50 disabled:shadow-none hover:brightness-110 transition-all"
               >
-                {isLimitReached ? <Lock size={18} /> : <Send size={18} />}
+                {isLimitReached ? <Lock size={20} /> : <Send size={20} />}
               </motion.button>
             </div>
             {isLimitReached && (
               <div className="text-center">
                 <button 
                   onClick={() => {/* Trigger upgrade modal */}}
-                  className="text-[10px] font-bold uppercase tracking-widest text-zenith-scarlet hover:text-zenith-neon-red transition-colors"
+                  className="text-[10px] font-black uppercase tracking-[0.2em] text-zenith-accent hover:text-white transition-colors duration-300 flex items-center justify-center space-x-2 mx-auto"
                 >
-                  Upgrade to unlock more messages
+                  <Sparkles size={12} className="animate-pulse" />
+                  <span>Desbloquear Potencial Ilimitado</span>
                 </button>
               </div>
             )}

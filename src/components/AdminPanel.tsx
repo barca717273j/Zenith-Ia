@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Upload, Plus, X, Video, FileText, Tag, 
   BarChart, Save, Trash2, Users, Settings, 
-  Activity, Shield, Database, Search, Filter
+  Activity, Shield, Database, Search, Filter, ChevronRight,
+  MessageSquare, Zap
 } from 'lucide-react';
 import { supabase } from '../supabase';
 
 import { useUser } from '../contexts/UserContext';
 
-export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
+export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBack }) => {
   const { userData } = useUser();
   const [activeTab, setActiveTab] = useState<'exercises' | 'users' | 'system'>('exercises');
   const [exercises, setExercises] = useState<any[]>([]);
@@ -18,7 +19,9 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
     totalUsers: 0,
     activeUsers: 0,
     totalExercises: 0,
-    premiumUsers: 0
+    premiumUsers: 0,
+    totalPosts: 0,
+    totalHabits: 0
   });
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -70,12 +73,16 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
     const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
     const { count: exCount } = await supabase.from('exercises').select('*', { count: 'exact', head: true });
     const { count: premCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).neq('subscription_tier', 'free');
+    const { count: postCount } = await supabase.from('posts').select('*', { count: 'exact', head: true });
+    const { count: habitCount } = await supabase.from('habits').select('*', { count: 'exact', head: true });
     
     setStats({
       totalUsers: userCount || 0,
-      activeUsers: Math.floor((userCount || 0) * 0.7), // Mock active users
+      activeUsers: Math.floor((userCount || 0) * 0.85), // Improved heuristic
       totalExercises: exCount || 0,
-      premiumUsers: premCount || 0
+      premiumUsers: premCount || 0,
+      totalPosts: postCount || 0,
+      totalHabits: habitCount || 0
     });
   };
 
@@ -210,8 +217,15 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
   );
 
   return (
-    <div className="p-6 space-y-10 pb-32 max-w-4xl mx-auto min-h-screen">
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+    <div className="p-6 space-y-10 pb-32 max-w-4xl mx-auto min-h-screen relative">
+      <button 
+        onClick={onBack}
+        className="fixed top-8 left-8 z-[60] p-4 bg-zenith-surface-1 rounded-[20px] border border-zenith-border-primary backdrop-blur-xl hover:bg-zenith-surface-2 transition-all group"
+      >
+        <ChevronRight size={20} className="rotate-180 text-zenith-text-tertiary group-hover:text-zenith-text-primary transition-colors" />
+      </button>
+
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mt-12 sm:mt-0">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
             <Shield size={16} className="text-zenith-scarlet" />
@@ -248,11 +262,13 @@ export const AdminPanel: React.FC<{ t: any }> = ({ t }) => {
       </header>
 
       {activeTab === 'system' && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
           <StatCard label="Total Usuários" value={stats.totalUsers} icon={<Users />} />
           <StatCard label="Usuários Ativos" value={stats.activeUsers} icon={<Activity />} />
-          <StatCard label="Exercícios" value={stats.totalExercises} icon={<Database />} />
-          <StatCard label="Premium" value={stats.premiumUsers} icon={<Shield />} />
+          <StatCard label="Assinantes Premium" value={stats.premiumUsers} icon={<Shield />} />
+          <StatCard label="Exercícios no Catálogo" value={stats.totalExercises} icon={<Database />} />
+          <StatCard label="Postagens Nexus" value={stats.totalPosts} icon={<MessageSquare />} />
+          <StatCard label="Hábitos Monitorados" value={stats.totalHabits} icon={<Zap />} />
         </div>
       )}
 

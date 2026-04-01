@@ -58,7 +58,7 @@ async function startServer() {
         const { error } = await supabaseAdmin
           .from('users')
           .update({ 
-            subscription_tier: planId.charAt(0).toUpperCase() + planId.slice(1),
+            subscription_tier: planId, // Save as lowercase (basic, pro, master)
             subscription_status: 'active',
             updated_at: new Date().toISOString()
           })
@@ -76,7 +76,7 @@ async function startServer() {
         const { error } = await supabaseAdmin
           .from('users')
           .update({ 
-            subscription_tier: 'Free',
+            subscription_tier: 'free',
             subscription_status: 'canceled',
             updated_at: new Date().toISOString()
           })
@@ -97,8 +97,8 @@ async function startServer() {
 
     // Map planId to actual Stripe Price IDs
     const priceMap: Record<string, string> = {
+      'basic': process.env.STRIPE_PRICE_BASIC || 'price_basic_placeholder',
       'pro': process.env.STRIPE_PRICE_PRO || 'price_pro_placeholder',
-      'elite': process.env.STRIPE_PRICE_ELITE || 'price_elite_placeholder',
       'master': process.env.STRIPE_PRICE_MASTER || 'price_master_placeholder',
     };
 

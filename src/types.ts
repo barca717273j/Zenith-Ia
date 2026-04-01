@@ -1,8 +1,6 @@
-export type SubscriptionTier = 'basic' | 'free' | 'weekly' | 'monthly' | 'annual' | 'pro' | 'elite' | 'master';
+export type SubscriptionTier = 'free' | 'basic' | 'pro' | 'master';
 
 export type UserIdentity = 'discipline_warrior' | 'strategic_mind' | 'mental_athlete' | 'wealth_builder' | 'focus_monk';
-
-export type MascoteState = 'sleeping' | 'energized' | 'happy' | 'tired';
 
 export interface UserProfile {
   id: string;
@@ -20,11 +18,11 @@ export interface UserProfile {
   onboarding_completed: boolean;
   identity?: UserIdentity;
   life_score: number;
-  mascote_state: MascoteState;
   bio?: string;
   is_private: boolean;
   photo_url?: string;
   avatar_url?: string;
+  role?: string;
   is_admin?: boolean;
   focus_minutes?: number;
   tasks_completed?: number;
@@ -128,6 +126,7 @@ export interface TierLimits {
   actionsPerDay: number;
   habits: number;
   posts: number;
+  storiesPerDay: number;
   hasFullSocial: boolean;
   hasPremiumExercises: boolean;
   hasAdvancedAnalytics: boolean;
@@ -138,26 +137,28 @@ export interface TierLimits {
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   free: {
-    aiMessagesPerDay: 5,
+    aiMessagesPerDay: 1,
     aiGenerationsPerDay: 1,
-    routinesPerDay: 3,
-    actionsPerDay: 5,
-    habits: 3,
-    posts: 1,
+    routinesPerDay: 1,
+    actionsPerDay: 1,
+    habits: 1,
+    posts: 0,
+    storiesPerDay: 0,
     hasFullSocial: false,
     hasPremiumExercises: false,
     hasAdvancedAnalytics: false,
-    hasFinanceTracking: false,
+    hasFinanceTracking: true,
     hasCustomRoutines: false,
     hasPrioritySupport: false,
   },
-  weekly: {
+  basic: {
     aiMessagesPerDay: 20,
-    aiGenerationsPerDay: 3,
+    aiGenerationsPerDay: 10,
     routinesPerDay: 10,
     actionsPerDay: 15,
     habits: 10,
-    posts: 3,
+    posts: 0,
+    storiesPerDay: 0,
     hasFullSocial: false,
     hasPremiumExercises: true,
     hasAdvancedAnalytics: false,
@@ -165,33 +166,20 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
     hasCustomRoutines: false,
     hasPrioritySupport: false,
   },
-  monthly: {
+  pro: {
     aiMessagesPerDay: 100,
-    aiGenerationsPerDay: 10,
+    aiGenerationsPerDay: 50,
     routinesPerDay: 30,
     actionsPerDay: 50,
     habits: 30,
-    posts: 10,
+    posts: 5,
+    storiesPerDay: 5,
     hasFullSocial: true,
     hasPremiumExercises: true,
-    hasAdvancedAnalytics: true,
+    hasAdvancedAnalytics: false,
     hasFinanceTracking: true,
     hasCustomRoutines: true,
     hasPrioritySupport: false,
-  },
-  annual: {
-    aiMessagesPerDay: Infinity,
-    aiGenerationsPerDay: Infinity,
-    routinesPerDay: Infinity,
-    actionsPerDay: Infinity,
-    habits: Infinity,
-    posts: Infinity,
-    hasFullSocial: true,
-    hasPremiumExercises: true,
-    hasAdvancedAnalytics: true,
-    hasFinanceTracking: true,
-    hasCustomRoutines: true,
-    hasPrioritySupport: true,
   },
   master: {
     aiMessagesPerDay: Infinity,
@@ -200,49 +188,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
     actionsPerDay: Infinity,
     habits: Infinity,
     posts: Infinity,
-    hasFullSocial: true,
-    hasPremiumExercises: true,
-    hasAdvancedAnalytics: true,
-    hasFinanceTracking: true,
-    hasCustomRoutines: true,
-    hasPrioritySupport: true,
-  },
-  // Legacy/Other tiers mapping to closest new tier
-  basic: {
-    aiMessagesPerDay: 5,
-    aiGenerationsPerDay: 1,
-    routinesPerDay: 3,
-    actionsPerDay: 5,
-    habits: 3,
-    posts: 1,
-    hasFullSocial: false,
-    hasPremiumExercises: false,
-    hasAdvancedAnalytics: false,
-    hasFinanceTracking: false,
-    hasCustomRoutines: false,
-    hasPrioritySupport: false,
-  },
-  pro: {
-    aiMessagesPerDay: 100,
-    aiGenerationsPerDay: 10,
-    routinesPerDay: 30,
-    actionsPerDay: 50,
-    habits: 30,
-    posts: 10,
-    hasFullSocial: true,
-    hasPremiumExercises: true,
-    hasAdvancedAnalytics: true,
-    hasFinanceTracking: true,
-    hasCustomRoutines: true,
-    hasPrioritySupport: false,
-  },
-  elite: {
-    aiMessagesPerDay: Infinity,
-    aiGenerationsPerDay: Infinity,
-    routinesPerDay: Infinity,
-    actionsPerDay: Infinity,
-    habits: Infinity,
-    posts: Infinity,
+    storiesPerDay: Infinity,
     hasFullSocial: true,
     hasPremiumExercises: true,
     hasAdvancedAnalytics: true,

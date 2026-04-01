@@ -8,7 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import Markdown from 'react-markdown';
 
 import { useUser } from '../contexts/UserContext';
-import { TIER_LIMITS } from '../types';
+import { TIER_LIMITS, SubscriptionTier } from '../types';
 import { Lock } from 'lucide-react';
 
 interface Transaction {
@@ -30,7 +30,7 @@ interface FinanceTrackerProps {
 export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, setAppTab }) => {
   const { userData } = useUser();
   const tier = userData?.subscription_tier || 'free';
-  const hasAccess = TIER_LIMITS[tier]?.hasFinanceTracking || false;
+  const hasAccess = TIER_LIMITS[tier as SubscriptionTier]?.hasFinanceTracking || false;
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<any[]>([]);
@@ -57,7 +57,10 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'flow' | 'budget' | 'goals'>('flow');
   
+  const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
+  const [newBudgetCategory, setNewBudgetCategory] = useState('');
+  const [newBudgetLimit, setNewBudgetLimit] = useState('');
   const [newGoalName, setNewGoalName] = useState('');
   const [newGoalTarget, setNewGoalTarget] = useState('');
 
@@ -76,19 +79,21 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
 
   if (!hasAccess) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6 min-h-[400px]">
-        <div className="w-20 h-20 bg-zenith-scarlet/10 rounded-full flex items-center justify-center">
-          <Lock className="text-zenith-scarlet" size={40} />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center space-y-6">
+        <div className="w-20 h-20 rounded-3xl bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center shadow-2xl shadow-zenith-scarlet/10">
+          <Lock size={40} className="text-zenith-scarlet" />
         </div>
-        <h2 className="text-2xl font-bold text-zenith-text-primary">{t.finance.premiumTitle || 'Finance Tracking is Premium'}</h2>
-        <p className="text-zenith-text-tertiary max-w-md">
-          {t.finance.premiumDesc || 'Upgrade your plan to access advanced financial management, budget tracking, and AI-powered financial insights.'}
-        </p>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-zenith-text-primary tracking-tight">{t.finance.premiumTitle}</h2>
+          <p className="text-sm text-zenith-text-tertiary max-w-xs mx-auto leading-relaxed">
+            {t.finance.premiumDesc}
+          </p>
+        </div>
         <button 
-          onClick={() => setAppTab('subscription')}
-          className="px-8 py-3 bg-gradient-to-r from-zenith-scarlet to-zenith-crimson text-white rounded-xl font-bold hover:bg-opacity-80 transition-all shadow-lg shadow-zenith-scarlet/20"
+          onClick={() => setAppTab('profile')}
+          className="bg-zenith-text-primary text-zenith-black px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:opacity-90 transition-all active:scale-95 shadow-xl shadow-zenith-text-primary/5"
         >
-          {t.finance.upgradeNow || 'Upgrade Now'}
+          {t.finance.upgradeNow}
         </button>
       </div>
     );
@@ -124,52 +129,32 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   };
 
   const fetchBudgets = async () => {
+    if (!userData?.id) return;
     try {
       const { data, error } = await supabase
         .from('finance_budgets')
         .select('*')
         .eq('user_id', userData.id);
       if (error) throw error;
-      if (data && data.length > 0) {
-        setBudgets(data);
-      } else {
-        setBudgets([
-          { category: 'Alimentação', limit: 1000, spent: 450 },
-          { category: 'Transporte', limit: 500, spent: 120 },
-          { category: 'Lazer', limit: 300, spent: 280 },
-        ]);
-      }
+      setBudgets(data || []);
     } catch (err) {
       console.error('Error fetching budgets:', err);
-      setBudgets([
-        { category: 'Alimentação', limit: 1000, spent: 450 },
-        { category: 'Transporte', limit: 500, spent: 120 },
-        { category: 'Lazer', limit: 300, spent: 280 },
-      ]);
+      setBudgets([]);
     }
   };
 
   const fetchGoals = async () => {
+    if (!userData?.id) return;
     try {
       const { data, error } = await supabase
         .from('finance_goals')
         .select('*')
         .eq('user_id', userData.id);
       if (error) throw error;
-      if (data && data.length > 0) {
-        setGoals(data);
-      } else {
-        setGoals([
-          { id: '1', name: 'Reserva de Emergência', target: 5000, current: 1200 },
-          { id: '2', name: 'Viagem Japão', target: 15000, current: 3500 },
-        ]);
-      }
+      setGoals(data || []);
     } catch (err) {
       console.error('Error fetching goals:', err);
-      setGoals([
-        { id: '1', name: 'Reserva de Emergência', target: 5000, current: 1200 },
-        { id: '2', name: 'Viagem Japão', target: 15000, current: 3500 },
-      ]);
+      setGoals([]);
     }
   };
 
@@ -261,9 +246,34 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
     }
   };
 
+  const handleAddBudget = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBudgetCategory || !newBudgetLimit || !userData?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('finance_budgets')
+        .insert([{
+          user_id: userData.id,
+          category: newBudgetCategory,
+          limit: parseFloat(newBudgetLimit),
+          spent: 0
+        }]);
+
+      if (error) throw error;
+      
+      setNewBudgetCategory('');
+      setNewBudgetLimit('');
+      setShowAddBudgetModal(false);
+      fetchBudgets();
+    } catch (err) {
+      console.error('Error adding budget:', err);
+    }
+  };
+
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newGoalName || !newGoalTarget) return;
+    if (!newGoalName || !newGoalTarget || !userData?.id) return;
     
     try {
       const { error } = await supabase
@@ -519,11 +529,21 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         )
       ) : activeTab === 'budget' ? (
         <section className="space-y-8">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-xl bg-zenith-surface-1 flex items-center justify-center">
-              <Sparkles size={16} className="text-zenith-text-tertiary" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-xl bg-zenith-surface-1 flex items-center justify-center">
+                <Sparkles size={16} className="text-zenith-text-tertiary" />
+              </div>
+              <h3 className="text-xs font-display font-bold text-zenith-text-secondary uppercase tracking-[0.2em]">{t.finance.budgets}</h3>
             </div>
-            <h3 className="text-xs font-display font-bold text-zenith-text-secondary uppercase tracking-[0.2em]">{t.finance.budgets}</h3>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAddBudgetModal(true)}
+              className="w-10 h-10 rounded-xl bg-zenith-scarlet/10 flex items-center justify-center text-zenith-scarlet border border-zenith-scarlet/20"
+            >
+              <Plus size={20} />
+            </motion.button>
           </div>
           <div className="space-y-6">
             {budgets.map((b, idx) => {
@@ -603,13 +623,80 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
                 target={goal.target} 
                 color="scarlet" 
                 formatCurrency={formatCurrency}
+                t={t}
               />
             ))}
           </div>
         </section>
       )}
 
-      {/* Add Goal Modal */}
+      {/* Add Budget Modal */}
+      <AnimatePresence>
+        {showAddBudgetModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAddBudgetModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md glass-card p-0 border-zenith-border-primary bg-zenith-surface-1 rounded-[40px] overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              <div className="p-8 border-b border-zenith-border-primary flex justify-between items-center bg-zenith-surface-1">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-display font-bold text-zenith-text-primary tracking-tight uppercase italic">Novo <span className="text-zenith-scarlet">Orçamento</span></h3>
+                  <p className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em]">Neural Wealth Protocol</p>
+                </div>
+                <button 
+                  onClick={() => setShowAddBudgetModal(false)} 
+                  className="w-12 h-12 rounded-2xl bg-zenith-surface-2 flex items-center justify-center text-zenith-text-tertiary hover:text-zenith-text-primary transition-all border border-zenith-border-secondary shadow-inner active:scale-90"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-8 space-y-8 overflow-y-auto scrollbar-hide flex-1">
+                <div className="space-y-3">
+                  <label className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">Categoria</label>
+                  <input
+                    type="text"
+                    value={newBudgetCategory}
+                    onChange={(e) => setNewBudgetCategory(e.target.value)}
+                    placeholder="Ex: Alimentação, Lazer..."
+                    className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-[2rem] px-6 py-5 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet/50 transition-all placeholder:text-zenith-text-tertiary/30 shadow-inner"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">Limite Mensal</label>
+                  <div className="relative">
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-zenith-text-tertiary font-bold">R$</span>
+                    <input
+                      type="number"
+                      value={newBudgetLimit}
+                      onChange={(e) => setNewBudgetLimit(e.target.value)}
+                      placeholder="0,00"
+                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-[2rem] pl-14 pr-6 py-5 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet/50 transition-all placeholder:text-zenith-text-tertiary/30 shadow-inner"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  onClick={handleAddBudget}
+                  className="w-full py-6 rounded-[2rem] bg-zenith-text-primary text-zenith-black text-[11px] font-bold uppercase tracking-[0.4em] hover:opacity-90 transition-all active:scale-[0.98] shadow-2xl shadow-zenith-text-primary/10 mt-4"
+                >
+                  Salvar Orçamento
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {showAddGoalModal && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -624,42 +711,54 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-md glass-card p-8 border-zenith-border-primary bg-zenith-surface-1"
+              className="relative w-full max-w-md glass-card p-0 border-zenith-border-primary bg-zenith-surface-1 rounded-[40px] overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-xl font-bold font-display uppercase tracking-tight text-zenith-text-primary">{t.finance.addGoal}</h2>
-                <button onClick={() => setShowAddGoalModal(false)} className="text-zenith-text-tertiary hover:text-zenith-text-primary">
-                  <X size={24} />
+              <div className="p-8 border-b border-zenith-border-primary flex justify-between items-center bg-zenith-surface-1">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-display font-bold text-zenith-text-primary tracking-tight uppercase italic">{t.finance.addGoal.split(' ')[0]} <span className="text-zenith-scarlet">{t.finance.addGoal.split(' ')[1]}</span></h3>
+                  <p className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em]">Neural Wealth Protocol</p>
+                </div>
+                <button 
+                  onClick={() => setShowAddGoalModal(false)} 
+                  className="w-12 h-12 rounded-2xl bg-zenith-surface-2 flex items-center justify-center text-zenith-text-tertiary hover:text-zenith-text-primary transition-all border border-zenith-border-secondary shadow-inner active:scale-90"
+                >
+                  <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleAddGoal} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-zenith-text-tertiary">{t.finance.goalName}</label>
+              <div className="p-8 space-y-8 overflow-y-auto scrollbar-hide flex-1">
+                <div className="space-y-3">
+                  <label className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.finance.goalName}</label>
                   <input
                     type="text"
                     value={newGoalName}
                     onChange={(e) => setNewGoalName(e.target.value)}
-                    className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl p-4 text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
                     placeholder="Ex: Reserva de Emergência"
+                    className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-[2rem] px-6 py-5 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet/50 transition-all placeholder:text-zenith-text-tertiary/30 shadow-inner"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-zenith-text-tertiary">{t.finance.targetAmount}</label>
-                  <input
-                    type="number"
-                    value={newGoalTarget}
-                    onChange={(e) => setNewGoalTarget(e.target.value)}
-                    className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl p-4 text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
-                    placeholder="0.00"
-                  />
+                <div className="space-y-3">
+                  <label className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.finance.targetAmount}</label>
+                  <div className="relative">
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-zenith-text-tertiary font-bold">R$</span>
+                    <input
+                      type="number"
+                      value={newGoalTarget}
+                      onChange={(e) => setNewGoalTarget(e.target.value)}
+                      placeholder="0,00"
+                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-[2rem] pl-14 pr-6 py-5 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet/50 transition-all placeholder:text-zenith-text-tertiary/30 shadow-inner"
+                    />
+                  </div>
                 </div>
 
-                <button type="submit" className="w-full btn-primary py-4 text-[10px] font-bold uppercase tracking-[0.3em]">
+                <button 
+                  onClick={handleAddGoal}
+                  className="w-full py-6 rounded-[2rem] bg-zenith-text-primary text-zenith-black text-[11px] font-bold uppercase tracking-[0.4em] hover:opacity-90 transition-all active:scale-[0.98] shadow-2xl shadow-zenith-text-primary/10 mt-4"
+                >
                   {t.finance.saveGoal}
                 </button>
-              </form>
+              </div>
             </motion.div>
           </div>
         )}
@@ -668,60 +767,78 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
       {/* Add Transaction Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAddModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="glass-card w-full max-w-sm p-8 space-y-8 bg-zenith-surface-1 border-zenith-border-primary"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md glass-card p-0 border-zenith-border-primary bg-zenith-surface-1 rounded-[40px] overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-display font-bold uppercase tracking-tighter text-zenith-text-primary">{t.finance.newTransaction}</h3>
-                <button onClick={() => setShowAddModal(false)} className="text-zenith-text-tertiary hover:text-zenith-text-primary"><X size={20} /></button>
+              <div className="p-8 border-b border-zenith-border-primary flex justify-between items-center bg-zenith-surface-1">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-display font-bold text-zenith-text-primary tracking-tight uppercase italic">{t.finance.newTransaction.split(' ')[0]} <span className="text-zenith-scarlet">{t.finance.newTransaction.split(' ')[1]}</span></h3>
+                  <p className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em]">{t.finance.wealthProtocol}</p>
+                </div>
+                <button 
+                  onClick={() => setShowAddModal(false)} 
+                  className="w-12 h-12 rounded-2xl bg-zenith-surface-2 flex items-center justify-center text-zenith-text-tertiary hover:text-zenith-text-primary transition-all border border-zenith-border-secondary shadow-inner active:scale-90"
+                >
+                  <X size={20} />
+                </button>
               </div>
 
-              <form onSubmit={handleAddTransaction} className="space-y-6">
-                <div className="flex bg-zenith-surface-1 p-1 rounded-xl border border-zenith-border-primary">
+              <form onSubmit={handleAddTransaction} className="p-8 space-y-8 overflow-y-auto scrollbar-hide flex-1">
+                <div className="flex bg-zenith-surface-2 p-1.5 rounded-2xl border border-zenith-border-primary shadow-inner">
                   <button
                     type="button"
                     onClick={() => setType('income')}
-                    className={`flex-1 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${type === 'income' ? 'bg-zenith-scarlet text-white' : 'text-zenith-text-tertiary'}`}
+                    className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all active:scale-95 ${type === 'income' ? 'bg-zenith-scarlet text-white shadow-lg shadow-zenith-scarlet/20' : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'}`}
                   >
                     {t.finance.income}
                   </button>
                   <button
                     type="button"
                     onClick={() => setType('expense')}
-                    className={`flex-1 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${type === 'expense' ? 'bg-zenith-surface-2 text-zenith-text-primary' : 'text-zenith-text-tertiary'}`}
+                    className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold rounded-xl transition-all active:scale-95 ${type === 'expense' ? 'bg-zenith-text-primary text-zenith-black shadow-lg shadow-zenith-text-primary/10' : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'}`}
                   >
                     {t.finance.expenses}
                   </button>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest font-bold ml-1">{t.finance.description}</label>
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.finance.description}</label>
                     <input 
                       type="text" 
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-xl p-4 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
                       placeholder={t.finance.description}
+                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-[2rem] px-6 py-5 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet/50 transition-all placeholder:text-zenith-text-tertiary/30 shadow-inner"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest font-bold ml-1">{t.finance.amount}</label>
-                    <input 
-                      type="number" 
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-xl p-4 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet transition-all"
-                      placeholder="0.00"
-                    />
+                  <div className="space-y-3">
+                    <label className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.finance.amount}</label>
+                    <div className="relative">
+                      <span className="absolute left-6 top-1/2 -translate-y-1/2 text-zenith-text-tertiary font-bold">R$</span>
+                      <input 
+                        type="number" 
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="0,00"
+                        className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-[2rem] pl-14 pr-6 py-5 text-sm text-zenith-text-primary focus:outline-none focus:border-zenith-scarlet/50 transition-all placeholder:text-zenith-text-tertiary/30 shadow-inner"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <button type="submit" className="w-full btn-primary py-4 text-[10px] uppercase tracking-[0.3em]">
+                <button type="submit" className="w-full py-6 rounded-[2rem] bg-zenith-text-primary text-zenith-black text-[11px] font-bold uppercase tracking-[0.4em] hover:opacity-90 transition-all active:scale-[0.98] shadow-2xl shadow-zenith-text-primary/10 mt-4">
                   {t.finance.save}
                 </button>
               </form>
@@ -746,8 +863,8 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
                     <Bot size={32} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-display font-bold uppercase tracking-tight text-zenith-text-primary">Estrategista Zenith</h3>
-                    <p className="text-[10px] text-zenith-scarlet font-black uppercase tracking-[0.3em]">Inteligência Financeira Ativa</p>
+                    <h3 className="text-xl font-display font-bold uppercase tracking-tight text-zenith-text-primary">{t.finance.zenithStrategist}</h3>
+                    <p className="text-[10px] text-zenith-scarlet font-black uppercase tracking-[0.3em]">{t.finance.activeFinanceIntelligence}</p>
                   </div>
                 </div>
                 <button 
@@ -775,13 +892,13 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
                       <div className="absolute inset-0 bg-zenith-scarlet/20 blur-[60px] rounded-full animate-pulse" />
                       <Bot size={100} className="relative z-10 text-zenith-scarlet" />
                     </div>
-                    <p className="text-[10px] uppercase tracking-[0.5em] font-black text-zenith-text-primary">Aguardando Comando de Análise...</p>
+                    <p className="text-[10px] uppercase tracking-[0.5em] font-black text-zenith-text-primary">{t.finance.waitingAnalysisCommand}</p>
                   </div>
                 )}
                 {isAiLoading && (
                   <div className="flex items-center space-x-4 text-zenith-scarlet">
                     <div className="w-3 h-3 rounded-full bg-zenith-scarlet animate-ping" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Processando Fluxo de Dados...</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t.finance.processingDataFlow}</span>
                   </div>
                 )}
               </div>
@@ -792,7 +909,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
                     value={aiMessage}
                     onChange={(e) => setAiMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), askFinanceAI())}
-                    placeholder="Ex: Como posso alavancar meus aportes este mês?"
+                    placeholder={t.finance.aiFinancePlaceholder}
                     className="w-full bg-zenith-surface-1 border border-zenith-border-primary rounded-[32px] p-6 pr-20 text-zenith-text-primary placeholder:text-zenith-text-tertiary focus:outline-none focus:border-zenith-scarlet/50 transition-all resize-none h-28 font-light text-lg"
                   />
                   <button 
@@ -812,7 +929,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   );
 };
 
-const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; current: number; target: number; color: 'cyan' | 'purple' | 'scarlet'; formatCurrency: (amount: number) => string }> = ({ idx, icon, label, current, target, color, formatCurrency }) => {
+const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; current: number; target: number; color: 'cyan' | 'purple' | 'scarlet'; formatCurrency: (amount: number) => string; t: any }> = ({ idx, icon, label, current, target, color, formatCurrency, t }) => {
   const progress = (current / target) * 100;
   const remaining = target - current;
   const accentColor = color === 'cyan' ? 'text-zenith-cyan' : color === 'purple' ? 'text-zenith-electric-blue' : 'text-zenith-scarlet';
@@ -835,7 +952,7 @@ const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; cu
         </div>
         <div className="text-right">
           <span className={`text-3xl font-display font-bold text-white`}>{Math.round(progress)}%</span>
-          <p className="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1">Concluído</p>
+          <p className="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1">{t.finance.completed}</p>
         </div>
       </div>
 
@@ -844,7 +961,7 @@ const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; cu
           <div>
             <h4 className="text-xl font-bold text-white tracking-tight">{label}</h4>
             <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em] mt-1">
-              Faltam {formatCurrency(remaining)}
+              {t.finance.remaining} {formatCurrency(remaining)}
             </p>
           </div>
           <p className="text-sm font-bold text-white/40">

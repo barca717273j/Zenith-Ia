@@ -134,6 +134,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const checkLimit = async (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts'): Promise<{ allowed: boolean; message?: string }> => {
     if (!userData) return { allowed: false, message: 'Usuário não carregado' };
 
+    // Admin bypass
+    if (userData.role === 'admin') return { allowed: true };
+
     const tier = userData.subscription_tier;
     const limits = TIER_LIMITS[tier];
     const today = new Date().toISOString().split('T')[0];

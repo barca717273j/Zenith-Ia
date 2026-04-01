@@ -19,14 +19,14 @@ export const generateLifeStrategy = async (userData: any, prompt: string) => {
     model: "gemini-3-flash-preview",
     contents: [
       {
-        text: `You are Zenith, a premium Life Operating System AI. 
-        User Data: ${JSON.stringify(userData)}
-        User Request: ${prompt}
-        Provide a structured, futuristic, and highly actionable response.`
+        text: `Você é o Zenith, uma IA de Sistema Operacional de Vida premium. 
+        Dados do Usuário: ${JSON.stringify(userData)}
+        Solicitação do Usuário: ${prompt}
+        Forneça uma resposta estruturada, futurista e altamente acionável em Português.`
       }
     ],
     config: {
-      systemInstruction: "You are the brain of Zenith. Your goal is to optimize the user's life across health, wealth, knowledge, and relationships. Be concise, futuristic, and encouraging.",
+      systemInstruction: "Você é o cérebro do Zenith. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
       temperature: 0.7,
     }
   });
@@ -41,8 +41,8 @@ export const generateRoutine = async (preferences: any) => {
     model: "gemini-3-flash-preview",
     contents: [
       {
-        text: `Generate an optimized daily routine based on: ${JSON.stringify(preferences)}. 
-        Return a JSON array of objects with 'time', 'task', and 'category'.`
+        text: `Gere uma rotina diária otimizada baseada em: ${JSON.stringify(preferences)}. 
+        Retorne um array JSON de objetos com 'time', 'task' e 'category'. Use Português para os campos 'task' e 'category'.`
       }
     ],
     config: {
