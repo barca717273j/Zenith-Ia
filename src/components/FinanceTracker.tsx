@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, CreditCard, PiggyBank, TrendingUp, TrendingDown, Sparkles, Zap, MessageSquare, X, Send, Bot, Activity, Timer, BarChart3, PieChart } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { Language } from '../translations';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart as RechartsPieChart, Pie } from 'recharts';
 import Markdown from 'react-markdown';
@@ -29,7 +29,7 @@ interface FinanceTrackerProps {
 
 export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, setAppTab }) => {
   const { userData } = useUser();
-  const tier = userData?.subscription_tier || 'free';
+  const tier = userData?.subscription_tier || 'basic';
   const hasAccess = TIER_LIMITS[tier as SubscriptionTier]?.hasFinanceTracking || false;
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);

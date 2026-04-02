@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'basic' | 'pro' | 'master';
+export type SubscriptionTier = 'basic' | 'pro' | 'master';
 
 export type UserIdentity = 'discipline_warrior' | 'strategic_mind' | 'mental_athlete' | 'wealth_builder' | 'focus_monk';
 
@@ -81,6 +81,7 @@ export interface SocialComment {
     username?: string;
     photo_url: string;
     avatar_url?: string;
+    level?: number;
   };
 }
 
@@ -136,21 +137,6 @@ export interface TierLimits {
 }
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
-  free: {
-    aiMessagesPerDay: 1,
-    aiGenerationsPerDay: 1,
-    routinesPerDay: 1,
-    actionsPerDay: 1,
-    habits: 1,
-    posts: 0,
-    storiesPerDay: 0,
-    hasFullSocial: false,
-    hasPremiumExercises: false,
-    hasAdvancedAnalytics: false,
-    hasFinanceTracking: true,
-    hasCustomRoutines: false,
-    hasPrioritySupport: false,
-  },
   basic: {
     aiMessagesPerDay: 20,
     aiGenerationsPerDay: 10,

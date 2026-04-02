@@ -205,7 +205,7 @@ export const translations = {
       basic: {
         name: 'Free',
         price: 'Free',
-        features: ['5 AI messages/day', '3 routines/day', '5 actions/day'],
+        features: ['20 AI messages/day', '10 routines/day', '15 actions/day', 'Premium Exercises'],
       },
       weekly: {
         name: 'Weekly',
@@ -684,7 +684,7 @@ export const translations = {
       basic: {
         name: 'Grátis',
         price: 'Grátis',
-        features: ['5 mensagens IA/dia', '3 rotinas/dia', '5 ações/dia'],
+        features: ['20 mensagens IA/dia', '10 rotinas/dia', '15 ações/dia', 'Exercícios Premium'],
       },
       weekly: {
         name: 'Semanal',

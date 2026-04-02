@@ -17,9 +17,9 @@ import { Journal } from './components/Journal';
 import { NewProtocolModal } from './components/NewProtocolModal';
 import { Stats } from './components/Stats';
 import { SubscriptionScreen } from './components/SubscriptionScreen';
-import { supabase } from './supabase';
+import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
-import { AlertCircle, ExternalLink, ShieldCheck } from 'lucide-react';
+import { AlertCircle, ExternalLink, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { FloatingThemeToggle } from './components/FloatingThemeToggle';
 
 import { translations, Language } from './translations';
@@ -45,6 +45,65 @@ function AppContent() {
 
   const lang: Language = userData?.language || 'pt-BR';
   const t = translations[lang] || translations['pt-BR'];
+
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-zenith-black relative overflow-hidden">
+        {/* Background Ambience */}
+        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none bg-zenith-black">
+          <div className="absolute inset-0 bg-fluid-marble opacity-30" />
+          <div className="marble-blob w-[600px] h-[600px] bg-zenith-scarlet/10 -top-20 -left-20" />
+          <div className="marble-blob w-[500px] h-[500px] bg-white/5 bottom-20 right-20" />
+        </div>
+
+        <div className="max-w-md w-full premium-card p-10 border-zenith-scarlet/30 space-y-8 text-center relative z-10 backdrop-blur-3xl bg-zenith-surface-1/80">
+          <div className="w-20 h-20 rounded-3xl bg-zenith-scarlet/10 flex items-center justify-center mx-auto border border-zenith-scarlet/20 shadow-[0_0_30px_rgba(255,36,0,0.3)] animate-pulse">
+            <AlertTriangle className="text-zenith-scarlet" size={40} />
+          </div>
+          
+          <div className="space-y-3">
+            <h2 className="text-3xl font-display font-bold text-zenith-text-primary uppercase tracking-tighter italic leading-none">
+              Zenith <span className="text-zenith-accent">Offline</span>
+            </h2>
+            <p className="text-[11px] font-bold text-zenith-text-tertiary uppercase tracking-[0.3em] opacity-60">
+              Configuração Supabase Pendente
+            </p>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-zenith-surface-2 border border-zenith-border-primary text-left space-y-4">
+            <p className="text-xs text-zenith-text-secondary leading-relaxed">
+              As credenciais do Supabase não foram detectadas no ambiente. Para ativar o sistema neural, configure as seguintes chaves:
+            </p>
+            <div className="space-y-2 font-mono text-[10px]">
+              <div className="flex items-center justify-between p-2 bg-zenith-black rounded border border-zenith-border-primary">
+                <span className="text-zenith-text-tertiary">VITE_SUPABASE_URL</span>
+                <span className="text-zenith-scarlet">MISSING</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-zenith-black rounded border border-zenith-border-primary">
+                <span className="text-zenith-text-tertiary">VITE_SUPABASE_ANON_KEY</span>
+                <span className="text-zenith-scarlet">MISSING</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 space-y-4">
+            <a 
+              href="https://supabase.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-3 w-full py-5 bg-zenith-accent text-white rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] hover:shadow-[0_0_30px_var(--accent-glow)] transition-all group"
+            >
+              <span>Acessar Supabase</span>
+              <ExternalLink size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+            <p className="text-[9px] text-zenith-text-tertiary uppercase tracking-widest font-bold">
+              Reinicie o servidor após configurar
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (userData && (!userData.display_name || !userData.onboarding_completed)) {

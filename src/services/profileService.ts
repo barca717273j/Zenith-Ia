@@ -1,4 +1,4 @@
-import { supabase } from "../supabase"
+import { supabase } from "../lib/supabase"
 
 export async function uploadAvatar(file: File){
   const { data } = await supabase.auth.getUser()

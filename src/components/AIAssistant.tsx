@@ -4,7 +4,7 @@ import { Send, X, Bot, User, Sparkles, Zap, Brain, Terminal, TrendingUp, Target,
 import { generateLifeStrategy } from '../services/gemini';
 import ReactMarkdown from 'react-markdown';
 import { TIER_LIMITS } from '../types';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 
 import { useUser } from '../contexts/UserContext';
 

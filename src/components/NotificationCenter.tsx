@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bell, X, Zap, Target, Award, Sparkles, Shield, Info } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 
 interface Notification {
   id: string;

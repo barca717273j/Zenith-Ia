@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Zap, Shield, Crown, Star, ArrowRight, Sparkles } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 
 import { useUser } from '../contexts/UserContext';
 

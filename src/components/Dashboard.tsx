@@ -11,7 +11,7 @@ import { motion } from 'motion/react';
 import { FloatingThemeToggle } from './FloatingThemeToggle';
 import { Zap, Target, TrendingUp, Wallet, User, ChevronRight, MessageSquare, Sparkles, Quote, Gamepad2, Brain, Activity, ArrowUpRight, Timer, Dumbbell, Flame, Book, Compass, Crown } from 'lucide-react';
 import { useGamification } from './GamificationContext';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 import { TIER_LIMITS, SubscriptionTier } from '../types';
 
@@ -21,8 +21,8 @@ interface DashboardProps {
 }
 
 const UsageStats: React.FC<{ t: any; userData: any }> = ({ t, userData }) => {
-  const tier = userData?.subscription_tier || 'free';
-  const limits = TIER_LIMITS[tier as SubscriptionTier] || TIER_LIMITS.free;
+  const tier = userData?.subscription_tier || 'basic';
+  const limits = TIER_LIMITS[tier as SubscriptionTier] || TIER_LIMITS.basic;
 
   const stats = [
     {
@@ -313,7 +313,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
       </header>
 
       {/* Premium Banner */}
-      {!userData?.subscription_tier || userData.subscription_tier === 'free' ? (
+      {!userData?.subscription_tier || userData.subscription_tier === 'basic' ? (
         <motion.section 
           whileHover={{ y: -4, scale: 1.01 }}
           whileTap={{ scale: 0.99 }}

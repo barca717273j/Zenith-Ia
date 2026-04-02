@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Book, Send, Sparkles, Calendar } from 'lucide-react';
 import { generateLifeStrategy } from '../services/gemini';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { AnimatePresence } from 'motion/react';
 
 import { useUser } from '../contexts/UserContext';

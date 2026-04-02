@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { LogIn, UserPlus, Globe, Mail, Lock, AlertTriangle, Sparkles, Shield } from 'lucide-react';
 import { ZenithLogo } from './ZenithLogo';
 import { useUser } from '../contexts/UserContext';

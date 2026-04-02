@@ -5,7 +5,7 @@ import {
   X, Activity, Lock, Sparkles, History, Heart, 
   Zap, Award, TrendingUp, CheckCircle2
 } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useGamification } from './GamificationContext';
 import { useUser } from '../contexts/UserContext';
 import { TIER_LIMITS } from '../types';
@@ -45,7 +45,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
   const { addXP } = useGamification();
   const { checkLimit, incrementUsage } = useUser();
 
-  const tier = userData?.subscription_tier || 'free';
+  const tier = userData?.subscription_tier || 'basic';
   const hasAccessToPremium = TIER_LIMITS[tier]?.hasPremiumExercises || false;
 
   useEffect(() => {

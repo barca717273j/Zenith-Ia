@@ -1,4 +1,4 @@
-import { supabase } from "../supabase"
+import { supabase } from "../lib/supabase"
 
 export async function createPost(file: File, caption: string) {
   const { data: userData } = await supabase.auth.getUser()

@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
   avatar_url TEXT,
   photo_url TEXT,
   language TEXT DEFAULT 'pt-BR',
-  subscription_tier TEXT DEFAULT 'free',
+  subscription_tier TEXT DEFAULT 'basic',
   energy_level INTEGER DEFAULT 100,
   xp INTEGER DEFAULT 0,
   level INTEGER DEFAULT 1,
@@ -50,7 +50,25 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable RLS on users
+-- Subscriptions Table
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+  plan TEXT DEFAULT 'basic',
+  status TEXT DEFAULT 'active',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS on subscriptions
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+
+-- Subscriptions Policies
+CREATE POLICY "Users can view their own subscription" ON subscriptions FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own subscription" ON subscriptions FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "System can manage subscriptions" ON subscriptions FOR ALL USING (true);
+
+-- Posts Table
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 -- Users Policies

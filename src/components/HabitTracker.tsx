@@ -5,7 +5,7 @@ import {
   Zap, Calendar, TrendingUp, Award, ChevronRight,
   Target, Info, Star, Clock, Activity
 } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useGamification } from './GamificationContext';
 import { useUser } from '../contexts/UserContext';
 import { TIER_LIMITS } from '../types';
@@ -289,7 +289,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
     }
   };
 
-  const tier = userData?.subscription_tier || 'free';
+  const tier = userData?.subscription_tier || 'basic';
   const habitLimit = TIER_LIMITS[tier].habits;
 
   // Stats Data

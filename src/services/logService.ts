@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 
 export const logSystemEvent = async (level: 'info' | 'error' | 'warn', message: string, details?: any) => {
   try {

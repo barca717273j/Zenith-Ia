@@ -1,5 +1,5 @@
 import React from 'react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { motion } from 'motion/react';
 import { Target, Star, Trophy, Sparkles, ShieldCheck, Zap, Award, ChevronRight } from 'lucide-react';
 import { useGamification } from './GamificationContext';

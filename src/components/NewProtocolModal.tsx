@@ -4,7 +4,7 @@ import {
   X, Clock, Activity, Brain, Dumbbell, Wind, TrendingUp, Zap
 } from 'lucide-react';
 import { CustomSlider } from './CustomSlider';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 import { useGamification } from './GamificationContext';
 

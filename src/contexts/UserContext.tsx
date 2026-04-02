@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { UserProfile, SubscriptionTier, TIER_LIMITS } from '../types';
 
 interface UserContextType {
@@ -21,12 +21,24 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      console.warn("Supabase is not configured. App will run in limited mode.");
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (!mounted) return;
       
+      if (error) {
+        console.error("Session error:", error);
+        setLoading(false);
+        return;
+      }
+
       if (session?.user) {
         setUser(session.user);
         fetchUserData(session.user.id, session.user.email, session.user.user_metadata);
@@ -35,6 +47,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUserData(null);
         setLoading(false);
       }
+    }).catch(err => {
+      console.error("Critical session error:", err);
+      if (mounted) setLoading(false);
     });
 
     // Listen for auth changes
@@ -64,7 +79,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       const { data, error } = await supabase
         .from('users')
-        .select('*')
+        .select('*, subscriptions(plan, status)')
         .eq('id', userId)
         .single();
 
@@ -73,7 +88,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       if (data) {
-        setUserData(data as UserProfile);
+        // Flatten subscription data
+        const subscription = (data as any).subscriptions;
+        const profile = {
+          ...data,
+          subscription_tier: subscription?.plan || data.subscription_tier || 'basic',
+          subscription_status: subscription?.status || 'active'
+        } as UserProfile;
+        setUserData(profile);
       } else {
         // Create user record if it doesn't exist
         const { data: newUser, error: insertError } = await supabase
@@ -83,7 +105,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             email: userEmail || '',
             username: metadata?.username || userEmail?.split('@')[0] || `user_${Math.floor(Math.random() * 1000)}`,
             display_name: metadata?.full_name || userEmail?.split('@')[0] || 'User',
-            subscription_tier: 'free',
+            subscription_tier: 'basic',
             energy_level: 100,
             xp: 0,
             level: 1,
@@ -102,7 +124,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .single();
 
         if (newUser) {
-          setUserData(newUser as UserProfile);
+          // Also create initial subscription record
+          await supabase.from('subscriptions').insert([{
+            user_id: userId,
+            plan: 'basic',
+            status: 'active'
+          }]);
+          
+          setUserData({ ...newUser, subscription_tier: 'basic' } as UserProfile);
         } else if (insertError) {
           console.error('Failed to create user record:', insertError);
         }
@@ -127,7 +156,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const isPlanActive = userData ? (
-    userData.subscription_tier !== 'free' && 
+    userData.subscription_tier !== 'basic' && 
     (!userData.plan_expires_at || new Date(userData.plan_expires_at) > new Date())
   ) : false;
 

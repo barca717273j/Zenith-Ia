@@ -1,7 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { motion } from 'motion/react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 import { TIER_LIMITS } from '../types';
 import { Lock } from 'lucide-react';
@@ -25,7 +25,7 @@ const categoryData = [
 
 export const Stats: React.FC = () => {
   const { userData } = useUser();
-  const tier = userData?.subscription_tier || 'free';
+  const tier = userData?.subscription_tier || 'basic';
   const hasAccess = TIER_LIMITS[tier]?.hasAdvancedAnalytics || false;
 
   const [productivityData, setProductivityData] = React.useState<any[]>([]);

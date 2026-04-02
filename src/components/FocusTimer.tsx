@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Play, Pause, RotateCcw, Zap, Sparkles, Timer, Brain } from 'lucide-react';
 import { useGamification } from './GamificationContext';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 
 export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFullPage = false }) => {

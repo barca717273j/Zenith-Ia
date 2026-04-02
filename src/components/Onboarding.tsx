@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, Sparkles, Target, Clock, Dumbbell, Brain, Check, Zap, Moon, Sun, Activity, Shield, Wind } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { translations, Language } from '../translations';
 
 import { useUser } from '../contexts/UserContext';

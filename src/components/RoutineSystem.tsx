@@ -6,7 +6,7 @@ import {
   Brain, Dumbbell, Wind, Activity, Sun, Moon, 
   Coffee, TrendingUp, ChevronRight, X, Loader2, Check
 } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useGamification } from './GamificationContext';
 
 interface Routine {

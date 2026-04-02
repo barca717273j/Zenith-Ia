@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Brain, Target, Puzzle, Gamepad2, ArrowLeft, Zap, Sparkles, Trophy, ChevronLeft, Award, Play, RotateCcw } from 'lucide-react';
 import { TetrisGame } from './TetrisGame';
 import { useGamification } from './GamificationContext';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 
 import { useUser } from '../contexts/UserContext';
 

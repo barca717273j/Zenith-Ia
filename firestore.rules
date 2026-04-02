@@ -34,7 +34,7 @@ service cloud.firestore {
     
     function isValidUser(data) {
       return data.email is string && isValidEmail(data.email) &&
-             data.subscriptionTier in ['free', 'pro', 'elite', 'master'] &&
+             data.subscriptionTier in ['basic', 'pro', 'master'] &&
              (data.energyLevel == null || (data.energyLevel is number && data.energyLevel >= 0 && data.energyLevel <= 100));
     }
 

@@ -6,7 +6,7 @@ import {
   Activity, Shield, Database, Search, Filter, ChevronRight,
   MessageSquare, Zap
 } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 
 import { useUser } from '../contexts/UserContext';
 
@@ -72,7 +72,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
   const fetchSystemStats = async () => {
     const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
     const { count: exCount } = await supabase.from('exercises').select('*', { count: 'exact', head: true });
-    const { count: premCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).neq('subscription_tier', 'free');
+    const { count: premCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).neq('subscription_tier', 'basic');
     const { count: postCount } = await supabase.from('posts').select('*', { count: 'exact', head: true });
     const { count: habitCount } = await supabase.from('habits').select('*', { count: 'exact', head: true });
     
@@ -356,7 +356,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                   <div className="space-y-1">
                     <h3 className="font-bold text-lg text-zenith-text-primary tracking-tight">{user.display_name || user.email}</h3>
                     <div className="flex items-center space-x-3">
-                      <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-lg ${user.subscription_tier !== 'free' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-zenith-surface-2 text-zenith-text-tertiary'}`}>
+                      <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-lg ${user.subscription_tier !== 'basic' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-zenith-surface-2 text-zenith-text-tertiary'}`}>
                         {user.subscription_tier || 'Free'}
                       </span>
                       <span className="text-[9px] text-zenith-text-tertiary font-bold uppercase tracking-widest">XP: {user.xp || 0}</span>

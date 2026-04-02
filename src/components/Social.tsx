@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { Profile } from './Profile';
 import { useGamification } from './GamificationContext';
 import { useUser } from '../contexts/UserContext';

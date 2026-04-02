@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Zap, Shield, Sparkles, Star, Crown, Loader2 } from 'lucide-react';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 import { SubscriptionTier } from '../types';
 
@@ -79,7 +79,7 @@ export const SubscriptionScreen: React.FC = () => {
     setLoading(tier);
     
     try {
-      const response = await fetch('/api/create-checkout-session', {
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -130,9 +130,9 @@ export const SubscriptionScreen: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <PlanCard
             tier="basic"
-            title="Semanal"
-            price="R$ 19,90"
-            period="semana"
+            title="Básico"
+            price="Grátis"
+            period="sempre"
             features={[
               '20 mensagens IA/dia',
               '10 rotinas/dia',
@@ -140,8 +140,7 @@ export const SubscriptionScreen: React.FC = () => {
               'Exercícios Premium',
               'Controle financeiro'
             ]}
-            onSelect={handleSubscribe}
-            loading={loading === 'basic'}
+            onSelect={() => {}} // No action for free plan
           />
           <PlanCard
             tier="pro"
@@ -214,7 +213,7 @@ export const SubscriptionScreen: React.FC = () => {
             onClick={() => window.history.back()}
             className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold transition-colors"
           >
-            Continuar com Plano Free (Limitado)
+            Continuar com Plano Básico (Grátis)
           </button>
         </div>
       </div>

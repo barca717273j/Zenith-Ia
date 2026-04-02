@@ -6,7 +6,7 @@ import { Subscription } from './Subscription';
 import { TetrisGame } from './TetrisGame';
 import { Journal } from './Journal';
 import { useGamification } from './GamificationContext';
-import { supabase } from '../supabase';
+import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../services/profileService';
 import { useUser } from '../contexts/UserContext';
 import { ensureBucketExists } from '../services/storageService';
