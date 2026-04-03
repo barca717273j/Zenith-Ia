@@ -54,12 +54,19 @@
   --color-zenith-accent: var(--accent-color);
   --color-zenith-scarlet: #FF3B3B;
   --color-zenith-crimson: #E63946;
+  --color-zenith-cyan: #00F5FF;
   
   --animate-pulse-glow: pulse-glow 3s infinite ease-in-out;
+  --animate-spin-slow: spin-slow 10s linear infinite;
 
   @keyframes pulse-glow {
     0%, 100% { opacity: 0.5; transform: scale(1); filter: blur(20px); }
     50% { opacity: 0.8; transform: scale(1.05); filter: blur(30px); }
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 }
 
@@ -71,9 +78,23 @@
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
   }
+}
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight text-zenith-text-primary;
+@layer utilities {
+  .bg-fluid-marble {
+    background: radial-gradient(circle at 50% 50%, var(--accent-glow) 0%, transparent 50%),
+                radial-gradient(circle at 10% 10%, var(--secondary-glow) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, var(--accent-glow) 0%, transparent 40%);
+    filter: blur(40px);
+  }
+
+  .marble-blob {
+    @apply absolute rounded-full blur-[100px] pointer-events-none;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-3xl border border-zenith-border-primary;
+    background-color: var(--surface-1);
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { UserProfile, SubscriptionTier, TIER_LIMITS } from '../types';
 
@@ -19,6 +19,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const isMounted = useRef(true);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -27,13 +28,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
-    let mounted = true;
+    isMounted.current = true;
 
     // Check active session
     const checkSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (!mounted) return;
+        if (!isMounted.current) return;
         
         if (error) {
           console.error("Session error:", error);
@@ -51,7 +52,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       } catch (err) {
         console.error("Critical session error:", err);
-        if (mounted) setLoading(false);
+        if (isMounted.current) setLoading(false);
       }
     };
 
@@ -59,7 +60,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!mounted) return;
+      if (!isMounted.current) return;
 
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
         if (session?.user) {
@@ -74,13 +75,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
 
     return () => {
-      mounted = false;
+      isMounted.current = false;
       subscription.unsubscribe();
     };
   }, []);
 
   const fetchUserData = async (userId: string, userEmail?: string, metadata?: any) => {
     try {
+      console.log('Fetching user data for:', userId);
       setLoading(true);
       const { data, error } = await supabase
         .from('users')
@@ -93,6 +95,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       if (data) {
+        console.log('User data found:', data.username);
         // Flatten subscription data
         const subscription = (data as any).subscriptions;
         const profile = {
@@ -102,6 +105,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } as UserProfile;
         setUserData(profile);
       } else {
+        console.log('User data not found, creating record...');
         // Create user record if it doesn't exist
         const { data: newUser, error: insertError } = await supabase
           .from('users')
@@ -129,6 +133,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .single();
 
         if (newUser) {
+          console.log('User record created successfully');
           // Also create initial subscription record
           await supabase.from('subscriptions').insert([{
             user_id: userId,
@@ -144,9 +149,21 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
-      setLoading(false);
+      // Small delay to ensure state updates are processed
+      setTimeout(() => {
+        if (isMounted.current) {
+          setLoading(false);
+          console.log('Loading state set to false');
+        }
+      }, 500);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const refreshUserData = async () => {
     if (user?.id) {
