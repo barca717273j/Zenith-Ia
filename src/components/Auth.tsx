@@ -24,7 +24,7 @@ export const Auth: React.FC = () => {
   const [resetSent, setResetSent] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  const t = translations[language];
+  const t = translations[language] || translations['pt-BR'] || translations['en'];
 
   const handleResendConfirmation = async () => {
     setLoading(true);

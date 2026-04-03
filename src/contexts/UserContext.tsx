@@ -30,27 +30,32 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let mounted = true;
 
     // Check active session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (!mounted) return;
-      
-      if (error) {
-        console.error("Session error:", error);
-        setLoading(false);
-        return;
-      }
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (!mounted) return;
+        
+        if (error) {
+          console.error("Session error:", error);
+          setLoading(false);
+          return;
+        }
 
-      if (session?.user) {
-        setUser(session.user);
-        fetchUserData(session.user.id, session.user.email, session.user.user_metadata);
-      } else {
-        setUser(null);
-        setUserData(null);
-        setLoading(false);
+        if (session?.user) {
+          setUser(session.user);
+          await fetchUserData(session.user.id, session.user.email, session.user.user_metadata);
+        } else {
+          setUser(null);
+          setUserData(null);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Critical session error:", err);
+        if (mounted) setLoading(false);
       }
-    }).catch(err => {
-      console.error("Critical session error:", err);
-      if (mounted) setLoading(false);
-    });
+    };
+
+    checkSession();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {

@@ -44,7 +44,7 @@ function AppContent() {
   const [isNewProtocolOpen, setIsNewProtocolOpen] = useState(false);
 
   const lang: Language = userData?.language || 'pt-BR';
-  const t = translations[lang] || translations['pt-BR'];
+  const t = translations[lang] || translations['pt-BR'] || translations['en'];
 
   if (!isSupabaseConfigured) {
     return (
@@ -139,6 +139,7 @@ function AppContent() {
   };
 
   if (loading) {
+    const loadingText = t?.common?.loading || 'Carregando Zenith...';
     return (
       <div className="min-h-screen flex items-center justify-center transition-colors duration-500 bg-zenith-black">
         <div className="text-center space-y-4">
@@ -147,7 +148,7 @@ function AppContent() {
             transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
             className="w-12 h-12 border-4 border-zenith-scarlet border-t-transparent rounded-full shadow-[0_0_20px_rgba(255,36,0,0.3)] mx-auto"
           />
-          <p className="text-zenith-text-tertiary text-xs font-display uppercase tracking-widest">{t.common.loading}</p>
+          <p className="text-zenith-text-tertiary text-xs font-display uppercase tracking-widest">{loadingText}</p>
         </div>
       </div>
     );
