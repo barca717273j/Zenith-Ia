@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, CreditCard, PiggyBank, TrendingUp, TrendingDown, Sparkles, Zap, MessageSquare, X, Send, Bot, Activity, Timer, BarChart3, PieChart } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { askAI } from '../services/gemini';
 import { supabase } from '../lib/supabase';
 import { Language } from '../translations';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart as RechartsPieChart, Pie } from 'recharts';
@@ -202,11 +202,6 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
     if (!aiMessage) return;
     setIsAiLoading(true);
     try {
-      const apiKey = (process.env.GEMINI_API_KEY || '').trim();
-      if (!apiKey) throw new Error('AI not configured: Missing API Key');
-
-      const ai = new GoogleGenAI({ apiKey });
-      
       const financeData = {
         transactions: transactions.slice(0, 20),
         budgets,
@@ -215,9 +210,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         totalExpenses: totalExpense
       };
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `Você é o Estrategista Financeiro de Elite da Zenith IA. Sua missão é realizar uma auditoria neural completa e projetar um protocolo de expansão de capital.
+      const prompt = `Você é o Estrategista Financeiro de Elite da Zenith IA. Sua missão é realizar uma auditoria neural completa e projetar um protocolo de expansão de capital.
           
           DATASET FINANCEIRO:
           ${JSON.stringify(financeData)}
@@ -230,13 +223,14 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
           3. ⚡ PROTOCOLO DE ALAVANCAGEM: 3 ações táticas de alto impacto para otimizar o fluxo e acelerar o atingimento de metas.
           4. 🎯 PROJEÇÃO DE CENÁRIO: Simulação probabilística de 90 dias baseada na manutenção ou ajuste dos protocolos atuais.
           
-          Diretrizes: Use linguagem de alta finanças e performance. Seja provocativo, analítico e focado em resultados exponenciais.`,
-        config: {
-          systemInstruction: "Você é o Mentor Financeiro Supremo do ecossistema Zenith. Sua inteligência é voltada para a otimização matemática da riqueza e a engenharia de liberdade financeira."
-        }
+          Diretrizes: Use linguagem de alta finanças e performance. Seja provocativo, analítico e focado em resultados exponenciais.`;
+
+      const text = await askAI({ 
+        prompt,
+        systemInstruction: "Você é o Mentor Financeiro Supremo do ecossistema Zenith. Sua inteligência é voltada para a otimização matemática da riqueza e a engenharia de liberdade financeira."
       });
       
-      setAiResponse(response.text || 'Desculpe, não consegui analisar seus dados agora.');
+      setAiResponse(text || 'Desculpe, não consegui analisar seus dados agora.');
       setAiMessage('');
     } catch (err: any) {
       console.error('AI Error:', err);

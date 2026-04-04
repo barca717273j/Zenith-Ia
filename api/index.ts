@@ -2,10 +2,15 @@ import express from 'express';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import geminiRouter from './gemini';
 
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+
+// --- AI INTEGRATION ---
+app.use('/api/gemini', geminiRouter);
 
 // --- SUPABASE SERVICE CLIENT ---
 const rawUrl = process.env.VITE_SUPABASE_URL || "";
@@ -101,8 +106,6 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
   res.json({ received: true });
 });
-
-app.use(express.json());
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', env: process.env.NODE_ENV });

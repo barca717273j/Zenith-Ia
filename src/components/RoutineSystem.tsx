@@ -29,7 +29,7 @@ interface Routine {
 }
 
 import { CustomSlider } from './CustomSlider';
-import { GoogleGenAI } from '@google/genai';
+import { askAI } from '../services/gemini';
 import { useUser } from '../contexts/UserContext';
 
 export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData }) => {
@@ -168,11 +168,6 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
       const goalsContext = goalsRes.data?.map(g => `- ${g.name} (Meta: ${g.target}, Atual: ${g.current})`).join('\n') || 'Nenhum objetivo financeiro registrado';
       const lifeGoals = userData?.identity || 'Não especificado';
 
-      const apiKey = (process.env.GEMINI_API_KEY || '').trim();
-      if (!apiKey) throw new Error('GEMINI_API_KEY not found');
-      
-      const ai = new GoogleGenAI({ apiKey });
-      
       const prompt = `Você é o Arquiteto de Performance Zenith, um especialista em biohacking, neurociência e produtividade de elite.
       Sua missão é projetar um PROTOCOLO DE ROTINA NEURAL otimizado para o usuário.
       
@@ -205,22 +200,10 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
       
       Retorne APENAS o JSON. Seja sofisticado nos nomes das tarefas (ex: 'Sessão de Deep Work Alpha' em vez de 'Trabalhar').`;
       
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt
+      const routineData = await askAI({
+        prompt,
+        responseMimeType: "application/json"
       });
-      
-      const text = response.text || '';
-      if (!text) throw new Error('Resposta da IA vazia');
-      
-      const cleanJson = text.replace(/```json|```/g, '').trim();
-      let routineData;
-      try {
-        routineData = JSON.parse(cleanJson);
-      } catch (e) {
-        console.error('JSON Parse Error:', cleanJson);
-        throw new Error('Falha ao processar resposta da IA. Tente novamente.');
-      }
       
       if (!routineData.tasks || !Array.isArray(routineData.tasks)) {
         throw new Error('Formato de rotina inválido retornado pela IA');

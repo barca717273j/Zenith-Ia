@@ -3,10 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Brain, Target, Zap, Loader2, Sparkles, History, Trash2, CheckCircle2, AlertTriangle, Scale, ChevronRight, Activity, Dumbbell, Wallet, Shield, ArrowUpRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
-import { GoogleGenAI, Type } from "@google/genai";
+import { askAI } from '../services/gemini';
 import { useGamification } from './GamificationContext';
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 interface Decision {
   id: string;
@@ -114,10 +112,7 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
 
     setIsAnalyzing(true);
     try {
-      const model = "gemini-3-flash-preview";
-      const response = await ai.models.generateContent({
-        model,
-        contents: `Analise este dilema ou decisão: "${query}". 
+      const prompt = `Analise este dilema ou decisão: "${query}". 
         Forneça uma análise estruturada EM PORTUGUÊS BRASILEIRO incluindo:
         1. Prós (lista de strings)
         2. Contras (lista de strings)
@@ -126,25 +121,25 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
         5. Insight Neural (um conselho profundo e filosófico, string)
         6. Nível de Risco (Low, Medium, High) - Use estes valores exatos em inglês para o campo riskLevel.
         
-        Considere a identidade do usuário: ${userData?.identity || 'Guerreiro da Disciplina'}.`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              pros: { type: Type.ARRAY, items: { type: Type.STRING } },
-              cons: { type: Type.ARRAY, items: { type: Type.STRING } },
-              longTermImpact: { type: Type.STRING },
-              goalAlignment: { type: Type.STRING },
-              neuralInsight: { type: Type.STRING },
-              riskLevel: { type: Type.STRING, enum: ["Low", "Medium", "High"] }
-            },
-            required: ["pros", "cons", "longTermImpact", "goalAlignment", "neuralInsight", "riskLevel"]
-          }
+        Considere a identidade do usuário: ${userData?.identity || 'Guerreiro da Disciplina'}.`;
+
+      const analysis = await askAI({
+        prompt,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            pros: { type: "ARRAY", items: { type: "STRING" } },
+            cons: { type: "ARRAY", items: { type: "STRING" } },
+            longTermImpact: { type: "STRING" },
+            goalAlignment: { type: "STRING" },
+            neuralInsight: { type: "STRING" },
+            riskLevel: { type: "STRING", enum: ["Low", "Medium", "High"] }
+          },
+          required: ["pros", "cons", "longTermImpact", "goalAlignment", "neuralInsight", "riskLevel"]
         }
       });
 
-      const analysis = JSON.parse(response.text || '{}');
       setResult(analysis);
 
       // Save to Supabase
