@@ -146,70 +146,67 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
 
   const generateAiRoutine = async (customPrompt?: string) => {
     const promptToUse = customPrompt || aiPrompt;
-    if (!promptToUse.trim()) return;
-
+    
     setIsAiGenerating(true);
     try {
-      // Check limits
-      const limitCheck = await checkLimit('ai_generations');
-      if (!limitCheck.allowed) {
-        throw new Error(limitCheck.message);
-      }
-
-      // Fetch user context for better personalization
-      const [habitsRes, tasksRes, goalsRes] = await Promise.all([
-        supabase.from('habits').select('title, category, streak').eq('user_id', userData.id),
-        supabase.from('tasks').select('title, completed').eq('user_id', userData.id),
-        supabase.from('finance_goals').select('name, target, current').eq('user_id', userData.id)
-      ]);
-
-      const habitsContext = habitsRes.data?.map(h => `- ${h.title} (${h.category}, streak: ${h.streak})`).join('\n') || 'Nenhum hábito registrado';
-      const tasksContext = tasksRes.data?.filter(t => !t.completed).map(t => `- ${t.title}`).join('\n') || 'Nenhuma tarefa pendente';
-      const goalsContext = goalsRes.data?.map(g => `- ${g.name} (Meta: ${g.target}, Atual: ${g.current})`).join('\n') || 'Nenhum objetivo financeiro registrado';
-      const lifeGoals = userData?.identity || 'Não especificado';
-
-      const prompt = `Você é o Arquiteto de Performance Zenith, um especialista em biohacking, neurociência e produtividade de elite.
-      Sua missão é projetar um PROTOCOLO DE ROTINA NEURAL otimizado para o usuário.
+      // Fornecendo uma rotina estática de alta performance conforme solicitado pelo usuário
+      // para evitar dependência de APIs externas por enquanto.
       
-      CONTEXTO BIOMÉTRICO E DE DADOS:
-      - Identidade de Performance: ${lifeGoals}
-      - Hábitos em Construção: ${habitsContext}
-      - Pendências Críticas: ${tasksContext}
-      - Alvos Financeiros: ${goalsContext}
-      - Solicitação Específica: "${promptToUse}"
-      
-      DIRETRIZES DE ENGENHARIA DE ROTINA:
-      1. SINCRONIZAÇÃO CIRCADIANA: Aloque tarefas exigentes (Deep Work) nos picos de energia.
-      2. BLOCOS DE PERFORMANCE: Use a técnica de Time Blocking para evitar fadiga de decisão.
-      3. INTEGRAÇÃO DE HÁBITOS: Use o empilhamento de hábitos (Habit Stacking).
-      4. CATEGORIAS: focus (trabalho/estudo), body (exercício/saúde), mind (meditação/descanso), work (tarefas gerais).
-      5. PERÍODOS: morning, afternoon, evening.
-      
-      Gere uma rotina estruturada em JSON obedecendo este formato rigoroso:
-      {
-        "tasks": [
+      const staticRoutine = {
+        tasks: [
           { 
-            "time": "HH:mm", 
-            "title": "Nome Impactante da Tarefa", 
-            "description": "Breve instrução tática",
-            "category": "focus|body|mind|work", 
-            "period": "morning|afternoon|evening" 
+            time: "06:00", 
+            title: "Ritual de Ativação Neural", 
+            description: "Meditação guiada e respiração Wim Hof para clareza mental.",
+            category: "mind", 
+            period: "morning" 
+          },
+          { 
+            time: "06:30", 
+            title: "Bio-Hack: Treino de Força", 
+            description: "Sessão de musculação ou calistenia para pico de testosterona e cortisol matinal.",
+            category: "body", 
+            period: "morning" 
+          },
+          { 
+            time: "08:30", 
+            title: "Bloco de Deep Work Alpha", 
+            description: "90 minutos de foco total na tarefa mais complexa do dia. Sem distrações.",
+            category: "focus", 
+            period: "morning" 
+          },
+          { 
+            time: "12:00", 
+            title: "Nutrição de Performance", 
+            description: "Refeição rica em proteínas e gorduras boas. Evitar picos de insulina.",
+            category: "body", 
+            period: "afternoon" 
+          },
+          { 
+            time: "14:00", 
+            title: "Sessão de Execução Tática", 
+            description: "Reuniões, e-mails e tarefas administrativas de baixa carga cognitiva.",
+            category: "work", 
+            period: "afternoon" 
+          },
+          { 
+            time: "17:00", 
+            title: "Revisão de Metas & Planejamento", 
+            description: "Analisar progresso do dia e definir o 'Big 3' para amanhã.",
+            category: "focus", 
+            period: "afternoon" 
+          },
+          { 
+            time: "21:30", 
+            title: "Protocolo de Higiene do Sono", 
+            description: "Desligar telas, luzes baixas e leitura para indução de melatonina.",
+            category: "mind", 
+            period: "evening" 
           }
         ]
-      }
+      };
       
-      Retorne APENAS o JSON. Seja sofisticado nos nomes das tarefas (ex: 'Sessão de Deep Work Alpha' em vez de 'Trabalhar').`;
-      
-      const routineData = await askAI({
-        prompt,
-        responseMimeType: "application/json"
-      });
-      
-      if (!routineData.tasks || !Array.isArray(routineData.tasks)) {
-        throw new Error('Formato de rotina inválido retornado pela IA');
-      }
-      
-      const tasksToInsert = routineData.tasks.map((t: any) => ({
+      const tasksToInsert = staticRoutine.tasks.map((t: any) => ({
         user_id: userData.id,
         time: t.time,
         title: t.title,
@@ -218,13 +215,13 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
         period: t.period,
         completed: false,
         notified: false,
-        priority: 'medium',
+        priority: 'high',
         frequency: 'daily',
         xp_reward: 50,
-        energy_level_expected: 50,
+        energy_level_expected: 80,
         alarm_sound: 'zenith-classic',
         days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-        icon: t.category === 'body' ? 'Dumbbell' : t.category === 'mind' ? 'Wind' : 'Zap'
+        icon: t.category === 'body' ? 'Dumbbell' : t.category === 'mind' ? 'Wind' : t.category === 'focus' ? 'Brain' : 'Zap'
       }));
       
       const { error: tasksError } = await supabase
@@ -233,14 +230,11 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
         
       if (tasksError) throw tasksError;
       
-      // Increment usage
-      await incrementUsage('ai_generations');
-
       setAiPrompt('');
       fetchRoutines();
-      alert('Rotina gerada com sucesso pela IA! 🚀');
+      alert('Protocolo de Rotina Zenith gerado com sucesso! 🚀');
     } catch (err: any) {
-      console.error('AI Routine Error:', err);
+      console.error('Routine Generation Error:', err);
       alert('Erro ao gerar rotina: ' + err.message);
     } finally {
       setIsAiGenerating(false);
