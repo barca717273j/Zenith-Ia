@@ -92,25 +92,35 @@ export const Auth: React.FC = () => {
 
     try {
       if (authMode === 'forgot') {
+        if (!email.trim()) {
+          setError('Preencha o campo de e-mail');
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/auth/reset-password`,
         });
         if (error) throw error;
         setResetSent(true);
       } else {
-        // Register
-        if (password !== confirmPassword) {
-          setError(t.common.passwordsDoNotMatch);
+        // Register validation
+        if (!fullName.trim() || !username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+          setError('Preencha todos os campos');
           setLoading(false);
           return;
         }
-        if (!username.trim()) {
-          setError('Nome de usuário é obrigatório');
+        if (password !== confirmPassword) {
+          setError('As senhas não coincidem');
+          setLoading(false);
+          return;
+        }
+        if (password.length < 6) {
+          setError('A senha deve ter pelo menos 6 caracteres');
           setLoading(false);
           return;
         }
         if (!acceptTerms) {
-          setError(t.common.mustAcceptTerms);
+          setError('Você deve aceitar os termos');
           setLoading(false);
           return;
         }
@@ -128,7 +138,6 @@ export const Auth: React.FC = () => {
         if (error) throw error;
         
         if (user) {
-          // UserProvider handles profile creation via fetchUserData on auth change
           const { data: { session } } = await supabase.auth.getSession();
           if (session) {
             await refreshUserData();
@@ -163,11 +172,11 @@ export const Auth: React.FC = () => {
 
   const isFormValid = () => {
     if (authMode === 'forgot') return email.length > 0;
-    if (authMode === 'login') return email.length > 0 && password.length >= 6;
+    if (authMode === 'login') return email.trim().length > 0 && password.trim().length >= 6;
     return (
-      fullName.length > 0 &&
-      username.length >= 3 &&
-      email.length > 0 &&
+      fullName.trim().length > 0 &&
+      username.trim().length >= 3 &&
+      email.trim().length > 0 &&
       password.length >= 6 &&
       password === confirmPassword &&
       acceptTerms
@@ -232,7 +241,7 @@ export const Auth: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <h1 className="text-5xl font-display font-bold tracking-tighter uppercase leading-none text-zenit-text-primary italic">Zenit <span className="text-zenit-accent">IA</span></h1>
+            <h1 className="text-5xl font-display font-bold tracking-tighter uppercase leading-none text-zenit-text-primary italic">ZENITH</h1>
             <div className="flex items-center justify-center space-x-3 text-zenit-accent">
               <Sparkles size={14} className="animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-[0.5em]">Life Operating System</span>
@@ -457,8 +466,8 @@ export const Auth: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={loading || !isFormValid()}
-                  className="w-full neon-button py-5 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl disabled:opacity-50 disabled:grayscale"
+                  disabled={loading}
+                  className="w-full neon-button py-5 text-[11px] font-black uppercase tracking-[0.4em] disabled:opacity-50 disabled:grayscale"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center space-x-3">
@@ -504,22 +513,17 @@ export const Auth: React.FC = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">Nome de Usuário</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
-                      <span className="text-sm font-black">@</span>
-                    </div>
-                    <input
-                      type="text"
-                      name="username"
-                      autoComplete="username"
-                      required
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-12 pr-6 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
-                      placeholder="ex: warrior_zenit"
-                    />
-                  </div>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.username}</label>
+                  <input
+                    type="text"
+                    name="username"
+                    autoComplete="username"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
+                    placeholder="username_neural"
+                  />
                 </div>
 
                 <div className="space-y-3">
@@ -606,8 +610,8 @@ export const Auth: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={loading || !isFormValid()}
-                  className="w-full neon-button py-5 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl disabled:opacity-50 disabled:grayscale"
+                  disabled={loading}
+                  className="w-full neon-button py-5 text-[11px] font-black uppercase tracking-[0.4em] disabled:opacity-50 disabled:grayscale"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center space-x-3">

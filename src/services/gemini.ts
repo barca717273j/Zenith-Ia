@@ -34,11 +34,11 @@ export const generateLifeStrategy = async (userData: any, prompt: string) => {
   try {
     // Try backend first
     const result = await callBackendAI({
-      prompt: `Você é o Zenit, uma IA de Sistema Operacional de Vida premium. 
+      prompt: `Você é o ZENITH, uma IA de Sistema Operacional de Vida premium. 
       Dados do Usuário: ${JSON.stringify(userData)}
       Solicitação do Usuário: ${prompt}
       Forneça uma resposta estruturada, futurista e altamente acionável em Português.`,
-      systemInstruction: "Você é o cérebro do Zenit. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
+      systemInstruction: "Você é o cérebro do ZENITH. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
     });
     return result.text;
   } catch (backendError) {
@@ -47,19 +47,19 @@ export const generateLifeStrategy = async (userData: any, prompt: string) => {
     if (!ai) {
       // Mock response if no AI is available
       console.warn("Using mock response for generateLifeStrategy");
-      return "O Zenit está em modo de manutenção neural. Sua solicitação foi registrada: '" + prompt + "'. Como recomendação geral, foque em blocos de 90 minutos de trabalho profundo e mantenha sua hidratação em níveis ótimos.";
+      return "O ZENITH está em modo de manutenção neural. Sua solicitação foi registrada: '" + prompt + "'. Como recomendação geral, foque em blocos de 90 minutos de trabalho profundo e mantenha sua hidratação em níveis ótimos.";
     }
     
     const model = ai.getGenerativeModel({ 
       model: "gemini-3-flash-preview",
-      systemInstruction: "Você é o cérebro do Zenit. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil."
+      systemInstruction: "Você é o cérebro do ZENITH. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil."
     });
     
     const result = await model.generateContent({
       contents: [{ 
         role: 'user', 
         parts: [{ 
-          text: `Você é o Zenit, uma IA de Sistema Operacional de Vida premium. 
+          text: `Você é o ZENITH, uma IA de Sistema Operacional de Vida premium. 
           Dados do Usuário: ${JSON.stringify(userData)}
           Solicitação do Usuário: ${prompt}
           Forneça uma resposta estruturada, futurista e altamente acionável em Português.` 
@@ -114,7 +114,7 @@ export const askAI = async (options: {
         }
         return {};
       }
-      return "O Zenit está processando sua solicitação offline. Continue focado em seus objetivos.";
+      return "O ZENITH está processando sua solicitação offline. Continue focado em seus objetivos.";
     }
     
     const model = ai.getGenerativeModel({ 

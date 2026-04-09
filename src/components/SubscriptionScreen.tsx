@@ -98,7 +98,7 @@ export const SubscriptionScreen: React.FC = () => {
       }
     } catch (err) {
       console.error('Subscription error:', err);
-      alert('Erro ao processar assinatura. Verifique sua conexão.');
+      // In a real app, we would use a toast or a modal
     } finally {
       setLoading(null);
     }
@@ -117,13 +117,13 @@ export const SubscriptionScreen: React.FC = () => {
         <div className="text-center space-y-4">
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 mb-4">
             <Crown size={14} className="text-zenit-scarlet" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">Zenit Premium</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">ZENITH Premium</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-display font-bold tracking-tighter uppercase leading-none">
             Desbloqueie seu <span className="text-zenit-scarlet italic">Potencial Máximo</span>
           </h1>
           <p className="text-white/40 text-sm max-w-xl mx-auto leading-relaxed">
-            Escolha o plano que melhor se adapta à sua jornada de evolução. Acesso ilimitado a todas as ferramentas neurais do Zenit.
+            Escolha o plano que melhor se adapta à sua jornada de evolução. Acesso ilimitado a todas as ferramentas neurais do ZENITH.
           </p>
         </div>
 
@@ -198,7 +198,7 @@ export const SubscriptionScreen: React.FC = () => {
               'Tudo Ilimitado Para Sempre',
               'Selo de Fundador',
               'Consultoria Individual',
-              'Herança Digital Zenit'
+              'Herança Digital ZENITH'
             ]}
             onSelect={handleSubscribe}
             loading={loading === 'lifetime'}

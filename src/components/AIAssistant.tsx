@@ -18,7 +18,7 @@ interface AIAssistantProps {
 export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) => {
   const { userData, refreshUserData, checkLimit, incrementUsage } = useUser();
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
-    { role: 'assistant', content: "Olá, eu sou o Zenit. Sua interface neural para otimização humana. Como posso acelerar sua evolução hoje?" }
+    { role: 'assistant', content: "Olá, eu sou o ZENITH. Sua interface neural para otimização humana. Como posso acelerar sua evolução hoje?" }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -62,7 +62,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
     // Check limits
     const limitCheck = await checkLimit('ai_messages');
     if (!limitCheck.allowed) {
-      alert(limitCheck.message);
+      setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ **Limite Atingido:** ${limitCheck.message}` }]);
       return;
     }
 

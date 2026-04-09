@@ -30,7 +30,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => 
           })}
         </div>
       </div>
-      <span className={`text-[7px] mt-1 font-bold uppercase tracking-[0.3em] transition-all duration-500 ${isActive ? 'text-zenit-accent opacity-100' : 'text-zenit-text-tertiary opacity-40 group-hover:opacity-80'}`}>
+      <span className={`text-[9px] mt-1.5 font-bold uppercase tracking-[0.2em] transition-all duration-500 ${isActive ? 'text-zenit-accent opacity-100' : 'text-zenit-text-tertiary opacity-70 group-hover:opacity-100'}`}>
         {label}
       </span>
     </div>

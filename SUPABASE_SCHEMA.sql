@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS public.finances (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
     title TEXT NOT NULL,
+    description TEXT,
     amount DECIMAL(12,2) NOT NULL,
     type TEXT NOT NULL, -- 'income' or 'expense'
     category TEXT,
@@ -194,6 +195,15 @@ CREATE TABLE IF NOT EXISTS public.notifications (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- 17. POST COMMENTS
+CREATE TABLE IF NOT EXISTS public.post_comments (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    post_id UUID REFERENCES public.posts(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- RLS POLICIES (Row Level Security)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view any profile" ON public.users FOR SELECT USING (true);
@@ -220,6 +230,16 @@ ALTER TABLE public.stories ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view stories" ON public.stories FOR SELECT USING (true);
 CREATE POLICY "Users can create stories" ON public.stories FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+ALTER TABLE public.post_comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view comments" ON public.post_comments FOR SELECT USING (true);
+CREATE POLICY "Users can create comments" ON public.post_comments FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own comments" ON public.post_comments FOR DELETE USING (auth.uid() = user_id);
+
+ALTER TABLE public.followers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view followers" ON public.followers FOR SELECT USING (true);
+CREATE POLICY "Users can follow others" ON public.followers FOR INSERT WITH CHECK (auth.uid() = follower_id);
+CREATE POLICY "Users can unfollow others" ON public.followers FOR DELETE USING (auth.uid() = follower_id);
+
 -- FUNCTIONS & TRIGGERS
 -- Function to increment likes
 CREATE OR REPLACE FUNCTION public.increment_likes(post_id UUID)
@@ -230,3 +250,46 @@ BEGIN
   WHERE id = post_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to decrement likes
+CREATE OR REPLACE FUNCTION public.decrement_likes(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE public.posts
+  SET likes_count = GREATEST(0, likes_count - 1)
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to increment comments
+CREATE OR REPLACE FUNCTION public.increment_comments(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE public.posts
+  SET comments_count = comments_count + 1
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to create a profile for every new user
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.users (id, email, display_name, username, avatar_url)
+  VALUES (
+    new.id,
+    new.email,
+    COALESCE(new.raw_user_meta_data->>'full_name', new.email),
+    COALESCE(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
+    COALESCE(new.raw_user_meta_data->>'avatar_url', 'https://api.dicebear.com/7.x/avataaars/svg?seed=' || new.id)
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Drop trigger if exists to avoid errors
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();

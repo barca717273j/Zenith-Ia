@@ -169,7 +169,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
           ];
           const seedGoals = [
             { user_id: user.id, title: 'Fundo de Emergência', target_amount: 10000, current_amount: 2500, deadline: '2026-12-31' },
-            { user_id: user.id, title: 'Viagem Zenit', target_amount: 5000, current_amount: 1200, deadline: '2026-08-15' }
+            { user_id: user.id, title: 'Viagem ZENITH', target_amount: 5000, current_amount: 1200, deadline: '2026-08-15' }
           ];
           
           await supabase.from('finance_budgets').insert(seedBudgets);
@@ -264,7 +264,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
               Terminal <span className="text-zenit-scarlet">Admin</span>
             </h1>
           </div>
-          <p className="text-zenit-text-tertiary text-[10px] uppercase tracking-[0.3em] font-bold">Zenit Core Infrastructure</p>
+          <p className="text-zenit-text-tertiary text-[10px] uppercase tracking-[0.3em] font-bold">ZENITH Core Infrastructure</p>
         </div>
         
         <div className="flex bg-zenit-surface-1 p-1 rounded-2xl border border-zenit-border-primary w-full sm:w-auto">

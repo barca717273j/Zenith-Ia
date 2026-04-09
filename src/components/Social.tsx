@@ -401,7 +401,7 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
 
       {/* Suggested Users */}
       <div className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary px-2">Mentes em Ascensão</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary px-2">Usuários em Ascensão</h3>
         <div className="grid grid-cols-1 gap-4">
           {searchResults.length > 0 ? searchResults.map((user) => (
             <div key={user.id} className="glass-card p-6 flex items-center justify-between bg-zenit-surface-1/50 rounded-[2.5rem]">
@@ -424,7 +424,7 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
             </div>
           )) : (
             <div className="text-center py-10 opacity-30">
-              <p className="text-[10px] font-bold uppercase tracking-widest">Pesquise para descobrir novas mentes</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest">Pesquise para descobrir novos usuários</p>
             </div>
           )}
         </div>
@@ -488,7 +488,7 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors" />
             <input 
               type="text"
-              placeholder="Buscar mentes..."
+              placeholder={t.social.search}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-zenit-surface-1/50 rounded-2xl py-3 pl-11 pr-4 text-xs focus:outline-none focus:border-zenit-accent/30 focus:bg-zenit-surface-2 transition-all placeholder:text-zenit-text-tertiary font-medium text-zenit-text-primary"

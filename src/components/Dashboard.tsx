@@ -9,7 +9,7 @@ import { FocusTimer } from './FocusTimer';
 import { NotificationCenter } from './NotificationCenter';
 import { motion } from 'motion/react';
 import { FloatingThemeToggle } from './FloatingThemeToggle';
-import { Zap, Target, TrendingUp, Wallet, User, ChevronRight, MessageSquare, Sparkles, Quote, Gamepad2, Brain, Activity, ArrowUpRight, Timer, Dumbbell, Flame, Book, Compass, Crown, Shield } from 'lucide-react';
+import { Zap, Target, TrendingUp, Wallet, User, ChevronRight, MessageSquare, Sparkles, Quote, Gamepad2, Brain, Activity, ArrowUpRight, Timer, Dumbbell, Flame, Book, Compass, Crown, Shield, PenTool, BookOpen } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
@@ -203,7 +203,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
               <ZenitLogo size={36} />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary leading-none italic">Zenit <span className="text-zenit-accent">IA</span></span>
+              <span className="text-xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary leading-none italic">ZENITH</span>
               <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary mt-1.5 opacity-50">Neural Interface</span>
             </div>
           </div>
@@ -265,7 +265,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
                 </div>
               </div>
               <h2 className="text-4xl sm:text-5xl font-display font-bold text-zenit-text-primary tracking-tighter italic leading-none">
-                Olá, eu sou o <span className="text-zenit-accent">Zenit</span>
+                Olá, eu sou o <span className="text-zenit-accent">ZENITH</span>
               </h2>
               <p className="text-sm text-zenit-text-tertiary font-medium max-w-md leading-relaxed">
                 Sua interface neural para otimização humana. Como posso acelerar sua evolução hoje?
@@ -314,23 +314,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
           <div className="w-2 h-6 bg-zenit-accent rounded-full shadow-[0_0_15px_var(--accent-glow)]" />
           <h3 className="text-sm font-bold uppercase tracking-[0.4em] text-zenit-text-primary italic">Acesso Rápido</h3>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <QuickAction 
-            icon={<Compass />} 
+            icon={<Brain />} 
             label="Axis" 
-            onClick={() => setActiveTab('map')} 
+            onClick={() => setActiveTab('axis')} 
             color="cyan"
-          />
-          <QuickAction 
-            icon={<Zap />} 
-            label="Nexus" 
-            onClick={() => setActiveTab('social')} 
-            color="scarlet"
           />
           <QuickAction 
             icon={<Dumbbell />} 
             label="Exercícios" 
             onClick={() => setActiveTab('exercises')} 
+            color="scarlet"
+          />
+          <QuickAction 
+            icon={<Target />} 
+            label="Hábitos" 
+            onClick={() => setActiveTab('tasks')} 
             color="scarlet"
           />
           <QuickAction 
@@ -340,15 +340,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
             color="scarlet"
           />
           <QuickAction 
-            icon={<Book />} 
+            icon={<BookOpen />} 
             label="Manual" 
             onClick={() => setActiveTab('manual')} 
             color="scarlet"
           />
           <QuickAction 
-            icon={<Brain />} 
-            label="Diário Neural" 
-            onClick={() => setActiveTab('journal_neural')} 
+            icon={<PenTool />} 
+            label="Diário" 
+            onClick={() => setActiveTab('journal')} 
+            color="scarlet"
+          />
+          <QuickAction 
+            icon={<Gamepad2 />} 
+            label="Mental Gym" 
+            onClick={() => setActiveTab('gym')} 
             color="scarlet"
           />
         </div>

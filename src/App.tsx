@@ -39,11 +39,18 @@ export default function App() {
 }
 
 function AppContent() {
-  const { user, userData, loading, isSupabaseConnected, refreshUserData } = useUser();
+  const { user, userData, loading, isSupabaseConnected, connectionError, refreshUserData } = useUser();
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState('home');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isNewProtocolOpen, setIsNewProtocolOpen] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    // The UserProvider will re-run the connection test if we trigger a state change or wait
+    window.location.reload();
+  };
 
   useEffect(() => {
     if (userData && (!userData.display_name || !userData.onboarding_completed)) {
@@ -73,7 +80,7 @@ function AppContent() {
           
           <div className="space-y-3">
             <h2 className="text-3xl font-display font-bold text-zenit-text-primary uppercase tracking-tighter italic leading-none">
-              Zenit <span className="text-zenit-accent">Offline</span>
+              ZENITH <span className="text-zenit-accent">Offline</span>
             </h2>
             <p className="text-[11px] font-bold text-zenit-text-tertiary uppercase tracking-[0.3em] opacity-60">
               {!isSupabaseConfigured ? 'Configuração Supabase Pendente' : 'Erro de Conexão com Supabase'}
@@ -82,9 +89,9 @@ function AppContent() {
 
           <div className="p-6 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary text-left space-y-4">
             <p className="text-xs text-zenit-text-secondary leading-relaxed">
-              {!isSupabaseConfigured 
+              {connectionError || (!isSupabaseConfigured 
                 ? 'As credenciais do Supabase não foram detectadas no ambiente. Para ativar o sistema neural, configure as seguintes chaves:'
-                : 'Não foi possível estabelecer uma conexão estável com o Supabase. Verifique se as credenciais estão corretas e se o banco de dados está ativo.'}
+                : 'Não foi possível estabelecer uma conexão estável com o Supabase. Verifique se as credenciais estão corretas e se o banco de dados está ativo.')}
             </p>
             <div className="space-y-2 font-mono text-[10px]">
               <div className="flex items-center justify-between p-2 bg-zenit-black rounded border border-zenit-border-primary">
@@ -104,14 +111,19 @@ function AppContent() {
 
           <div className="pt-4 space-y-4">
             <button 
-              onClick={() => window.location.reload()}
-              className="flex items-center justify-center space-x-3 w-full py-5 bg-zenit-accent text-white rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] hover:shadow-[0_0_30px_var(--accent-glow)] transition-all group"
+              onClick={handleRetry}
+              disabled={isRetrying}
+              className="flex items-center justify-center space-x-3 w-full py-5 bg-zenit-accent text-white rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] hover:shadow-[0_0_30px_var(--accent-glow)] transition-all group disabled:opacity-50"
             >
-              <span>Tentar Novamente</span>
-              <ExternalLink size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              {isRetrying ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <ShieldCheck size={18} className="group-hover:scale-110 transition-transform" />
+              )}
+              <span>{isRetrying ? 'Tentando Conexão...' : 'Tentar Novamente'}</span>
             </button>
-            <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest font-bold">
-              Reinicie o servidor após configurar
+            <p className="text-[9px] text-zenit-text-tertiary/50 uppercase tracking-widest leading-relaxed">
+              Dica: Verifique se o projeto no Supabase não está pausado e se as chaves no menu "Settings" estão corretas.
             </p>
           </div>
         </div>
@@ -145,7 +157,7 @@ function AppContent() {
   };
 
   if (loading) {
-    const loadingText = t?.common?.loading || 'Carregando Zenit...';
+    const loadingText = t?.common?.loading || 'Carregando ZENITH...';
     return (
       <div className="min-h-screen flex items-center justify-center transition-colors duration-500 bg-zenit-black">
         <div className="text-center space-y-4">
@@ -184,10 +196,6 @@ function AppContent() {
         return <Profile key="profile" t={t} setActiveTab={setActiveTab} />;
       case 'social':
         return <Social key="social" t={t} />;
-      case 'journal_manual':
-        return <Journal key="journal_manual" t={t} mode="manual" />;
-      case 'journal_neural':
-        return <Journal key="journal_neural" t={t} mode="neural" />;
       case 'journal':
         return <Journal key="journal" t={t} />;
       case 'manual':
@@ -196,12 +204,12 @@ function AppContent() {
         return <Protocols key="protocols" t={t} />;
       case 'stats':
         return <Stats key="stats" />;
-      case 'map':
-        return <Axis key="map" t={t} />;
+      case 'axis':
+        return <Axis key="axis" t={t} />;
       case 'admin':
         return userData?.is_admin ? <AdminPanel key="admin" t={t} onBack={() => setActiveTab('profile')} /> : null;
-      case 'break':
-        return <MentalGym key="break" t={t} />;
+      case 'gym':
+        return <MentalGym key="gym" t={t} />;
       case 'subscription':
         return <SubscriptionScreen key="subscription" />;
       default:

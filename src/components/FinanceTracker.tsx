@@ -21,6 +21,21 @@ interface Transaction {
   category?: string;
 }
 
+interface Budget {
+  id: string;
+  category: string;
+  limit: number;
+  spent: number;
+}
+
+interface Goal {
+  id: string;
+  name: string;
+  target: number;
+  current: number;
+  icon?: any;
+}
+
 interface FinanceTrackerProps {
   t: any;
   language: Language;
@@ -33,8 +48,8 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   const hasAccess = TIER_LIMITS[tier as SubscriptionTier]?.hasFinanceTracking || false;
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [budgets, setBudgets] = useState<any[]>([]);
-  const [goals, setGoals] = useState<any[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
 
   const formatCurrency = (amount: number) => {
     const config: Record<Language, { locale: string, currency: string }> = {
@@ -68,6 +83,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<'income' | 'expense'>('expense');
+  const [category, setCategory] = useState('');
 
   useEffect(() => {
     if (userData?.id && hasAccess) {
@@ -136,7 +152,15 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         .select('*')
         .eq('user_id', userData.id);
       if (error) throw error;
-      setBudgets(data || []);
+      
+      const mappedBudgets: Budget[] = (data || []).map(b => ({
+        id: b.id,
+        category: b.category,
+        limit: Number(b.limit_amount),
+        spent: Number(b.current_amount)
+      }));
+      
+      setBudgets(mappedBudgets);
     } catch (err) {
       console.error('Error fetching budgets:', err);
       setBudgets([]);
@@ -151,7 +175,16 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         .select('*')
         .eq('user_id', userData.id);
       if (error) throw error;
-      setGoals(data || []);
+
+      const mappedGoals: Goal[] = (data || []).map(g => ({
+        id: g.id,
+        name: g.name,
+        target: Number(g.target_amount),
+        current: Number(g.current_amount),
+        icon: null // Default icon if not in DB
+      }));
+
+      setGoals(mappedGoals);
     } catch (err) {
       console.error('Error fetching goals:', err);
       setGoals([]);
@@ -160,14 +193,66 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
 
   const deleteTransaction = async (id: string) => {
     try {
+      const { data: transaction } = await supabase
+        .from('finances')
+        .select('*')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('finances')
         .delete()
         .eq('id', id);
+      
       if (error) throw error;
+
+      // If it was an expense with a category, decrease the budget spent amount
+      if (transaction && transaction.type === 'expense' && transaction.category) {
+        const { data: budget } = await supabase
+          .from('finance_budgets')
+          .select('*')
+          .eq('user_id', userData.id)
+          .eq('category', transaction.category)
+          .single();
+
+        if (budget) {
+          await supabase
+            .from('finance_budgets')
+            .update({ current_amount: Math.max(0, Number(budget.current_amount) - Number(transaction.amount)) })
+            .eq('id', budget.id);
+          fetchBudgets();
+        }
+      }
+
       setTransactions(transactions.filter(t => t.id !== id));
     } catch (error) {
       console.error('Error deleting transaction:', error);
+    }
+  };
+
+  const deleteBudget = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('finance_budgets')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      setBudgets(budgets.filter(b => b.id !== id));
+    } catch (error) {
+      console.error('Error deleting budget:', error);
+    }
+  };
+
+  const deleteGoal = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('finance_goals')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      setGoals(goals.filter(g => g.id !== id));
+    } catch (error) {
+      console.error('Error deleting goal:', error);
     }
   };
 
@@ -176,21 +261,42 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
     if (!description || !amount) return;
 
     try {
+      const amountVal = parseFloat(amount);
       const { error } = await supabase
         .from('finances')
         .insert([{
           user_id: userData.id,
           title: description,
           description: '',
-          amount: parseFloat(amount),
+          amount: amountVal,
           type,
+          category: category || null,
           date: new Date().toISOString().split('T')[0]
         }]);
 
       if (error) throw error;
+
+      // Update budget if it's an expense and has a category
+      if (type === 'expense' && category) {
+        const { data: budget } = await supabase
+          .from('finance_budgets')
+          .select('*')
+          .eq('user_id', userData.id)
+          .eq('category', category)
+          .single();
+
+        if (budget) {
+          await supabase
+            .from('finance_budgets')
+            .update({ current_amount: Number(budget.current_amount) + amountVal })
+            .eq('id', budget.id);
+          fetchBudgets();
+        }
+      }
       
       setDescription('');
       setAmount('');
+      setCategory('');
       setShowAddModal(false);
       fetchTransactions();
     } catch (err) {
@@ -210,7 +316,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         totalExpenses: totalExpense
       };
 
-      const prompt = `Você é o Estrategista Financeiro de Elite da Zenit IA. Sua missão é realizar uma auditoria neural completa e projetar um protocolo de expansão de capital.
+      const prompt = `Você é o Estrategista Financeiro de Elite da ZENITH. Sua missão é realizar uma auditoria neural completa e projetar um protocolo de expansão de capital.
           
           DATASET FINANCEIRO:
           ${JSON.stringify(financeData)}
@@ -227,7 +333,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
 
       const text = await askAI({ 
         prompt,
-        systemInstruction: "Você é o Mentor Financeiro Supremo do ecossistema Zenit. Sua inteligência é voltada para a otimização matemática da riqueza e a engenharia de liberdade financeira."
+        systemInstruction: "Você é o Mentor Financeiro Supremo do ecossistema ZENITH. Sua inteligência é voltada para a otimização matemática da riqueza e a engenharia de liberdade financeira."
       });
       
       setAiResponse(text || 'Desculpe, não consegui analisar seus dados agora.');
@@ -250,8 +356,8 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         .insert([{
           user_id: userData.id,
           category: newBudgetCategory,
-          limit: parseFloat(newBudgetLimit),
-          spent: 0
+          limit_amount: parseFloat(newBudgetLimit),
+          current_amount: 0
         }]);
 
       if (error) throw error;
@@ -275,8 +381,8 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         .insert([{
           user_id: userData.id,
           name: newGoalName,
-          target: parseFloat(newGoalTarget),
-          current: 0
+          target_amount: parseFloat(newGoalTarget),
+          current_amount: 0
         }]);
 
       if (error) throw error;
@@ -561,10 +667,16 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
                         {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex flex-col items-end space-y-2">
                       <span className={`text-2xl font-display font-bold ${isOver ? 'text-red-500' : 'text-zenit-text-primary'}`}>
                         {Math.round(progress)}%
                       </span>
+                      <button 
+                        onClick={() => deleteBudget(b.id)}
+                        className="text-[9px] text-zenit-text-tertiary/30 hover:text-zenit-scarlet uppercase tracking-widest font-bold transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        Excluir
+                      </button>
                     </div>
                   </div>
                   <div className="relative h-2 w-full bg-zenit-surface-2 rounded-full overflow-hidden">
@@ -618,6 +730,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
                 color="scarlet" 
                 formatCurrency={formatCurrency}
                 t={t}
+                onDelete={() => deleteGoal(goal.id)}
               />
             ))}
           </div>
@@ -830,6 +943,22 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
                       />
                     </div>
                   </div>
+
+                  {type === 'expense' && budgets.length > 0 && (
+                    <div className="space-y-3">
+                      <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">Categoria (Opcional)</label>
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[2rem] px-6 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet/50 transition-all shadow-inner appearance-none"
+                      >
+                        <option value="">Sem categoria</option>
+                        {budgets.map(b => (
+                          <option key={b.id} value={b.category}>{b.category}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 <button type="submit" className="w-full py-6 rounded-[2rem] bg-zenit-text-primary text-zenit-black text-[11px] font-bold uppercase tracking-[0.4em] hover:opacity-90 transition-all active:scale-[0.98] shadow-2xl shadow-zenit-text-primary/10 mt-4">
@@ -923,7 +1052,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   );
 };
 
-const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; current: number; target: number; color: 'cyan' | 'purple' | 'scarlet'; formatCurrency: (amount: number) => string; t: any }> = ({ idx, icon, label, current, target, color, formatCurrency, t }) => {
+const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; current: number; target: number; color: 'cyan' | 'purple' | 'scarlet'; formatCurrency: (amount: number) => string; t: any; onDelete: () => void }> = ({ idx, icon, label, current, target, color, formatCurrency, t, onDelete }) => {
   const progress = (current / target) * 100;
   const remaining = target - current;
   const accentColor = color === 'cyan' ? 'text-zenit-cyan' : color === 'purple' ? 'text-zenit-electric-blue' : 'text-zenit-scarlet';
@@ -944,9 +1073,15 @@ const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; cu
         <div className={`w-14 h-14 rounded-[20px] bg-white/5 flex items-center justify-center ${accentColor} border border-white/10 group-hover:scale-110 transition-transform duration-500`}>
           {icon}
         </div>
-        <div className="text-right">
+        <div className="text-right flex flex-col items-end space-y-2">
           <span className={`text-3xl font-display font-bold text-white`}>{Math.round(progress)}%</span>
           <p className="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1">{t.finance.completed}</p>
+          <button 
+            onClick={onDelete}
+            className="text-[9px] text-white/10 hover:text-zenit-scarlet uppercase tracking-widest font-bold transition-colors opacity-0 group-hover:opacity-100"
+          >
+            Excluir
+          </button>
         </div>
       </div>
 

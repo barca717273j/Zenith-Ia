@@ -7,6 +7,7 @@ interface UserContextType {
   userData: UserProfile | null;
   loading: boolean;
   isSupabaseConnected: boolean;
+  connectionError: string | null;
   refreshUserData: () => Promise<void>;
   signOut: () => Promise<void>;
   isPlanActive: boolean;
@@ -21,6 +22,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSupabaseConnected, setIsSupabaseConnected] = useState(true);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const isMounted = useRef(true);
 
   useEffect(() => {
@@ -42,6 +44,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (isMounted.current) setIsSupabaseConnected(isConnected);
 
         if (!isConnected) {
+          setConnectionError("Não foi possível alcançar o servidor Supabase. Verifique sua conexão e se o projeto não está pausado.");
           console.error("Supabase connection failed.");
           if (isMounted.current) setLoading(false);
           return;
@@ -334,7 +337,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <UserContext.Provider value={{ user, userData, loading, isSupabaseConnected, refreshUserData, signOut, isPlanActive, checkLimit, incrementUsage }}>
+    <UserContext.Provider value={{ user, userData, loading, isSupabaseConnected, connectionError, refreshUserData, signOut, isPlanActive, checkLimit, incrementUsage }}>
       {children}
     </UserContext.Provider>
   );
