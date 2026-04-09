@@ -27,22 +27,22 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-zenith-black flex items-center justify-center p-6">
-          <div className="max-w-md w-full glass-card p-8 text-center space-y-6 border-zenith-scarlet/30">
-            <div className="w-20 h-20 bg-zenith-scarlet/20 rounded-full flex items-center justify-center mx-auto border border-zenith-scarlet/30 shadow-lg shadow-zenith-scarlet/20">
-              <AlertTriangle className="text-zenith-scarlet w-10 h-10" />
+        <div className="min-h-screen bg-zenit-black flex items-center justify-center p-6">
+          <div className="max-w-md w-full glass-card p-8 text-center space-y-6 border-zenit-accent/30">
+            <div className="w-20 h-20 bg-zenit-accent/20 rounded-full flex items-center justify-center mx-auto border border-zenit-accent/30 shadow-lg shadow-zenit-accent/20">
+              <AlertTriangle className="text-zenit-accent w-10 h-10" />
             </div>
             
             <div className="space-y-2">
-              <h2 className="text-2xl font-display font-bold text-zenith-text-primary uppercase tracking-tight">System Error</h2>
-              <p className="text-zenith-text-secondary text-sm leading-relaxed">
-                Ocorreu um erro crítico no sistema Zenith. A conexão neural pode ter sido interrompida.
+              <h2 className="text-2xl font-display font-bold text-zenit-text-primary uppercase tracking-tight">System Error</h2>
+              <p className="text-zenit-text-secondary text-sm leading-relaxed">
+                Ocorreu um erro crítico no sistema Zenit. A conexão neural pode ter sido interrompida.
               </p>
             </div>
 
             {this.state.error && (
               <div className="p-4 bg-black/40 rounded-xl border border-white/5 text-left">
-                <p className="text-[10px] font-mono text-zenith-scarlet/80 break-words">
+                <p className="text-[10px] font-mono text-zenit-accent/80 break-words">
                   {this.state.error.message}
                 </p>
               </div>

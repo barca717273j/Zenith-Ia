@@ -139,10 +139,10 @@ export const TetrisWidget: React.FC<{ t: any }> = ({ t }) => {
     <div className="glass-card p-4 space-y-4 border-white/5 bg-white/[0.01] relative overflow-hidden group">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Gamepad2 size={14} className="text-zenith-scarlet" />
+          <Gamepad2 size={14} className="text-zenit-accent" />
           <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">{t.gamification.tetris}</h3>
         </div>
-        <div className="text-[10px] font-mono font-bold text-zenith-scarlet">SCORE: {score}</div>
+        <div className="text-[10px] font-mono font-bold text-zenit-accent">SCORE: {score}</div>
       </div>
 
       <div className="flex gap-4">
@@ -163,7 +163,7 @@ export const TetrisWidget: React.FC<{ t: any }> = ({ t }) => {
           </div>
           {!isPlaying && !gameOver && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-              <button onClick={resetGame} className="w-10 h-10 rounded-full bg-zenith-scarlet flex items-center justify-center text-white">
+              <button onClick={resetGame} className="w-10 h-10 rounded-full bg-zenit-accent flex items-center justify-center text-white">
                 <Play size={20} fill="currentColor" />
               </button>
             </div>

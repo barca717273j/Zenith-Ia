@@ -2,7 +2,7 @@ import express from 'express';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
-import geminiRouter from './gemini';
+import geminiRouter from './gemini.ts';
 
 dotenv.config();
 

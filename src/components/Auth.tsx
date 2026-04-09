@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { LogIn, UserPlus, Globe, Mail, Lock, AlertTriangle, Sparkles, Shield } from 'lucide-react';
-import { ZenithLogo } from './ZenithLogo';
+import { ZenitLogo } from './ZenitLogo';
 import { useUser } from '../contexts/UserContext';
 import { translations, Language } from '../translations';
 
@@ -175,7 +175,7 @@ export const Auth: React.FC = () => {
   };
 
   const getPasswordStrength = (pass: string) => {
-    if (pass.length === 0) return { label: '', color: 'bg-zenith-surface-2', text: '' };
+    if (pass.length === 0) return { label: '', color: 'bg-zenit-surface-2', text: '' };
     if (pass.length < 6) return { label: t.common.weak, color: 'bg-red-500 shadow-sm shadow-red-500/50', text: 'text-red-400' };
     if (pass.length < 10) return { label: t.common.medium, color: 'bg-orange-500 shadow-sm shadow-orange-500/50', text: 'text-orange-400' };
     return { label: t.common.strong, color: 'bg-green-500 shadow-sm shadow-green-500/50', text: 'text-green-400' };
@@ -184,9 +184,9 @@ export const Auth: React.FC = () => {
   const strength = getPasswordStrength(password);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-zenith-black relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-zenit-black relative overflow-hidden">
       {/* Background Ambience */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zenith-black">
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zenit-black">
         <div className="absolute inset-0 bg-fluid-marble opacity-50" />
         
         {/* Animated Marble Blobs */}
@@ -198,7 +198,7 @@ export const Auth: React.FC = () => {
             opacity: [0.2, 0.4, 0.2]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="marble-blob w-[600px] h-[600px] bg-zenith-scarlet/20 -top-20 -left-20"
+          className="marble-blob w-[600px] h-[600px] bg-zenit-scarlet/20 -top-20 -left-20"
         />
         <motion.div 
           animate={{ 
@@ -218,12 +218,12 @@ export const Auth: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md p-10 space-y-8 relative z-10 premium-card border-zenith-border-primary bg-zenith-surface-1/40 backdrop-blur-3xl rounded-[32px] shadow-2xl"
+        className="w-full max-w-md p-10 space-y-8 relative z-10 premium-card border-zenit-border-primary bg-zenit-surface-1/40 backdrop-blur-3xl rounded-[32px] shadow-2xl"
       >
         <div className="text-center space-y-5">
           <div className="flex justify-center">
             <div className="relative">
-              <ZenithLogo size={70} className="text-zenith-text-primary relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
+              <ZenitLogo size={70} className="text-zenit-text-primary relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
               <motion.div 
                 animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
                 transition={{ duration: 4, repeat: Infinity }}
@@ -232,8 +232,8 @@ export const Auth: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <h1 className="text-5xl font-display font-bold tracking-tighter uppercase leading-none text-zenith-text-primary italic">Zenith <span className="text-zenith-accent">IA</span></h1>
-            <div className="flex items-center justify-center space-x-3 text-zenith-accent">
+            <h1 className="text-5xl font-display font-bold tracking-tighter uppercase leading-none text-zenit-text-primary italic">Zenit <span className="text-zenit-accent">IA</span></h1>
+            <div className="flex items-center justify-center space-x-3 text-zenit-accent">
               <Sparkles size={14} className="animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-[0.5em]">Life Operating System</span>
             </div>
@@ -248,16 +248,16 @@ export const Auth: React.FC = () => {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="p-4 rounded-2xl bg-zenith-accent/10 border border-zenith-accent/20 flex items-start gap-3 mb-4 shadow-lg">
-                <AlertTriangle className="w-5 h-5 text-zenith-accent shrink-0 mt-0.5" />
+              <div className="p-4 rounded-2xl bg-zenit-accent/10 border border-zenit-accent/20 flex items-start gap-3 mb-4 shadow-lg">
+                <AlertTriangle className="w-5 h-5 text-zenit-accent shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-zenith-accent/90 leading-relaxed font-bold">
+                  <p className="text-sm text-zenit-accent/90 leading-relaxed font-bold">
                     {error}
                   </p>
                   {showResend && (
                     <button
                       onClick={handleResendConfirmation}
-                      className="mt-2 text-[10px] font-black uppercase tracking-widest text-zenith-accent hover:text-white transition-colors underline underline-offset-4"
+                      className="mt-2 text-[10px] font-black uppercase tracking-widest text-zenit-accent hover:text-white transition-colors underline underline-offset-4"
                     >
                       Reenviar e-mail de confirmação
                     </button>
@@ -276,12 +276,12 @@ export const Auth: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center space-y-8 py-8"
             >
-              <div className="w-24 h-24 bg-zenith-accent/20 rounded-full flex items-center justify-center mx-auto border border-zenith-accent/30 shadow-[0_0_30px_var(--accent-glow)]">
-                <Sparkles className="text-zenith-accent w-12 h-12" />
+              <div className="w-24 h-24 bg-zenit-accent/20 rounded-full flex items-center justify-center mx-auto border border-zenit-accent/30 shadow-[0_0_30px_var(--accent-glow)]">
+                <Sparkles className="text-zenit-accent w-12 h-12" />
               </div>
               <div className="space-y-3">
-                <h2 className="text-3xl font-bold text-zenith-text-primary uppercase tracking-tight italic">{t.common.accountCreated}</h2>
-                <p className="text-zenith-text-secondary text-sm leading-relaxed font-medium">
+                <h2 className="text-3xl font-bold text-zenit-text-primary uppercase tracking-tight italic">{t.common.accountCreated}</h2>
+                <p className="text-zenit-text-secondary text-sm leading-relaxed font-medium">
                   {t.common.confirmationEmailSent}
                 </p>
               </div>
@@ -290,7 +290,7 @@ export const Auth: React.FC = () => {
                   setSuccess(false);
                   setAuthMode('login');
                 }}
-                className="w-full bg-zenith-surface-2 border border-zenith-border-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] hover:bg-zenith-surface-3 transition-all"
+                className="w-full bg-zenit-surface-2 border border-zenit-border-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] hover:bg-zenit-surface-3 transition-all"
               >
                 {t.common.backToLogin}
               </button>
@@ -302,12 +302,12 @@ export const Auth: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center space-y-8 py-8"
             >
-              <div className="w-24 h-24 bg-zenith-accent/20 rounded-full flex items-center justify-center mx-auto border border-zenith-accent/30 shadow-[0_0_30px_var(--accent-glow)]">
-                <Mail className="text-zenith-accent w-12 h-12" />
+              <div className="w-24 h-24 bg-zenit-accent/20 rounded-full flex items-center justify-center mx-auto border border-zenit-accent/30 shadow-[0_0_30px_var(--accent-glow)]">
+                <Mail className="text-zenit-accent w-12 h-12" />
               </div>
               <div className="space-y-3">
-                <h2 className="text-3xl font-bold text-zenith-text-primary uppercase tracking-tight italic">{t.common.emailSent}</h2>
-                <p className="text-zenith-text-secondary text-sm leading-relaxed font-medium">
+                <h2 className="text-3xl font-bold text-zenit-text-primary uppercase tracking-tight italic">{t.common.emailSent}</h2>
+                <p className="text-zenit-text-secondary text-sm leading-relaxed font-medium">
                   {t.common.resetLinkSent}
                 </p>
               </div>
@@ -316,7 +316,7 @@ export const Auth: React.FC = () => {
                   setResetSent(false);
                   setAuthMode('login');
                 }}
-                className="w-full bg-zenith-surface-2 border border-zenith-border-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] hover:bg-zenith-surface-3 transition-all"
+                className="w-full bg-zenit-surface-2 border border-zenit-border-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] hover:bg-zenit-surface-3 transition-all"
               >
                 {t.common.backToLogin}
               </button>
@@ -330,14 +330,14 @@ export const Auth: React.FC = () => {
               className="space-y-8"
             >
               <div className="space-y-2 text-center">
-                <h2 className="text-2xl font-bold text-zenith-text-primary uppercase tracking-tight italic">{t.common.recoverPassword}</h2>
-                <p className="text-zenith-text-tertiary text-[10px] uppercase tracking-[0.3em] font-black">{t.common.enterEmailToReset}</p>
+                <h2 className="text-2xl font-bold text-zenit-text-primary uppercase tracking-tight italic">{t.common.recoverPassword}</h2>
+                <p className="text-zenit-text-tertiary text-[10px] uppercase tracking-[0.3em] font-black">{t.common.enterEmailToReset}</p>
               </div>
               <form onSubmit={handleAuth} className="space-y-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.email}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.email}</label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-5 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-accent transition-colors">
+                    <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
                       <Mail size={20} />
                     </div>
                     <input
@@ -347,7 +347,7 @@ export const Auth: React.FC = () => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 pl-14 pr-5 focus:outline-none focus:border-zenith-accent transition-all text-sm font-bold text-zenith-text-primary shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-14 pr-5 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
                       placeholder="seu@email.com"
                     />
                   </div>
@@ -371,7 +371,7 @@ export const Auth: React.FC = () => {
               <div className="text-center">
                 <button
                   onClick={() => setAuthMode('login')}
-                  className="text-[10px] text-zenith-text-tertiary hover:text-zenith-text-primary uppercase tracking-[0.3em] font-black transition-colors"
+                  className="text-[10px] text-zenit-text-tertiary hover:text-zenit-text-primary uppercase tracking-[0.3em] font-black transition-colors"
                 >
                   {t.common.backToLogin}
                 </button>
@@ -387,9 +387,9 @@ export const Auth: React.FC = () => {
             >
               <form onSubmit={handleAuth} className="space-y-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.email}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.email}</label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-5 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-accent transition-colors">
+                    <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
                       <Mail size={20} />
                     </div>
                     <input
@@ -399,7 +399,7 @@ export const Auth: React.FC = () => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 pl-14 pr-5 focus:outline-none focus:border-zenith-accent transition-all text-sm font-bold text-zenith-text-primary shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-14 pr-5 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
                       placeholder="seu@email.com"
                     />
                   </div>
@@ -407,17 +407,17 @@ export const Auth: React.FC = () => {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.password}</label>
+                    <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.password}</label>
                     <button 
                       type="button" 
                       onClick={() => setAuthMode('forgot')}
-                      className="text-[10px] text-zenith-accent hover:text-white uppercase tracking-widest font-black transition-colors"
+                      className="text-[10px] text-zenit-accent hover:text-white uppercase tracking-widest font-black transition-colors"
                     >
                       {t.common.forgotPassword}
                     </button>
                   </div>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-5 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-accent transition-colors">
+                    <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
                       <Lock size={20} />
                     </div>
                     <input
@@ -427,13 +427,13 @@ export const Auth: React.FC = () => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 pl-14 pr-14 focus:outline-none focus:border-zenith-accent transition-all text-sm font-bold text-zenith-text-primary shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-14 pr-14 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-5 flex items-center text-zenith-text-tertiary hover:text-zenith-accent transition-colors"
+                      className="absolute inset-y-0 right-5 flex items-center text-zenit-text-tertiary hover:text-zenit-accent transition-colors"
                     >
                       {showPassword ? <Shield size={20} /> : <Sparkles size={20} />}
                     </button>
@@ -447,9 +447,9 @@ export const Auth: React.FC = () => {
                       id="remember"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-zenith-border-primary bg-zenith-surface-2 text-zenith-accent focus:ring-zenith-accent transition-all"
+                      className="w-4 h-4 rounded border-zenit-border-primary bg-zenit-surface-2 text-zenit-accent focus:ring-zenit-accent transition-all"
                     />
-                    <label htmlFor="remember" className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest font-black cursor-pointer hover:text-zenith-text-secondary transition-colors">
+                    <label htmlFor="remember" className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest font-black cursor-pointer hover:text-zenit-text-secondary transition-colors">
                       Lembrar de mim
                     </label>
                   </div>
@@ -474,7 +474,7 @@ export const Auth: React.FC = () => {
               <div className="text-center">
                 <button
                   onClick={() => setAuthMode('register')}
-                  className="text-[10px] text-zenith-text-tertiary hover:text-zenith-text-primary uppercase tracking-[0.3em] font-black transition-colors"
+                  className="text-[10px] text-zenit-text-tertiary hover:text-zenit-text-primary uppercase tracking-[0.3em] font-black transition-colors"
                 >
                   {t.common.dontHaveAccount}
                 </button>
@@ -490,7 +490,7 @@ export const Auth: React.FC = () => {
             >
               <form onSubmit={handleAuth} className="space-y-5">
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.fullName}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.fullName}</label>
                   <input
                     type="text"
                     name="name"
@@ -498,15 +498,15 @@ export const Auth: React.FC = () => {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 px-6 focus:outline-none focus:border-zenith-accent transition-all text-sm font-bold text-zenith-text-primary shadow-inner"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
                     placeholder={t.common.fullNamePlaceholder}
                   />
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">Nome de Usuário</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">Nome de Usuário</label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-5 flex items-center text-zenith-text-tertiary group-focus-within:text-zenith-accent transition-colors">
+                    <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
                       <span className="text-sm font-black">@</span>
                     </div>
                     <input
@@ -516,14 +516,14 @@ export const Auth: React.FC = () => {
                       required
                       value={username}
                       onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
-                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 pl-12 pr-6 focus:outline-none focus:border-zenith-accent transition-all text-sm font-bold text-zenith-text-primary shadow-inner"
-                      placeholder="ex: warrior_zenith"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-12 pr-6 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
+                      placeholder="ex: warrior_zenit"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.email}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.email}</label>
                   <input
                     type="email"
                     name="email"
@@ -531,13 +531,13 @@ export const Auth: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 px-6 focus:outline-none focus:border-zenith-accent transition-all text-sm font-bold text-zenith-text-primary shadow-inner"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
                     placeholder="seu@email.com"
                   />
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.password}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.password}</label>
                   <div className="relative group">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -546,13 +546,13 @@ export const Auth: React.FC = () => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-2xl py-5 px-6 pr-14 focus:outline-none focus:border-zenith-accent transition-all text-sm font-bold text-zenith-text-primary shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 pr-14 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-5 flex items-center text-zenith-text-tertiary hover:text-zenith-accent transition-colors"
+                      className="absolute inset-y-0 right-5 flex items-center text-zenit-text-tertiary hover:text-zenit-accent transition-colors"
                     >
                       {showPassword ? <Shield size={20} /> : <Sparkles size={20} />}
                     </button>
@@ -561,20 +561,20 @@ export const Auth: React.FC = () => {
                   {password.length > 0 && (
                     <div className="space-y-2.5 px-1">
                       <div className="flex justify-between items-center text-[9px] uppercase tracking-widest font-black">
-                        <span className="text-zenith-text-tertiary">{t.common.passwordStrength}</span>
+                        <span className="text-zenit-text-tertiary">{t.common.passwordStrength}</span>
                         <span className={strength.text}>{strength.label}</span>
                       </div>
                       <div className="flex space-x-1.5 h-1.5">
-                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length > 0 ? strength.color : 'bg-zenith-surface-3'}`} />
-                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 6 ? strength.color : 'bg-zenith-surface-3'}`} />
-                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 10 ? strength.color : 'bg-zenith-surface-3'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length > 0 ? strength.color : 'bg-zenit-surface-3'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 6 ? strength.color : 'bg-zenit-surface-3'}`} />
+                        <div className={`flex-1 rounded-full transition-all duration-500 ${password.length >= 10 ? strength.color : 'bg-zenit-surface-3'}`} />
                       </div>
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.confirmPassword}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.confirmPassword}</label>
                   <input
                     type="password"
                     name="confirm-password"
@@ -582,7 +582,7 @@ export const Auth: React.FC = () => {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full bg-zenith-surface-2 border rounded-2xl py-5 px-6 focus:outline-none transition-all text-sm font-bold text-zenith-text-primary shadow-inner ${password && confirmPassword && password !== confirmPassword ? 'border-zenith-accent' : 'border-zenith-border-primary focus:border-zenith-accent'}`}
+                    className={`w-full bg-zenit-surface-2 border rounded-2xl py-5 px-6 focus:outline-none transition-all text-sm font-bold text-zenit-text-primary shadow-inner ${password && confirmPassword && password !== confirmPassword ? 'border-zenit-accent' : 'border-zenit-border-primary focus:border-zenit-accent'}`}
                     placeholder="••••••••"
                   />
                 </div>
@@ -595,11 +595,11 @@ export const Auth: React.FC = () => {
                         id="terms"
                         checked={acceptTerms}
                         onChange={(e) => setAcceptTerms(e.target.checked)}
-                        className="w-5 h-5 rounded border-zenith-border-primary bg-zenith-surface-2 text-zenith-accent focus:ring-zenith-accent transition-all"
+                        className="w-5 h-5 rounded border-zenit-border-primary bg-zenit-surface-2 text-zenit-accent focus:ring-zenit-accent transition-all"
                       />
                     </div>
-                    <label htmlFor="terms" className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest font-black cursor-pointer hover:text-zenith-text-secondary transition-colors leading-relaxed">
-                      {t.common.iAgreeTo} <a href="#" className="text-zenith-accent hover:text-white transition-colors underline underline-offset-4">{t.common.termsOfUse}</a> {t.common.and} <a href="#" className="text-zenith-accent hover:text-white transition-colors underline underline-offset-4">{t.common.privacyPolicy}</a>
+                    <label htmlFor="terms" className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest font-black cursor-pointer hover:text-zenit-text-secondary transition-colors leading-relaxed">
+                      {t.common.iAgreeTo} <a href="#" className="text-zenit-accent hover:text-white transition-colors underline underline-offset-4">{t.common.termsOfUse}</a> {t.common.and} <a href="#" className="text-zenit-accent hover:text-white transition-colors underline underline-offset-4">{t.common.privacyPolicy}</a>
                     </label>
                   </div>
                 </div>
@@ -623,7 +623,7 @@ export const Auth: React.FC = () => {
               <div className="text-center">
                 <button
                   onClick={() => setAuthMode('login')}
-                  className="text-[10px] text-zenith-text-tertiary hover:text-zenith-text-primary uppercase tracking-[0.3em] font-black transition-colors"
+                  className="text-[10px] text-zenit-text-tertiary hover:text-zenit-text-primary uppercase tracking-[0.3em] font-black transition-colors"
                 >
                   {t.common.alreadyHaveAccount}
                 </button>
@@ -633,14 +633,14 @@ export const Auth: React.FC = () => {
         </AnimatePresence>
 
         <div className="relative py-4">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zenith-border-primary opacity-50"></div></div>
-          <div className="relative flex justify-center text-[10px] uppercase tracking-[0.5em] font-black"><span className="bg-zenith-black px-6 text-zenith-text-tertiary/40">{t.common.orContinueWith}</span></div>
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zenit-border-primary opacity-50"></div></div>
+          <div className="relative flex justify-center text-[10px] uppercase tracking-[0.5em] font-black"><span className="bg-zenit-black px-6 text-zenit-text-tertiary/40">{t.common.orContinueWith}</span></div>
         </div>
 
         <button
           onClick={handleGoogle}
           disabled={loading}
-          className="w-full bg-zenith-surface-2 border border-zenith-border-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] hover:bg-zenith-surface-3 hover:border-zenith-accent/30 transition-all flex items-center justify-center space-x-5 text-zenith-text-primary shadow-lg"
+          className="w-full bg-zenit-surface-2 border border-zenit-border-primary py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] hover:bg-zenit-surface-3 hover:border-zenit-accent/30 transition-all flex items-center justify-center space-x-5 text-zenit-text-primary shadow-lg"
         >
           <svg className="w-6 h-6" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -651,7 +651,7 @@ export const Auth: React.FC = () => {
           <span>Neural Link Google</span>
         </button>
 
-        <div className="flex items-center justify-center space-x-3 text-zenith-text-tertiary opacity-60">
+        <div className="flex items-center justify-center space-x-3 text-zenit-text-tertiary opacity-60">
           <Shield size={14} />
           <span className="text-[9px] font-black uppercase tracking-widest">{t.common.endToEndEncryption}</span>
         </div>

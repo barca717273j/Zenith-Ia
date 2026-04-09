@@ -23,7 +23,9 @@ app.post('/api/checkout', async (req, res) => {
 
   const priceMap: Record<string, string> = {
     'pro': process.env.STRIPE_PRICE_PRO || 'price_pro_placeholder',
-    'master': process.env.STRIPE_PRICE_MASTER || 'price_master_placeholder',
+    'elite': process.env.STRIPE_PRICE_ELITE || 'price_elite_placeholder',
+    'annual': process.env.STRIPE_PRICE_ANNUAL || 'price_annual_placeholder',
+    'lifetime': process.env.STRIPE_PRICE_LIFETIME || 'price_lifetime_placeholder',
   };
 
   const priceId = priceMap[planId];
@@ -32,7 +34,7 @@ app.post('/api/checkout', async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: planId === 'master' ? 'payment' : 'subscription',
+      mode: planId === 'lifetime' ? 'payment' : 'subscription',
       success_url: `${process.env.APP_URL || 'http://localhost:3000'}/profile?success=true`,
       cancel_url: `${process.env.APP_URL || 'http://localhost:3000'}/profile?canceled=true`,
       customer_email: email,

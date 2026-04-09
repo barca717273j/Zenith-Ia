@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Fallback to client-side if needed, but prefer backend
 const getClientAI = () => {
@@ -7,7 +7,7 @@ const getClientAI = () => {
     console.warn("VITE_GEMINI_API_KEY is not defined. AI features will be limited.");
     return null;
   }
-  return new GoogleGenAI({ apiKey });
+  return new GoogleGenerativeAI(apiKey);
 };
 
 const callBackendAI = async (data: any) => {
@@ -34,11 +34,11 @@ export const generateLifeStrategy = async (userData: any, prompt: string) => {
   try {
     // Try backend first
     const result = await callBackendAI({
-      prompt: `Você é o Zenith, uma IA de Sistema Operacional de Vida premium. 
+      prompt: `Você é o Zenit, uma IA de Sistema Operacional de Vida premium. 
       Dados do Usuário: ${JSON.stringify(userData)}
       Solicitação do Usuário: ${prompt}
       Forneça uma resposta estruturada, futurista e altamente acionável em Português.`,
-      systemInstruction: "Você é o cérebro do Zenith. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
+      systemInstruction: "Você é o cérebro do Zenit. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
     });
     return result.text;
   } catch (backendError) {
@@ -47,23 +47,30 @@ export const generateLifeStrategy = async (userData: any, prompt: string) => {
     if (!ai) {
       // Mock response if no AI is available
       console.warn("Using mock response for generateLifeStrategy");
-      return "O Zenith está em modo de manutenção neural. Sua solicitação foi registrada: '" + prompt + "'. Como recomendação geral, foque em blocos de 90 minutos de trabalho profundo e mantenha sua hidratação em níveis ótimos.";
+      return "O Zenit está em modo de manutenção neural. Sua solicitação foi registrada: '" + prompt + "'. Como recomendação geral, foque em blocos de 90 minutos de trabalho profundo e mantenha sua hidratação em níveis ótimos.";
     }
     
-    const model = ai.models.generateContent({
+    const model = ai.getGenerativeModel({ 
       model: "gemini-3-flash-preview",
-      contents: `Você é o Zenith, uma IA de Sistema Operacional de Vida premium. 
-      Dados do Usuário: ${JSON.stringify(userData)}
-      Solicitação do Usuário: ${prompt}
-      Forneça uma resposta estruturada, futurista e altamente acionável em Português.`,
-      config: {
-        systemInstruction: "Você é o cérebro do Zenith. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
+      systemInstruction: "Você é o cérebro do Zenit. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil."
+    });
+    
+    const result = await model.generateContent({
+      contents: [{ 
+        role: 'user', 
+        parts: [{ 
+          text: `Você é o Zenit, uma IA de Sistema Operacional de Vida premium. 
+          Dados do Usuário: ${JSON.stringify(userData)}
+          Solicitação do Usuário: ${prompt}
+          Forneça uma resposta estruturada, futurista e altamente acionável em Português.` 
+        }] 
+      }],
+      generationConfig: {
         temperature: 0.7,
       }
     });
 
-    const response = await model;
-    return response.text;
+    return result.response.text();
   }
 };
 
@@ -78,11 +85,14 @@ export const askAI = async (options: {
     const result = await callBackendAI({
       prompt: options.prompt,
       systemInstruction: options.systemInstruction,
-      model: options.model || "gemini-3-flash-preview"
+      model: options.model || "gemini-3-flash-preview",
+      responseMimeType: options.responseMimeType,
+      responseSchema: options.responseSchema
     });
     
     if (options.responseMimeType === "application/json") {
-      return JSON.parse(result.text || "{}");
+      const cleanText = (result.text || "{}").replace(/```json|```/g, '').trim();
+      return JSON.parse(cleanText);
     }
     return result.text;
   } catch (backendError) {
@@ -104,24 +114,28 @@ export const askAI = async (options: {
         }
         return {};
       }
-      return "O Zenith está processando sua solicitação offline. Continue focado em seus objetivos.";
+      return "O Zenit está processando sua solicitação offline. Continue focado em seus objetivos.";
     }
     
-    const model = ai.models.generateContent({
+    const model = ai.getGenerativeModel({ 
       model: options.model || "gemini-3-flash-preview",
-      contents: options.prompt,
-      config: {
-        systemInstruction: options.systemInstruction,
-        responseMimeType: options.responseMimeType as any,
-        responseSchema: options.responseSchema,
+      systemInstruction: options.systemInstruction as any
+    });
+    
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: options.prompt }] }],
+      generationConfig: {
         temperature: 0.7,
+        responseMimeType: options.responseMimeType as any,
+        responseSchema: options.responseSchema
       }
     });
 
-    const response = await model;
+    const responseText = result.response.text();
     if (options.responseMimeType === "application/json") {
-      return JSON.parse(response.text || "{}");
+      const cleanText = (responseText || "{}").replace(/```json|```/g, '').trim();
+      return JSON.parse(cleanText);
     }
-    return response.text;
+    return responseText;
   }
 };

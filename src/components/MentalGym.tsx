@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Brain, Target, Puzzle, Gamepad2, ArrowLeft, Zap, Sparkles, Trophy, ChevronLeft, Award, Play, RotateCcw } from 'lucide-react';
 import { TetrisGame } from './TetrisGame';
@@ -18,6 +18,32 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
   const [mode, setMode] = useState<GymMode>('menu');
   const { addXP } = useGamification();
 
+  const [scoresHistory, setScoresHistory] = useState<any[]>([]);
+  const [loadingScores, setLoadingScores] = useState(false);
+
+  useEffect(() => {
+    if (mode === 'menu' && userData?.id) {
+      fetchScores();
+    }
+  }, [mode, userData?.id]);
+
+  const fetchScores = async () => {
+    setLoadingScores(true);
+    try {
+      const { data } = await supabase
+        .from('game_scores')
+        .select('*')
+        .eq('user_id', userData.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (data) setScoresHistory(data);
+    } catch (err) {
+      console.error('Error fetching scores:', err);
+    } finally {
+      setLoadingScores(false);
+    }
+  };
+
   const saveScore = async (gameId: string, score: number) => {
     if (!userData?.id) return;
     try {
@@ -26,6 +52,7 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
         game_id: gameId,
         score: score
       }]);
+      fetchScores();
     } catch (err) {
       console.error('Error saving score:', err);
     }
@@ -37,16 +64,16 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
       title: t.gym.memoryTitle,
       desc: t.gym.memoryDesc,
       icon: <Brain size={24} />,
-      color: 'text-zenith-electric-blue',
-      bg: 'bg-zenith-electric-blue/10'
+      color: 'text-zenit-electric-blue',
+      bg: 'bg-zenit-electric-blue/10'
     },
     {
       id: 'focus',
       title: t.gym.focusTitle,
       desc: t.gym.focusDesc,
       icon: <Target size={24} />,
-      color: 'text-zenith-scarlet',
-      bg: 'bg-zenith-scarlet/10'
+      color: 'text-zenit-scarlet',
+      bg: 'bg-zenit-scarlet/10'
     },
     {
       id: 'logic',
@@ -100,17 +127,17 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
     <div className="p-6 space-y-12 pb-32 max-w-4xl mx-auto min-h-screen">
       <header className="space-y-4">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-zenith-accent/10 flex items-center justify-center text-zenith-accent border border-zenith-accent/20 shadow-[0_0_20px_rgba(255,59,59,0.1)]">
+          <div className="w-12 h-12 rounded-2xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent border border-zenit-accent/20 shadow-[0_0_20px_rgba(255,59,59,0.1)]">
             <Brain size={28} />
           </div>
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenith-text-primary italic">
-              Academia <span className="text-zenith-accent">Mental</span>
+            <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary italic">
+              Academia <span className="text-zenit-accent">Mental</span>
             </h1>
-            <p className="text-zenith-text-tertiary text-[11px] font-bold uppercase tracking-[0.3em]">{t.gym.subtitle}</p>
+            <p className="text-zenit-text-tertiary text-[11px] font-bold uppercase tracking-[0.3em]">{t.gym.subtitle}</p>
           </div>
         </div>
-        <div className="h-px w-full bg-gradient-to-r from-zenith-accent/30 via-zenith-accent/5 to-transparent" />
+        <div className="h-px w-full bg-gradient-to-r from-zenit-accent/30 via-zenit-accent/5 to-transparent" />
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,15 +149,15 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
             onClick={() => setMode(ex.id as GymMode)}
             className="premium-card premium-card-hover flex items-start space-x-5 text-left group relative overflow-hidden"
           >
-            <div className="absolute -top-10 -right-10 w-24 h-24 bg-zenith-accent/5 blur-[40px] rounded-full group-hover:bg-zenith-accent/10 transition-all duration-500" />
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-zenit-accent/5 blur-[40px] rounded-full group-hover:bg-zenit-accent/10 transition-all duration-500" />
             
             <div className={`w-14 h-14 rounded-2xl ${ex.bg} flex items-center justify-center ${ex.color} group-hover:scale-110 transition-transform duration-500 border border-white/5 shadow-lg relative z-10`}>
               {ex.icon}
             </div>
             <div className="flex-1 space-y-2 relative z-10">
-              <h3 className="text-lg font-bold text-zenith-text-primary uppercase tracking-wider group-hover:text-zenith-accent transition-colors">{ex.title}</h3>
-              <p className="text-xs text-zenith-text-tertiary leading-relaxed font-medium">{ex.desc}</p>
-              <div className="pt-2 flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zenith-accent opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+              <h3 className="text-lg font-bold text-zenit-text-primary uppercase tracking-wider group-hover:text-zenit-accent transition-colors">{ex.title}</h3>
+              <p className="text-xs text-zenit-text-tertiary leading-relaxed font-medium">{ex.desc}</p>
+              <div className="pt-2 flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zenit-accent opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
                 <span>Acessar Protocolo</span>
                 <Sparkles size={10} />
               </div>
@@ -139,20 +166,20 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
         ))}
       </div>
 
-      <div className="premium-card p-10 border-zenith-accent/20 bg-gradient-to-br from-zenith-surface-1 to-zenith-surface-2 relative overflow-hidden group">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-zenith-accent/10 blur-[100px] rounded-full group-hover:bg-zenith-accent/20 transition-all duration-1000" />
+      <div className="premium-card p-10 border-zenit-accent/20 bg-gradient-to-br from-zenit-surface-1 to-zenit-surface-2 relative overflow-hidden group">
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-zenit-accent/10 blur-[100px] rounded-full group-hover:bg-zenit-accent/20 transition-all duration-1000" />
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/10 blur-[100px] rounded-full group-hover:bg-purple-500/20 transition-all duration-1000" />
 
         <div className="flex items-center justify-between relative z-10">
           <div className="space-y-4">
             <div className="space-y-1">
-              <p className="text-[11px] text-zenith-text-tertiary uppercase font-black tracking-[0.4em]">Status Cognitivo</p>
-              <h2 className="text-6xl font-display font-bold text-zenith-text-primary tracking-tighter italic">
-                Nível <span className="text-zenith-accent">Elite</span>
+              <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.4em]">Status Cognitivo</p>
+              <h2 className="text-6xl font-display font-bold text-zenit-text-primary tracking-tighter italic">
+                Nível <span className="text-zenit-accent">Elite</span>
               </h2>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-zenith-accent/10 px-4 py-2 rounded-xl border border-zenith-accent/20 text-zenith-accent text-[11px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(255,59,59,0.1)]">
+              <div className="flex items-center space-x-2 bg-zenit-accent/10 px-4 py-2 rounded-xl border border-zenit-accent/20 text-zenit-accent text-[11px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(255,59,59,0.1)]">
                 <Zap size={14} />
                 <span>Foco: 94%</span>
               </div>
@@ -168,12 +195,58 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
               rotate: [0, 5, -5, 0]
             }}
             transition={{ duration: 4, repeat: Infinity }}
-            className="w-24 h-24 rounded-3xl bg-zenith-surface-2 border border-zenith-accent/30 flex items-center justify-center shadow-[0_0_40px_rgba(255,59,59,0.15)]"
+            className="w-24 h-24 rounded-3xl bg-zenit-surface-2 border border-zenit-accent/30 flex items-center justify-center shadow-[0_0_40px_rgba(255,59,59,0.15)]"
           >
-            <Sparkles size={48} className="text-zenith-accent" />
+            <Sparkles size={48} className="text-zenit-accent" />
           </motion.div>
         </div>
       </div>
+
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[10px] font-display font-bold text-zenit-text-tertiary uppercase tracking-[0.4em]">Histórico de Performance</h3>
+          <div className="h-[1px] flex-1 bg-white/5 mx-4" />
+        </div>
+        
+        <div className="grid gap-4">
+          {scoresHistory.length > 0 ? (
+            scoresHistory.map((score, idx) => (
+              <motion.div 
+                key={score.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className="premium-card p-4 flex items-center justify-between border-white/5 bg-white/[0.01]"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent">
+                    {score.game_id === 'tetris' ? <Gamepad2 size={18} /> : 
+                     score.game_id === 'memory' ? <Brain size={18} /> : 
+                     score.game_id === 'focus' ? <Target size={18} /> : <Puzzle size={18} />}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-zenit-text-primary uppercase tracking-tight">
+                      {score.game_id.charAt(0).toUpperCase() + score.game_id.slice(1)}
+                    </p>
+                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest">
+                      {new Date(score.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-display font-bold text-zenit-accent italic">{score.score}</p>
+                  <p className="text-[8px] text-zenit-text-tertiary uppercase font-black tracking-widest">Pontos</p>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-[2rem] opacity-20">
+              <Trophy size={32} className="mx-auto mb-4" />
+              <p className="text-[10px] font-bold uppercase tracking-widest">Nenhum recorde registrado</p>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };
@@ -230,13 +303,13 @@ const MemoryGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => 
   return (
     <div className="max-w-md mx-auto space-y-10">
       <div className="text-center space-y-3">
-        <p className="text-[11px] text-zenith-text-tertiary font-black uppercase tracking-[0.4em]">Protocolo de Retenção</p>
-        <h2 className="text-4xl font-display font-bold italic uppercase tracking-tighter text-zenith-text-primary">
-          Memória <span className="text-zenith-accent">Neural</span>
+        <p className="text-[11px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em]">Protocolo de Retenção</p>
+        <h2 className="text-4xl font-display font-bold italic uppercase tracking-tighter text-zenit-text-primary">
+          Memória <span className="text-zenit-accent">Neural</span>
         </h2>
-        <div className="inline-flex items-center space-x-3 bg-zenith-surface-2 px-6 py-2 rounded-2xl border border-zenith-border-primary">
-          <Trophy size={16} className="text-zenith-accent" />
-          <span className="text-xl font-mono font-bold text-zenith-text-primary">Score: {score}</span>
+        <div className="inline-flex items-center space-x-3 bg-zenit-surface-2 px-6 py-2 rounded-2xl border border-zenit-border-primary">
+          <Trophy size={16} className="text-zenit-accent" />
+          <span className="text-xl font-mono font-bold text-zenit-text-primary">Score: {score}</span>
         </div>
       </div>
 
@@ -248,8 +321,8 @@ const MemoryGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => 
             onClick={() => handleButtonClick(i)}
             className={`rounded-[2.5rem] border-2 transition-all duration-300 relative overflow-hidden ${
               activeButton === i 
-                ? 'bg-zenith-accent border-zenith-accent shadow-[0_0_50px_var(--accent-glow)] scale-105' 
-                : 'bg-zenith-surface-1 border-zenith-border-primary hover:border-zenith-accent/30'
+                ? 'bg-zenit-accent border-zenit-accent shadow-[0_0_50px_var(--accent-glow)] scale-105' 
+                : 'bg-zenit-surface-1 border-zenit-border-primary hover:border-zenit-accent/30'
             }`}
           >
             {activeButton === i && (
@@ -260,7 +333,7 @@ const MemoryGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => 
               />
             )}
             <div className={`absolute inset-0 flex items-center justify-center opacity-10 ${activeButton === i ? 'opacity-100' : ''}`}>
-              <Zap size={48} className={activeButton === i ? 'text-white' : 'text-zenith-text-tertiary'} />
+              <Zap size={48} className={activeButton === i ? 'text-white' : 'text-zenit-text-tertiary'} />
             </div>
           </motion.button>
         ))}
@@ -282,8 +355,8 @@ const MemoryGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => 
           animate={{ opacity: 1, y: 0 }}
           className="text-center space-y-6"
         >
-          <div className="premium-card border-zenith-accent/30 bg-zenith-accent/5 py-4">
-            <p className="text-zenith-accent font-black uppercase tracking-[0.3em] text-sm">Sincronia Perdida</p>
+          <div className="premium-card border-zenit-accent/30 bg-zenit-accent/5 py-4">
+            <p className="text-zenit-accent font-black uppercase tracking-[0.3em] text-sm">Sincronia Perdida</p>
           </div>
           <button 
             onClick={() => { setGameOver(false); setScore(0); setSequence([]); setIsPlaying(true); startLevel(0); }}
@@ -335,16 +408,16 @@ const FocusGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
     <div className="max-w-md mx-auto space-y-10">
       <div className="flex justify-between items-end">
         <div className="space-y-1">
-          <p className="text-[11px] text-zenith-text-tertiary uppercase font-black tracking-[0.3em]">Tempo Restante</p>
-          <p className="text-5xl font-display font-bold italic text-zenith-text-primary leading-none">{timeLeft}s</p>
+          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Tempo Restante</p>
+          <p className="text-5xl font-display font-bold italic text-zenit-text-primary leading-none">{timeLeft}s</p>
         </div>
         <div className="text-right space-y-1">
-          <p className="text-[11px] text-zenith-text-tertiary uppercase font-black tracking-[0.3em]">Alvos Atingidos</p>
-          <p className="text-5xl font-display font-bold italic text-zenith-accent leading-none">{score}</p>
+          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Alvos Atingidos</p>
+          <p className="text-5xl font-display font-bold italic text-zenit-accent leading-none">{score}</p>
         </div>
       </div>
 
-      <div className="aspect-square premium-card relative overflow-hidden border-zenith-border-primary bg-zenith-surface-1 group">
+      <div className="aspect-square premium-card relative overflow-hidden border-zenit-border-primary bg-zenit-surface-1 group">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,59,59,0.03)_0%,transparent_70%)]" />
         
         {isPlaying && (
@@ -352,7 +425,7 @@ const FocusGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
             initial={false}
             animate={{ left: `${targetPos.x}%`, top: `${targetPos.y}%` }}
             onClick={handleHit}
-            className="absolute w-16 h-16 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zenith-accent shadow-[0_0_30px_var(--accent-glow)] flex items-center justify-center group/target"
+            className="absolute w-16 h-16 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zenit-accent shadow-[0_0_30px_var(--accent-glow)] flex items-center justify-center group/target"
           >
             <motion.div 
               animate={{ scale: [1, 1.2, 1] }}
@@ -380,8 +453,8 @@ const FocusGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
         {gameOver && (
           <div className="absolute inset-0 flex flex-col items-center justify-center space-y-6 z-10">
             <div className="text-center space-y-2">
-              <p className="text-zenith-accent font-black uppercase tracking-[0.4em] text-sm">Protocolo Concluído</p>
-              <p className="text-zenith-text-tertiary text-[11px] font-bold uppercase tracking-widest">Performance Analisada</p>
+              <p className="text-zenit-accent font-black uppercase tracking-[0.4em] text-sm">Protocolo Concluído</p>
+              <p className="text-zenit-text-tertiary text-[11px] font-bold uppercase tracking-widest">Performance Analisada</p>
             </div>
             <button 
               onClick={() => { setGameOver(false); setIsPlaying(true); setTimeLeft(30); setScore(0); moveTarget(); }}
@@ -465,29 +538,29 @@ const LogicGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
     <div className="max-w-md mx-auto space-y-10">
       <div className="flex justify-between items-end">
         <div className="space-y-1">
-          <p className="text-[11px] text-zenith-text-tertiary uppercase font-black tracking-[0.3em]">Tempo</p>
-          <p className="text-5xl font-display font-bold italic text-zenith-text-primary leading-none">{timeLeft}s</p>
+          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Tempo</p>
+          <p className="text-5xl font-display font-bold italic text-zenit-text-primary leading-none">{timeLeft}s</p>
         </div>
         <div className="text-right space-y-1">
-          <p className="text-[11px] text-zenith-text-tertiary uppercase font-black tracking-[0.3em]">Equações</p>
+          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Equações</p>
           <p className="text-5xl font-display font-bold italic text-emerald-400 leading-none">{score}</p>
         </div>
       </div>
 
-      <div className="premium-card p-8 sm:p-12 text-center space-y-10 border-zenith-border-primary bg-zenith-surface-1 relative overflow-hidden">
+      <div className="premium-card p-8 sm:p-12 text-center space-y-10 border-zenit-border-primary bg-zenit-surface-1 relative overflow-hidden">
         {isPlaying ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-10"
           >
-            <div className="text-6xl sm:text-7xl font-display font-bold tracking-tighter text-zenith-text-primary italic">
-              {problem.a} <span className="text-zenith-accent">{problem.op === '*' ? '×' : problem.op}</span> {problem.b}
+            <div className="text-6xl sm:text-7xl font-display font-bold tracking-tighter text-zenit-text-primary italic">
+              {problem.a} <span className="text-zenit-accent">{problem.op === '*' ? '×' : problem.op}</span> {problem.b}
             </div>
 
             <div className="relative">
-              <div className="w-full bg-zenith-surface-2 border border-zenith-border-primary rounded-[2rem] py-8 text-center text-5xl font-bold text-zenith-text-primary min-h-[100px] flex items-center justify-center shadow-inner">
-                {userAns || <span className="text-zenith-text-tertiary opacity-20">?</span>}
+              <div className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[2rem] py-8 text-center text-5xl font-bold text-zenit-text-primary min-h-[100px] flex items-center justify-center shadow-inner">
+                {userAns || <span className="text-zenit-text-tertiary opacity-20">?</span>}
               </div>
             </div>
 
@@ -498,7 +571,7 @@ const LogicGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
                   whileHover={{ backgroundColor: 'var(--surface-2)', scale: 1.05 }}
                   whileTap={{ scale: 0.92 }}
                   onClick={() => handleNumberInput(num)}
-                  className="py-6 bg-zenith-surface-2 rounded-2xl border border-zenith-border-primary text-3xl font-bold text-zenith-text-primary transition-all shadow-sm hover:border-zenith-accent/30"
+                  className="py-6 bg-zenit-surface-2 rounded-2xl border border-zenit-border-primary text-3xl font-bold text-zenit-text-primary transition-all shadow-sm hover:border-zenit-accent/30"
                 >
                   {num}
                 </motion.button>
@@ -506,14 +579,14 @@ const LogicGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
               <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={() => setUserAns('')}
-                className="py-6 bg-zenith-accent/10 rounded-2xl border border-zenith-accent/20 text-zenith-accent font-black text-2xl uppercase tracking-widest"
+                className="py-6 bg-zenit-accent/10 rounded-2xl border border-zenit-accent/20 text-zenit-accent font-black text-2xl uppercase tracking-widest"
               >
                 C
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={() => handleNumberInput(0)}
-                className="py-6 bg-zenith-surface-2 rounded-2xl border border-zenith-border-primary text-3xl font-bold text-zenith-text-primary"
+                className="py-6 bg-zenit-surface-2 rounded-2xl border border-zenit-border-primary text-3xl font-bold text-zenit-text-primary"
               >
                 0
               </motion.button>
@@ -529,8 +602,8 @@ const LogicGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
         ) : gameOver ? (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <p className="text-zenith-accent font-black uppercase tracking-[0.4em] text-sm">Lógica Concluída</p>
-              <p className="text-zenith-text-tertiary text-[11px] font-bold uppercase tracking-widest">Processamento Finalizado</p>
+              <p className="text-zenit-accent font-black uppercase tracking-[0.4em] text-sm">Lógica Concluída</p>
+              <p className="text-zenit-text-tertiary text-[11px] font-bold uppercase tracking-widest">Processamento Finalizado</p>
             </div>
             <button 
               onClick={() => { setGameOver(false); setIsPlaying(true); setTimeLeft(30); setScore(0); generateProblem(); }}

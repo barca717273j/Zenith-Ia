@@ -13,7 +13,7 @@ export const FloatingThemeToggle: React.FC = () => {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       onClick={toggleTheme}
-      className="fixed bottom-28 right-6 z-[100] p-4 rounded-full bg-zenith-surface-1 border border-zenith-border-primary shadow-2xl flex items-center justify-center text-zenith-scarlet backdrop-blur-xl"
+      className="fixed bottom-28 right-6 z-[100] p-4 rounded-full bg-zenit-surface-1 border border-zenit-border-primary shadow-2xl flex items-center justify-center text-zenit-accent backdrop-blur-xl"
       aria-label="Toggle theme"
     >
       {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}

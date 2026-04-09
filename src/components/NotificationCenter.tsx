@@ -34,9 +34,9 @@ export const NotificationCenter: React.FC<{ userId: string }> = ({ userId }) => 
         
         // Show browser notification if permitted
         if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          new Notification('Zenith', {
+          new Notification('Zenit', {
             body: payload.new.title,
-            icon: '/zenith-logo.png'
+            icon: '/zenit-logo.png'
           });
         }
       })
@@ -88,11 +88,11 @@ export const NotificationCenter: React.FC<{ userId: string }> = ({ userId }) => 
   const getIcon = (type: string) => {
     switch (type) {
       case 'achievement': return <Award className="text-yellow-500" size={18} />;
-      case 'boost': return <Zap className="text-zenith-scarlet" size={18} />;
+      case 'boost': return <Zap className="text-zenit-scarlet" size={18} />;
       case 'success': return <Sparkles className="text-emerald-500" size={18} />;
       case 'warning': return <Shield className="text-orange-500" size={18} />;
       case 'error': return <X className="text-red-500" size={18} />;
-      default: return <Info className="text-zenith-cyan" size={18} />;
+      default: return <Info className="text-zenit-cyan" size={18} />;
     }
   };
 
@@ -104,7 +104,7 @@ export const NotificationCenter: React.FC<{ userId: string }> = ({ userId }) => 
       >
         <Bell size={20} />
         {unreadCount > 0 && (
-          <span className="absolute top-2 right-2 w-4 h-4 bg-zenith-scarlet text-white text-[8px] font-bold flex items-center justify-center rounded-full border-2 border-zenith-black">
+          <span className="absolute top-2 right-2 w-4 h-4 bg-zenit-scarlet text-white text-[8px] font-bold flex items-center justify-center rounded-full border-2 border-zenit-black">
             {unreadCount}
           </span>
         )}
@@ -118,7 +118,7 @@ export const NotificationCenter: React.FC<{ userId: string }> = ({ userId }) => 
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute right-0 mt-4 w-80 max-h-[480px] z-[90] glass-card bg-zenith-black/95 border-white/10 shadow-2xl flex flex-col overflow-hidden"
+              className="absolute right-0 mt-4 w-80 max-h-[480px] z-[90] glass-card bg-zenit-black/95 border-white/10 shadow-2xl flex flex-col overflow-hidden"
             >
               <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
                 <div className="space-y-1">
@@ -128,7 +128,7 @@ export const NotificationCenter: React.FC<{ userId: string }> = ({ userId }) => 
                 {unreadCount > 0 && (
                   <button 
                     onClick={markAllAsRead}
-                    className="text-[10px] text-zenith-scarlet font-bold uppercase tracking-widest hover:underline"
+                    className="text-[10px] text-zenit-scarlet font-bold uppercase tracking-widest hover:underline"
                   >
                     Ler tudo
                   </button>
@@ -147,11 +147,11 @@ export const NotificationCenter: React.FC<{ userId: string }> = ({ userId }) => 
                         {getIcon(n.type)}
                       </div>
                       <div className="flex-1 space-y-1">
-                        <p className="text-xs font-bold text-white group-hover:text-zenith-scarlet transition-colors">{n.title}</p>
+                        <p className="text-xs font-bold text-white group-hover:text-zenit-scarlet transition-colors">{n.title}</p>
                         <p className="text-[10px] text-white/40 leading-relaxed">{n.message}</p>
                         <p className="text-[8px] text-white/10 font-mono">{new Date(n.created_at).toLocaleTimeString()}</p>
                       </div>
-                      {!n.read && <div className="w-2 h-2 rounded-full bg-zenith-scarlet mt-2 shadow-[0_0_10px_rgba(255,38,33,0.5)]" />}
+                      {!n.read && <div className="w-2 h-2 rounded-full bg-zenit-scarlet mt-2 shadow-[0_0_10px_rgba(255,38,33,0.5)]" />}
                     </button>
                   ))
                 ) : (

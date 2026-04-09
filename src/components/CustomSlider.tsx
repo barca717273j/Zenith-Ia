@@ -59,8 +59,8 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({ min, max, value, onC
     <div className="space-y-4 w-full select-none">
       {label && (
         <div className="flex justify-between items-center">
-          <label className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{label}</label>
-          <span className="text-[10px] font-bold text-zenith-scarlet">{value}%</span>
+          <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{label}</label>
+          <span className="text-[10px] font-bold text-zenit-accent">{value}%</span>
         </div>
       )}
       <div 
@@ -70,10 +70,10 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({ min, max, value, onC
         className="relative h-8 flex items-center cursor-pointer group"
       >
         {/* Track Background */}
-        <div className="absolute w-full h-1.5 bg-zenith-surface-2 rounded-full overflow-hidden shadow-inner">
+        <div className="absolute w-full h-1.5 bg-zenit-surface-2 rounded-full overflow-hidden shadow-inner">
           {/* Active Trail (Red) */}
           <motion.div 
-            className="h-full bg-zenith-scarlet shadow-[0_0_15px_rgba(255,36,0,0.4)]"
+            className="h-full bg-zenit-accent shadow-[0_0_15px_rgba(255,36,0,0.4)]"
             initial={false}
             animate={{ width: `${percentage}%` }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
@@ -90,8 +90,8 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({ min, max, value, onC
           }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         >
-          <div className="w-5 h-5 bg-white rounded-full shadow-[0_0_10px_rgba(0,0,0,0.3)] border-2 border-zenith-scarlet flex items-center justify-center relative">
-            <div className="w-1.5 h-1.5 bg-zenith-scarlet rounded-full" />
+          <div className="w-5 h-5 bg-white rounded-full shadow-[0_0_10px_rgba(0,0,0,0.3)] border-2 border-zenit-accent flex items-center justify-center relative">
+            <div className="w-1.5 h-1.5 bg-zenit-accent rounded-full" />
             
             {/* Ripple effect on drag */}
             {isDragging && (
@@ -99,7 +99,7 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({ min, max, value, onC
                 initial={{ scale: 0.8, opacity: 0.5 }}
                 animate={{ scale: 2, opacity: 0 }}
                 transition={{ repeat: Infinity, duration: 1 }}
-                className="absolute inset-0 bg-zenith-scarlet rounded-full"
+                className="absolute inset-0 bg-zenit-accent rounded-full"
               />
             )}
           </div>

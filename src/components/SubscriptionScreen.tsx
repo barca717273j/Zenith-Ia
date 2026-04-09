@@ -21,12 +21,12 @@ const PlanCard: React.FC<PlanCardProps> = ({ tier, title, price, period, feature
     whileHover={{ y: -5 }}
     className={`relative p-8 rounded-[2.5rem] border transition-all ${
       isPopular 
-        ? 'bg-white/5 border-zenith-scarlet shadow-[0_0_40px_rgba(255,36,0,0.1)]' 
+        ? 'bg-white/5 border-zenit-scarlet shadow-[0_0_40px_rgba(255,36,0,0.1)]' 
         : 'bg-white/[0.02] border-white/5'
     }`}
   >
     {isPopular && (
-      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-zenith-scarlet text-white text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg">
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-zenit-scarlet text-white text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg">
         Mais Popular
       </div>
     )}
@@ -43,8 +43,8 @@ const PlanCard: React.FC<PlanCardProps> = ({ tier, title, price, period, feature
       <ul className="space-y-4">
         {features.map((feature, i) => (
           <li key={i} className="flex items-start space-x-3">
-            <div className="mt-1 w-4 h-4 rounded-full bg-zenith-scarlet/20 flex items-center justify-center border border-zenith-scarlet/30">
-              <Check size={10} className="text-zenith-scarlet" />
+            <div className="mt-1 w-4 h-4 rounded-full bg-zenit-scarlet/20 flex items-center justify-center border border-zenit-scarlet/30">
+              <Check size={10} className="text-zenit-scarlet" />
             </div>
             <span className="text-xs text-white/60 leading-relaxed">{feature}</span>
           </li>
@@ -109,87 +109,99 @@ export const SubscriptionScreen: React.FC = () => {
       {/* Background Ambience */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#111,0%,#000,100%)]" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-zenith-scarlet/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-zenith-cyan/10 blur-[120px] rounded-full" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-zenit-scarlet/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-zenit-cyan/10 blur-[120px] rounded-full" />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10 space-y-16 pt-12">
         <div className="text-center space-y-4">
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 mb-4">
-            <Crown size={14} className="text-zenith-scarlet" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">Zenith Premium</span>
+            <Crown size={14} className="text-zenit-scarlet" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">Zenit Premium</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-display font-bold tracking-tighter uppercase leading-none">
-            Desbloqueie seu <span className="text-zenith-scarlet italic">Potencial Máximo</span>
+            Desbloqueie seu <span className="text-zenit-scarlet italic">Potencial Máximo</span>
           </h1>
           <p className="text-white/40 text-sm max-w-xl mx-auto leading-relaxed">
-            Escolha o plano que melhor se adapta à sua jornada de evolução. Acesso ilimitado a todas as ferramentas neurais do Zenith.
+            Escolha o plano que melhor se adapta à sua jornada de evolução. Acesso ilimitado a todas as ferramentas neurais do Zenit.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <PlanCard
             tier="basic"
             title="Básico"
             price="Grátis"
             period="sempre"
             features={[
-              '20 mensagens IA/dia',
-              '10 rotinas/dia',
-              '15 ações/dia',
-              'Exercícios Premium',
-              'Controle financeiro'
+              '1 função/área a cada 2 dias',
+              'IA Mentor Básico',
+              'Rotina Essencial',
+              'Acesso ao Nexus',
+              'Manual do Usuário'
             ]}
-            onSelect={() => {}} // No action for free plan
+            onSelect={() => {}} 
           />
           <PlanCard
             tier="pro"
-            title="Mensal"
-            price="R$ 49,90"
+            title="Pro"
+            price="R$ 29,90"
+            period="mês"
+            features={[
+              '10 funções/área por dia',
+              'IA Mentor Avançado',
+              'Rotinas Customizadas',
+              'Finanças Pro',
+              'Nexus Completo'
+            ]}
+            onSelect={handleSubscribe}
+            loading={loading === 'pro'}
+          />
+          <PlanCard
+            tier="elite"
+            title="Elite"
+            price="R$ 59,90"
             period="mês"
             isPopular
             features={[
-              '100 mensagens IA/dia',
-              '30 rotinas/dia',
-              '50 ações/dia',
-              'Social (Nexus) Completo',
-              'Análise avançada',
-              'Mentoria Financeira'
+              '20 funções/área por dia',
+              'IA Mentor Elite',
+              'Protocolos Exclusivos',
+              'Análise de Performance',
+              'Suporte Prioritário'
             ]}
             onSelect={handleSubscribe}
-            loading={loading === 'pro'}
+            loading={loading === 'elite'}
           />
           <PlanCard
-            tier="pro"
+            tier="annual"
             title="Anual"
-            price="R$ 399,90"
+            price="R$ 299,90"
             period="ano"
             features={[
-              'Mensagens IA Ilimitadas',
-              'Rotinas Ilimitadas',
-              'Ações Ilimitadas',
-              'Suporte Prioritário',
-              'Economia de 33%',
-              'Acesso antecipado'
+              'Tudo Ilimitado',
+              'Economia de 50%',
+              'Acesso Antecipado',
+              'Selo de Membro Anual',
+              'Mentoria Coletiva'
             ]}
             onSelect={handleSubscribe}
-            loading={loading === 'pro'}
+            loading={loading === 'annual'}
           />
           <PlanCard
-            tier="master"
-            title="Master"
-            price="R$ 899,90"
-            period="vitalício"
+            tier="lifetime"
+            title="Vitalício"
+            price="R$ 799,90"
+            period="total"
             features={[
+              'Acesso Total Vitalício',
               'Tudo Ilimitado Para Sempre',
               'Selo de Fundador',
-              'Consultoria Trimestral',
-              'Conteúdo Exclusivo Elite',
-              'Acesso Vitalício',
-              'Suporte VIP'
+              'Consultoria Individual',
+              'Herança Digital Zenit'
             ]}
             onSelect={handleSubscribe}
-            loading={loading === 'master'}
+            loading={loading === 'lifetime'}
           />
         </div>
 

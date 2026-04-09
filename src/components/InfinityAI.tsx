@@ -15,7 +15,7 @@ export const InfinityAI: React.FC<InfinityAIProps> = ({ isResponding = false }) 
           opacity: isResponding ? [0.4, 0.7, 0.4] : [0.2, 0.3, 0.2],
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-48 h-48 bg-zenith-accent/30 blur-[80px] rounded-full"
+        className="absolute w-48 h-48 bg-zenit-accent/30 blur-[80px] rounded-full"
       />
 
       {/* Glass Morphism Ring */}
@@ -108,7 +108,7 @@ export const InfinityAI: React.FC<InfinityAIProps> = ({ isResponding = false }) 
               delay: Math.random() * 5,
               ease: "easeInOut"
             }}
-            className="absolute w-1 h-1 bg-zenith-accent rounded-full blur-[0.5px] shadow-[0_0_10px_var(--accent-glow)]"
+            className="absolute w-1 h-1 bg-zenit-accent rounded-full blur-[0.5px] shadow-[0_0_10px_var(--accent-glow)]"
             style={{
               top: `${20 + Math.random() * 60}%`,
               left: `${20 + Math.random() * 60}%`,

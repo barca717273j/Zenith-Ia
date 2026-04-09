@@ -1,5 +1,5 @@
 {
-  "name": "Zenith IA",
-  "description": "Zenith IA: O Sistema Operacional de Vida definitivo. Alta performance, estratégia neural e gestão completa de rotina, hábitos e finanças em uma interface profissional.",
+  "name": "Zenit IA",
+  "description": "Zenit IA: O Sistema Operacional de Vida definitivo. Alta performance, estratégia neural e gestão completa de rotina, hábitos e finanças em uma interface profissional.",
   "requestFramePermissions": ["notifications", "geolocation", "camera"]
 }

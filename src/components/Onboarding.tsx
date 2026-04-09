@@ -105,8 +105,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             className="space-y-8 text-center"
           >
             <div className="flex justify-center">
-              <div className="p-6 bg-zenith-scarlet/10 rounded-full border border-zenith-scarlet/20 shadow-[0_0_30px_rgba(255,38,33,0.1)]">
-                <Sparkles className="w-12 h-12 text-zenith-scarlet" />
+              <div className="p-6 bg-zenit-accent/10 rounded-full border border-zenit-accent/20 shadow-[0_0_30px_rgba(255,38,33,0.1)]">
+                <Sparkles className="w-12 h-12 text-zenit-accent" />
               </div>
             </div>
             <div className="space-y-4">
@@ -117,7 +117,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             </div>
             <button
               onClick={() => setStep('objective')}
-              className="w-full py-5 bg-zenith-scarlet hover:bg-zenith-scarlet/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group shadow-[0_0_30px_rgba(255,38,33,0.3)]"
+              className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group shadow-[0_0_30px_rgba(255,38,33,0.3)]"
             >
               {t.common.start}
               <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -151,10 +151,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     setStep('energy');
                   }}
                   className={`flex items-center space-x-4 p-5 rounded-2xl border transition-all text-left group ${
-                    objective === opt.id ? 'bg-zenith-scarlet/20 border-zenith-scarlet text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    objective === opt.id ? 'bg-zenit-accent/20 border-zenit-accent text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                   }`}
                 >
-                  <div className={`transition-colors ${objective === opt.id ? 'text-zenith-scarlet' : 'text-white/20 group-hover:text-white/40'}`}>
+                  <div className={`transition-colors ${objective === opt.id ? 'text-zenit-accent' : 'text-white/20 group-hover:text-white/40'}`}>
                     {opt.icon}
                   </div>
                   <span className="font-bold uppercase tracking-widest text-xs">{opt.label}</span>
@@ -185,9 +185,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   max="100"
                   value={energyLevel}
                   onChange={(e) => setEnergyLevel(parseInt(e.target.value))}
-                  className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-zenith-scarlet"
+                  className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-zenit-accent"
                 />
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-zenith-scarlet text-white px-4 py-2 rounded-xl font-bold text-xl shadow-lg shadow-zenith-scarlet/20">
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-zenit-accent text-white px-4 py-2 rounded-xl font-bold text-xl shadow-lg shadow-zenit-accent/20">
                   {energyLevel}%
                 </div>
               </div>
@@ -198,7 +198,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             </div>
             <button
               onClick={() => setStep('schedule')}
-              className="w-full py-5 bg-zenith-scarlet hover:bg-zenith-scarlet/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group"
+              className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group"
             >
               {t.common.save}
               <ChevronRight className="ml-2 w-5 h-5" />
@@ -229,7 +229,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   type="time"
                   value={wakeTime}
                   onChange={(e) => setWakeTime(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-2xl font-bold text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-2xl font-bold text-white focus:outline-none focus:border-zenit-accent transition-all"
                 />
               </div>
               <div className="space-y-3">
@@ -241,13 +241,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   type="time"
                   value={sleepTime}
                   onChange={(e) => setSleepTime(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-2xl font-bold text-white focus:outline-none focus:border-zenith-scarlet transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-2xl font-bold text-white focus:outline-none focus:border-zenit-accent transition-all"
                 />
               </div>
             </div>
             <button
               onClick={() => setStep('identity')}
-              className="w-full py-5 bg-zenith-scarlet hover:bg-zenith-scarlet/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group"
+              className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group"
             >
               {t.common.save}
               <ChevronRight className="ml-2 w-5 h-5" />
@@ -283,10 +283,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     setStep('focus');
                   }}
                   className={`flex items-center space-x-4 p-5 rounded-2xl border transition-all text-left group ${
-                    identity === opt.id ? 'bg-zenith-scarlet/20 border-zenith-scarlet text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    identity === opt.id ? 'bg-zenit-accent/20 border-zenit-accent text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                   }`}
                 >
-                  <div className={`transition-colors ${identity === opt.id ? 'text-zenith-scarlet' : 'text-white/20 group-hover:text-white/40'}`}>
+                  <div className={`transition-colors ${identity === opt.id ? 'text-zenit-accent' : 'text-white/20 group-hover:text-white/40'}`}>
                     {opt.icon}
                   </div>
                   <span className="font-bold uppercase tracking-widest text-xs">{opt.label}</span>
@@ -322,10 +322,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     setFocus(opt.id);
                   }}
                   className={`flex flex-col items-center justify-center space-y-4 p-6 rounded-2xl border transition-all text-center group ${
-                    focus === opt.id ? 'bg-zenith-scarlet/20 border-zenith-scarlet text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    focus === opt.id ? 'bg-zenit-accent/20 border-zenit-accent text-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                   }`}
                 >
-                  <div className={`transition-colors ${focus === opt.id ? 'text-zenith-scarlet' : 'text-white/20 group-hover:text-white/40'}`}>
+                  <div className={`transition-colors ${focus === opt.id ? 'text-zenit-accent' : 'text-white/20 group-hover:text-white/40'}`}>
                     {opt.icon}
                   </div>
                   <span className="font-bold uppercase tracking-widest text-[10px]">{opt.label}</span>
@@ -335,7 +335,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <button
               disabled={!focus}
               onClick={handleComplete}
-              className="w-full py-5 bg-zenith-scarlet hover:bg-zenith-scarlet/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group disabled:opacity-50 shadow-[0_0_30px_rgba(255,38,33,0.2)]"
+              className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group disabled:opacity-50 shadow-[0_0_30px_rgba(255,38,33,0.2)]"
             >
               {t.onboarding.complete}
               <Check className="ml-2 w-5 h-5" />
@@ -352,9 +352,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             className="text-center space-y-8 py-12"
           >
             <div className="relative flex justify-center">
-              <div className="w-24 h-24 border-4 border-zenith-scarlet/20 border-t-zenith-scarlet rounded-full animate-spin shadow-[0_0_20px_rgba(255,38,33,0.2)]" />
+              <div className="w-24 h-24 border-4 border-zenit-accent/20 border-t-zenit-accent rounded-full animate-spin shadow-[0_0_20px_rgba(255,38,33,0.2)]" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Sparkles className="text-zenith-scarlet w-8 h-8 animate-pulse" />
+                <Sparkles className="text-zenit-accent w-8 h-8 animate-pulse" />
               </div>
             </div>
             <div className="space-y-4">
@@ -367,7 +367,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-zenith-black flex items-center justify-center p-6 overflow-hidden">
+    <div className="fixed inset-0 z-[100] bg-zenit-black flex items-center justify-center p-6 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,38,33,0.05)_0%,transparent_70%)]" />
       
       <div className="w-full max-w-lg relative">

@@ -311,21 +311,21 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
   return (
     <div className="p-4 space-y-6 pb-32 flex flex-col items-center max-w-lg mx-auto min-h-screen select-none touch-none relative">
       {/* Background Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenith-accent/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
       <header className="w-full flex justify-between items-center bg-[#1A1A1A]/80 backdrop-blur-2xl p-5 rounded-3xl border border-white/10 relative z-10 shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
         <div className="space-y-1">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-zenith-accent to-zenith-crimson shadow-[0_0_15px_var(--accent-glow)]">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-zenit-accent to-zenit-crimson shadow-[0_0_15px_var(--accent-glow)]">
               <Brain size={18} className="text-white" />
             </div>
-            <h1 className="text-xl font-display font-bold uppercase tracking-tighter text-zenith-text-primary italic">Neural Tetris</h1>
+            <h1 className="text-xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary italic">Neural Tetris</h1>
           </div>
-          <p className="text-zenith-text-tertiary text-[8px] uppercase tracking-[0.3em] font-bold opacity-60">Cognitive Processing Grid</p>
+          <p className="text-zenit-text-tertiary text-[8px] uppercase tracking-[0.3em] font-bold opacity-60">Cognitive Processing Grid</p>
         </div>
         <div className="flex items-center space-x-3 bg-black/40 px-5 py-2.5 rounded-2xl border border-white/5 shadow-inner">
-          <Clock size={16} className="text-zenith-accent animate-pulse" />
-          <span className="text-lg font-mono font-bold text-zenith-accent drop-shadow-[0_0_8px_var(--accent-glow)] tracking-tighter">{formatTime(timeLeft)}</span>
+          <Clock size={16} className="text-zenit-accent animate-pulse" />
+          <span className="text-lg font-mono font-bold text-zenit-accent drop-shadow-[0_0_8px_var(--accent-glow)] tracking-tighter">{formatTime(timeLeft)}</span>
         </div>
       </header>
 
@@ -338,39 +338,39 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
           {/* Background Grid Pattern */}
           <div className="absolute inset-0 grid grid-cols-10 gap-[1px] opacity-10 pointer-events-none">
             {[...Array(200)].map((_, i) => (
-              <div key={i} className="border-[0.5px] border-zenith-border-primary/20" />
+              <div key={i} className="border-[0.5px] border-zenit-border-primary/20" />
             ))}
           </div>
 
           {!isPlaying && !gameOver && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/90 backdrop-blur-xl p-8 text-center">
-              <div className="w-20 h-20 rounded-3xl bg-zenith-accent/20 flex items-center justify-center mb-6 relative border border-zenith-accent/30 shadow-[0_0_30px_var(--accent-glow)]">
+              <div className="w-20 h-20 rounded-3xl bg-zenit-accent/20 flex items-center justify-center mb-6 relative border border-zenit-accent/30 shadow-[0_0_30px_var(--accent-glow)]">
                 <motion.div
                   animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 rounded-3xl border border-zenith-accent/40"
+                  className="absolute inset-0 rounded-3xl border border-zenit-accent/40"
                 />
-                <Gamepad2 size={32} className="text-zenith-accent" />
+                <Gamepad2 size={32} className="text-zenit-accent" />
               </div>
-              <h2 className="text-2xl font-display font-bold uppercase tracking-tighter mb-2 text-zenith-text-primary italic">Neural Sync</h2>
-              <p className="text-zenith-text-tertiary text-[9px] uppercase tracking-[0.25em] mb-8 leading-relaxed font-bold opacity-60">
+              <h2 className="text-2xl font-display font-bold uppercase tracking-tighter mb-2 text-zenit-text-primary italic">Neural Sync</h2>
+              <p className="text-zenit-text-tertiary text-[9px] uppercase tracking-[0.25em] mb-8 leading-relaxed font-bold opacity-60">
                 Align the neural blocks to optimize cognitive flow.
               </p>
               
               <div className="grid grid-cols-2 gap-3 mb-8 w-full">
-                <div className="bg-white/5 p-3 rounded-2xl border border-white/10 text-[8px] uppercase tracking-widest text-zenith-text-tertiary font-bold shadow-inner">
-                  <ArrowUp size={12} className="mx-auto mb-2 text-zenith-accent" />
+                <div className="bg-white/5 p-3 rounded-2xl border border-white/10 text-[8px] uppercase tracking-widest text-zenit-text-tertiary font-bold shadow-inner">
+                  <ArrowUp size={12} className="mx-auto mb-2 text-zenit-accent" />
                   Rotate
                 </div>
-                <div className="bg-white/5 p-3 rounded-2xl border border-white/10 text-[8px] uppercase tracking-widest text-zenith-text-tertiary font-bold shadow-inner">
-                  <ArrowDown size={12} className="mx-auto mb-2 text-zenith-accent" />
+                <div className="bg-white/5 p-3 rounded-2xl border border-white/10 text-[8px] uppercase tracking-widest text-zenit-text-tertiary font-bold shadow-inner">
+                  <ArrowDown size={12} className="mx-auto mb-2 text-zenit-accent" />
                   Drop
                 </div>
               </div>
 
               <button
                 onClick={resetGame}
-                className="w-full bg-gradient-to-r from-zenith-accent to-zenith-crimson text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_var(--accent-glow)] hover:scale-105 transition-all active:scale-95"
+                className="w-full bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_var(--accent-glow)] hover:scale-105 transition-all active:scale-95"
               >
                 Initialize Link
               </button>
@@ -379,19 +379,19 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
 
           {gameOver && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/95 backdrop-blur-2xl text-center p-8">
-              <div className="w-20 h-20 rounded-full bg-zenith-accent/20 flex items-center justify-center mb-8 border border-zenith-accent/40 shadow-[0_0_40px_var(--accent-glow)]">
-                <Trophy size={40} className="text-zenith-accent" />
+              <div className="w-20 h-20 rounded-full bg-zenit-accent/20 flex items-center justify-center mb-8 border border-zenit-accent/40 shadow-[0_0_40px_var(--accent-glow)]">
+                <Trophy size={40} className="text-zenit-accent" />
               </div>
-              <h2 className="text-3xl font-display font-bold uppercase tracking-tighter text-zenith-text-primary italic">{t.gym.gameOver}</h2>
+              <h2 className="text-3xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary italic">{t.gym.gameOver}</h2>
               <div className="mt-8 space-y-5 w-full">
                 <div className="bg-white/5 rounded-[1.5rem] p-5 border border-white/10 shadow-inner">
-                  <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.3em] mb-2 font-bold opacity-60">{t.gym.scoreLabel}</p>
-                  <p className="text-4xl font-display font-bold text-zenith-text-primary italic tracking-tighter">{score}</p>
+                  <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] mb-2 font-bold opacity-60">{t.gym.scoreLabel}</p>
+                  <p className="text-4xl font-display font-bold text-zenit-text-primary italic tracking-tighter">{score}</p>
                 </div>
                 <motion.div 
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="flex items-center justify-center space-x-3 text-zenith-accent bg-zenith-accent/10 py-4 rounded-2xl border border-zenith-accent/20 shadow-[0_0_20px_var(--accent-glow)]"
+                  className="flex items-center justify-center space-x-3 text-zenit-accent bg-zenit-accent/10 py-4 rounded-2xl border border-zenit-accent/20 shadow-[0_0_20px_var(--accent-glow)]"
                 >
                   <Sparkles size={16} />
                   <span className="text-[11px] font-bold uppercase tracking-[0.2em]">+{Math.floor(score / 10) + 100} {t.gym.xpReward}</span>
@@ -399,7 +399,7 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
               </div>
               <button
                 onClick={resetGame}
-                className="mt-10 w-full bg-gradient-to-r from-zenith-accent to-zenith-crimson text-white py-5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_var(--accent-glow)] hover:scale-105 transition-all active:scale-95"
+                className="mt-10 w-full bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white py-5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_var(--accent-glow)] hover:scale-105 transition-all active:scale-95"
               >
                 {t.gym.newSession}
               </button>
@@ -431,8 +431,8 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
         {/* Side Info & Controls */}
         <div className="w-full lg:w-48 space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
-            <div className="bg-zenith-surface-1 rounded-3xl p-6 border border-zenith-border-primary text-center space-y-2">
-              <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest font-bold">{t.gym.nextPiece}</p>
+            <div className="bg-zenit-surface-1 rounded-3xl p-6 border border-zenit-border-primary text-center space-y-2">
+              <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest font-bold">{t.gym.nextPiece}</p>
               <div className="aspect-square flex items-center justify-center">
                 {nextPiece && (
                   <div className="grid grid-cols-4 gap-[2px]">
@@ -450,24 +450,24 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
               </div>
             </div>
 
-            <div className="bg-zenith-surface-1 rounded-3xl p-6 border border-zenith-border-primary text-center flex flex-col justify-center">
-              <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest mb-1 font-bold">{t.gym.scoreCurrent}</p>
-              <p className="text-3xl font-display font-bold text-zenith-text-primary italic">{score}</p>
+            <div className="bg-zenit-surface-1 rounded-3xl p-6 border border-zenit-border-primary text-center flex flex-col justify-center">
+              <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest mb-1 font-bold">{t.gym.scoreCurrent}</p>
+              <p className="text-3xl font-display font-bold text-zenit-text-primary italic">{score}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => setIsPlaying(!isPlaying)}
-              className="py-6 rounded-3xl bg-zenith-surface-1 flex items-center justify-center border border-zenith-border-primary hover:bg-zenith-surface-2 transition-all active:scale-95"
+              className="py-6 rounded-3xl bg-zenit-surface-1 flex items-center justify-center border border-zenit-border-primary hover:bg-zenit-surface-2 transition-all active:scale-95"
             >
-              {isPlaying ? <Pause size={24} className="text-zenith-text-tertiary" /> : <Play size={24} className="text-zenith-text-tertiary" />}
+              {isPlaying ? <Pause size={24} className="text-zenit-text-tertiary" /> : <Play size={24} className="text-zenit-text-tertiary" />}
             </button>
             <button 
               onClick={resetGame}
-              className="py-6 rounded-3xl bg-zenith-surface-1 flex items-center justify-center border border-zenith-border-primary hover:bg-zenith-surface-2 transition-all active:scale-95"
+              className="py-6 rounded-3xl bg-zenit-surface-1 flex items-center justify-center border border-zenit-border-primary hover:bg-zenit-surface-2 transition-all active:scale-95"
             >
-              <RotateCcw size={24} className="text-zenith-text-tertiary" />
+              <RotateCcw size={24} className="text-zenit-text-tertiary" />
             </button>
           </div>
 
@@ -476,7 +476,7 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
             <div />
             <button 
               onPointerDown={() => handleManualControl('ArrowUp')}
-              className="w-full aspect-square rounded-2xl bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center text-zenith-text-tertiary active:bg-zenith-surface-2 active:scale-95 transition-all"
+              className="w-full aspect-square rounded-2xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center text-zenit-text-tertiary active:bg-zenit-surface-2 active:scale-95 transition-all"
             >
               <ArrowUp size={24} />
             </button>
@@ -484,19 +484,19 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
             
             <button 
               onPointerDown={() => handleManualControl('ArrowLeft')}
-              className="w-full aspect-square rounded-2xl bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center text-zenith-text-tertiary active:bg-zenith-surface-2 active:scale-95 transition-all"
+              className="w-full aspect-square rounded-2xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center text-zenit-text-tertiary active:bg-zenit-surface-2 active:scale-95 transition-all"
             >
               <ArrowLeft size={24} />
             </button>
             <button 
               onPointerDown={() => handleManualControl('ArrowDown')}
-              className="w-full aspect-square rounded-2xl bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center text-zenith-text-tertiary active:bg-zenith-surface-2 active:scale-95 transition-all"
+              className="w-full aspect-square rounded-2xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center text-zenit-text-tertiary active:bg-zenit-surface-2 active:scale-95 transition-all"
             >
               <ArrowDown size={24} />
             </button>
             <button 
               onPointerDown={() => handleManualControl('ArrowRight')}
-              className="w-full aspect-square rounded-2xl bg-zenith-surface-1 border border-zenith-border-primary flex items-center justify-center text-zenith-text-tertiary active:bg-zenith-surface-2 active:scale-95 transition-all"
+              className="w-full aspect-square rounded-2xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center text-zenit-text-tertiary active:bg-zenit-surface-2 active:scale-95 transition-all"
             >
               <ArrowRight size={24} />
             </button>
@@ -504,7 +504,7 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
             <div />
             <button 
               onPointerDown={() => handleManualControl(' ')}
-              className="w-full aspect-square rounded-2xl bg-zenith-accent/10 border border-zenith-accent/20 flex items-center justify-center text-zenith-accent active:bg-zenith-accent/30 active:scale-95 transition-all"
+              className="w-full aspect-square rounded-2xl bg-zenit-accent/10 border border-zenit-accent/20 flex items-center justify-center text-zenit-accent active:bg-zenit-accent/30 active:scale-95 transition-all"
             >
               <Zap size={24} />
             </button>
@@ -516,12 +516,12 @@ export const TetrisGame: React.FC<{ t: any; onGameOver?: (score: number) => void
       {/* Instructions */}
       <div className="w-full max-w-md space-y-6 relative z-10">
         <div className="premium-card p-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full bg-zenith-accent/30" />
+          <div className="absolute top-0 left-0 w-1 h-full bg-zenit-accent/30" />
           <div className="flex items-center space-x-3 mb-4">
-            <Zap size={18} className="text-zenith-accent" />
-            <p className="text-[12px] text-zenith-text-secondary uppercase tracking-[0.2em] font-bold">{t.gym.tipTitle}</p>
+            <Zap size={18} className="text-zenit-accent" />
+            <p className="text-[12px] text-zenit-text-secondary uppercase tracking-[0.2em] font-bold">{t.gym.tipTitle}</p>
           </div>
-          <p className="text-[12px] text-zenith-text-tertiary uppercase tracking-[0.15em] leading-relaxed italic font-medium">
+          <p className="text-[12px] text-zenit-text-tertiary uppercase tracking-[0.15em] leading-relaxed italic font-medium">
             "{t.gym.tipDesc}"
           </p>
         </div>

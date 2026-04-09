@@ -35,7 +35,7 @@ interface ExercisesProps {
 }
 
 export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
-  const { userData } = useUser();
+  const { user: authUser, userData } = useUser();
   const [activeTab, setActiveTab] = useState<'browse' | 'history'>('browse');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -65,7 +65,8 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
   };
 
   const fetchHistory = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: userDataAuth } = await supabase.auth.getUser();
+    const user = userDataAuth?.user || authUser;
     if (!user) return;
 
     const { data, error } = await supabase
@@ -78,7 +79,8 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
   };
 
   const completeExercise = async (exercise: Exercise) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: userDataAuth } = await supabase.auth.getUser();
+    const user = userDataAuth?.user || authUser;
     if (!user) return;
 
     const { error } = await supabase
@@ -115,21 +117,21 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
     <div className="flex flex-col gap-4 p-4 pb-32 max-w-2xl mx-auto min-h-screen">
       <header className="flex justify-between items-end mb-4">
         <div className="space-y-2">
-          <h2 className="text-3xl font-display font-bold tracking-tighter uppercase text-zenith-text-primary">
-            Bio <span className="text-zenith-scarlet">Hacking</span>
+          <h2 className="text-3xl font-display font-bold tracking-tighter uppercase text-zenit-text-primary">
+            Bio <span className="text-zenit-accent">Hacking</span>
           </h2>
-          <p className="text-zenith-text-secondary text-[10px] font-bold uppercase tracking-[0.3em]">Otimize seu hardware biológico</p>
+          <p className="text-zenit-text-secondary text-[10px] font-bold uppercase tracking-[0.3em]">Otimize seu hardware biológico</p>
         </div>
-        <div className="flex bg-zenith-surface-1 p-1 rounded-xl border border-zenith-border-primary">
+        <div className="flex bg-zenit-surface-1 p-1 rounded-xl border border-zenit-border-primary">
           <button 
             onClick={() => setActiveTab('browse')}
-            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-zenith-scarlet text-white' : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'}`}
+            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-zenit-accent text-white' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
           >
             Explorar
           </button>
           <button 
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-zenith-scarlet text-white' : 'text-zenith-text-tertiary hover:text-zenith-text-secondary'}`}
+            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-zenit-accent text-white' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
           >
             Histórico
           </button>
@@ -153,8 +155,8 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                   onClick={() => setActiveCategory(cat.id)}
                   className={`flex items-center space-x-2 px-5 py-3 rounded-2xl border whitespace-nowrap transition-all ${
                     activeCategory === cat.id 
-                      ? 'bg-zenith-scarlet text-white border-zenith-scarlet shadow-[0_0_20px_rgba(255,38,33,0.3)]' 
-                      : 'bg-zenith-surface-1 border-zenith-border-primary text-zenith-text-tertiary hover:bg-zenith-surface-2'
+                      ? 'bg-zenit-accent text-white border-zenit-accent shadow-[0_0_20px_rgba(255,38,33,0.3)]' 
+                      : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-2'
                   }`}
                 >
                   {cat.icon}
@@ -166,7 +168,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
             {/* Exercise Grid */}
             {loading ? (
               <div className="flex justify-center py-20">
-                <div className="w-8 h-8 border-2 border-zenith-scarlet border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-zenit-accent border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6">
@@ -177,7 +179,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                       key={ex.id}
                       layoutId={`ex-${ex.id}`}
                       onClick={() => !isLocked && setSelectedExercise(ex)}
-                      className={`glass-card group cursor-pointer overflow-hidden border-zenith-border-secondary bg-zenith-surface-1 hover:bg-zenith-surface-2 transition-all relative ${isLocked ? 'opacity-60 grayscale' : ''}`}
+                      className={`glass-card group cursor-pointer overflow-hidden border-zenit-border-secondary bg-zenit-surface-1 hover:bg-zenit-surface-2 transition-all relative ${isLocked ? 'opacity-60 grayscale' : ''}`}
                     >
                       <div className="aspect-video relative overflow-hidden">
                         <img 
@@ -189,7 +191,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                         
                         {isLocked && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-                            <div className="bg-zenith-scarlet/20 border border-zenith-scarlet/40 p-4 rounded-3xl text-zenith-scarlet">
+                            <div className="bg-zenit-accent/20 border border-zenit-accent/40 p-4 rounded-3xl text-zenit-accent">
                               <Lock size={32} />
                             </div>
                           </div>
@@ -197,33 +199,33 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
 
                         <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
                           <div className="space-y-2">
-                            <div className="flex items-center space-x-2 text-zenith-scarlet">
+                            <div className="flex items-center space-x-2 text-zenit-accent">
                               <span className="text-[9px] font-bold uppercase tracking-[0.3em]">{ex.category}</span>
                             </div>
                             <h3 className="text-xl font-bold text-white tracking-tight leading-tight">{ex.title}</h3>
                           </div>
                           {!isLocked && (
-                            <div className="bg-zenith-scarlet p-3 rounded-2xl shadow-lg">
+                            <div className="bg-zenit-accent p-3 rounded-2xl shadow-lg">
                               <Play size={20} className="text-white" fill="currentColor" />
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="p-6 flex items-center justify-between bg-zenith-surface-1 border-t border-zenith-border-primary/50">
+                      <div className="p-6 flex items-center justify-between bg-zenit-surface-1 border-t border-zenit-border-primary/50">
                         <div className="flex items-center space-x-6">
-                          <div className="flex items-center space-x-2 text-zenith-text-secondary">
-                            <Clock size={14} className="text-zenith-scarlet" />
+                          <div className="flex items-center space-x-2 text-zenit-text-secondary">
+                            <Clock size={14} className="text-zenit-accent" />
                             <span className="text-[10px] font-bold uppercase tracking-widest">{ex.duration}</span>
                           </div>
-                          <div className="flex items-center space-x-2 text-zenith-text-secondary">
-                            <Award size={14} className="text-zenith-scarlet" />
+                          <div className="flex items-center space-x-2 text-zenit-text-secondary">
+                            <Award size={14} className="text-zenit-accent" />
                             <span className="text-[10px] font-bold uppercase tracking-widest">{ex.difficulty}</span>
                           </div>
                         </div>
                         {isLocked ? (
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-zenith-scarlet">Elite Only</span>
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-zenit-accent">Elite Only</span>
                         ) : (
-                          <div className="flex items-center space-x-1 text-zenith-scarlet">
+                          <div className="flex items-center space-x-1 text-zenit-accent">
                             <Zap size={12} />
                             <span className="text-[10px] font-bold uppercase tracking-widest">+{ex.xp_reward || 50} XP</span>
                           </div>
@@ -244,20 +246,20 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
             className="space-y-6"
           >
             {history.length > 0 ? history.map((item) => (
-              <div key={item.id} className="glass-card p-6 border-zenith-border-secondary bg-zenith-surface-1 flex items-center justify-between">
+              <div key={item.id} className="glass-card p-6 border-zenit-border-secondary bg-zenit-surface-1 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-xl bg-zenith-scarlet/10 flex items-center justify-center text-zenith-scarlet">
+                  <div className="w-12 h-12 rounded-xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent">
                     <CheckCircle2 size={24} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-zenith-text-primary">{item.exercises?.title || 'Exercício Concluído'}</h4>
-                    <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-widest">
+                    <h4 className="text-sm font-bold text-zenit-text-primary">{item.exercises?.title || 'Exercício Concluído'}</h4>
+                    <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest">
                       {new Date(item.completed_at).toLocaleDateString()} às {new Date(item.completed_at).toLocaleTimeString()}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-zenith-scarlet uppercase tracking-widest">+{item.exercises?.xp_reward || 50} XP</span>
+                  <span className="text-[10px] font-bold text-zenit-accent uppercase tracking-widest">+{item.exercises?.xp_reward || 50} XP</span>
                 </div>
               </div>
             )) : (
@@ -288,9 +290,9 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="bg-zenith-surface-1 w-full max-w-lg rounded-t-[2.5rem] border-t border-zenith-border-primary flex flex-col max-h-[95vh] shadow-2xl z-10 overflow-hidden"
+              className="bg-zenit-surface-1 w-full max-w-lg rounded-t-[2.5rem] border-t border-zenit-border-primary flex flex-col max-h-[95vh] shadow-2xl z-10 overflow-hidden"
             >
-              <div className="w-12 h-1.5 bg-zenith-border-primary rounded-full mx-auto my-3 opacity-50" />
+              <div className="w-12 h-1.5 bg-zenit-border-primary rounded-full mx-auto my-3 opacity-50" />
               
               <div className="relative aspect-video bg-black">
                 <iframe 
@@ -301,7 +303,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                 />
                 <button 
                   onClick={() => setSelectedExercise(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-zenith-border-primary flex items-center justify-center text-white z-10 hover:bg-zenith-scarlet transition-colors"
+                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-zenit-border-primary flex items-center justify-center text-white z-10 hover:bg-zenit-accent transition-colors"
                 >
                   <X size={20} />
                 </button>
@@ -309,20 +311,20 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
 
               <div className="p-8 space-y-8 overflow-y-auto scrollbar-hide">
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2 text-zenith-scarlet">
+                  <div className="flex items-center space-x-2 text-zenit-accent">
                     <span className="text-[10px] font-bold uppercase tracking-[0.4em]">{selectedExercise.category}</span>
                   </div>
-                  <h3 className="text-3xl font-display font-bold text-zenith-text-primary tracking-tighter uppercase leading-none">{selectedExercise.title}</h3>
+                  <h3 className="text-3xl font-display font-bold text-zenit-text-primary tracking-tighter uppercase leading-none">{selectedExercise.title}</h3>
                   <div className="flex items-center space-x-6 pt-2">
-                    <div className="flex items-center space-x-2 text-zenith-text-secondary">
-                      <Clock size={16} className="text-zenith-scarlet" />
+                    <div className="flex items-center space-x-2 text-zenit-text-secondary">
+                      <Clock size={16} className="text-zenit-accent" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">{selectedExercise.duration}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-zenith-text-secondary">
-                      <Award size={16} className="text-zenith-scarlet" />
+                    <div className="flex items-center space-x-2 text-zenit-text-secondary">
+                      <Award size={16} className="text-zenit-accent" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">{selectedExercise.difficulty}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-zenith-scarlet">
+                    <div className="flex items-center space-x-2 text-zenit-accent">
                       <Zap size={16} />
                       <span className="text-[10px] font-bold uppercase tracking-widest">+{selectedExercise.xp_reward || 50} XP</span>
                     </div>
@@ -330,14 +332,14 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                 </div>
 
                 <div className="space-y-3">
-                  <h4 className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-[0.4em]">Protocolo de Execução</h4>
-                  <p className="text-sm text-zenith-text-secondary leading-relaxed font-light">{selectedExercise.description}</p>
+                  <h4 className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em]">Protocolo de Execução</h4>
+                  <p className="text-sm text-zenit-text-secondary leading-relaxed font-light">{selectedExercise.description}</p>
                 </div>
 
                 <div className="flex space-x-4 pt-4">
                   <button 
                     onClick={() => completeExercise(selectedExercise)}
-                    className="flex-1 bg-zenith-scarlet text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(255,38,33,0.3)] hover:shadow-[0_0_50px_rgba(255,38,33,0.5)] transition-all flex items-center justify-center space-x-3"
+                    className="flex-1 bg-zenit-accent text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(255,38,33,0.3)] hover:shadow-[0_0_50px_rgba(255,38,33,0.5)] transition-all flex items-center justify-center space-x-3"
                   >
                     <CheckCircle2 size={16} />
                     <span>Concluir Treino</span>

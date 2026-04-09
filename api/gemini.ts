@@ -1,5 +1,5 @@
 import express from 'express';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,12 +11,12 @@ const getAI = () => {
   if (!apiKey) {
     return null;
   }
-  return new GoogleGenAI({ apiKey });
+  return new GoogleGenerativeAI(apiKey);
 };
 
 router.post('/', async (req, res) => {
   try {
-    const { prompt, systemInstruction, model: modelName = 'gemini-3-flash-preview', history = [] } = req.body;
+    const { prompt, systemInstruction, model: modelName = 'gemini-3-flash-preview', history = [], responseMimeType, responseSchema } = req.body;
 
     const ai = getAI();
     if (!ai) {
@@ -27,17 +27,21 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const model = ai.models.generateContent({
+    const model = ai.getGenerativeModel({ 
       model: modelName,
-      contents: prompt,
-      config: {
-        systemInstruction,
+      systemInstruction: systemInstruction as any
+    });
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
         temperature: 0.7,
+        responseMimeType,
+        responseSchema
       }
     });
 
-    const result = await model;
-    res.json({ text: result.text });
+    res.json({ text: result.response.text() });
   } catch (error: any) {
     console.error('Gemini API Error:', error);
     res.status(500).json({ 

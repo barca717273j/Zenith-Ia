@@ -30,10 +30,10 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
       name: t.subscription.pro.name,
       price: t.subscription.pro.price,
       features: t.subscription.pro.features,
-      icon: <Shield className="text-zenith-accent" />,
-      color: 'border-zenith-accent/30',
-      bg: 'bg-zenith-accent/5',
-      button: 'bg-zenith-accent text-white shadow-lg shadow-zenith-accent/20',
+      icon: <Shield className="text-zenit-accent" />,
+      color: 'border-zenit-accent/30',
+      bg: 'bg-zenit-accent/5',
+      button: 'bg-zenit-accent text-white shadow-lg shadow-zenit-accent/20',
       popular: true
     },
     {
@@ -41,10 +41,10 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
       name: t.subscription.elite.name,
       price: t.subscription.elite.price,
       features: t.subscription.elite.features,
-      icon: <Crown className="text-zenith-crimson" />,
-      color: 'border-zenith-crimson/30',
-      bg: 'bg-zenith-crimson/5',
-      button: 'bg-zenith-crimson text-white shadow-lg shadow-zenith-crimson/20',
+      icon: <Crown className="text-zenit-crimson" />,
+      color: 'border-zenit-crimson/30',
+      bg: 'bg-zenit-crimson/5',
+      button: 'bg-zenit-crimson text-white shadow-lg shadow-zenit-crimson/20',
       popular: false
     },
     {
@@ -93,15 +93,15 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
   return (
     <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto relative">
       {/* Background Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenith-accent/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
       <header className="text-center space-y-4 relative z-10">
-        <div className="inline-flex items-center space-x-2 bg-zenith-accent/10 px-4 py-2 rounded-full border border-zenith-accent/20 mb-4">
-          <Sparkles size={14} className="text-zenith-accent" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zenith-accent">Premium Access</span>
+        <div className="inline-flex items-center space-x-2 bg-zenit-accent/10 px-4 py-2 rounded-full border border-zenit-accent/20 mb-4">
+          <Sparkles size={14} className="text-zenit-accent" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zenit-accent">Premium Access</span>
         </div>
-        <h2 className="text-4xl font-display font-bold tracking-tighter uppercase text-zenith-text-primary italic">{t.subscription.title}</h2>
-        <p className="text-zenith-text-tertiary text-xs font-bold uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+        <h2 className="text-4xl font-display font-bold tracking-tighter uppercase text-zenit-text-primary italic">{t.subscription.title}</h2>
+        <p className="text-zenit-text-tertiary text-xs font-bold uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
           {t.subscription.choosePlan}
         </p>
       </header>
@@ -114,7 +114,7 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
             className={`flex-shrink-0 w-[300px] snap-center premium-card p-8 border ${plan.color} ${plan.bg} relative overflow-hidden group`}
           >
             {plan.popular && (
-              <div className="absolute top-0 right-0 bg-zenith-accent text-white text-[8px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-widest">
+              <div className="absolute top-0 right-0 bg-zenit-accent text-white text-[8px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-widest">
                 {t.common.mostPopular}
               </div>
             )}
@@ -122,23 +122,23 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
             <div className="flex justify-between items-start mb-8">
               <div className="space-y-2">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-xl bg-zenith-surface-1 border border-zenith-border-primary">
+                  <div className="p-2 rounded-xl bg-zenit-surface-1 border border-zenit-border-primary">
                     {plan.icon}
                   </div>
-                  <h3 className="text-2xl font-display font-bold text-zenith-text-primary tracking-tighter uppercase italic">{plan.name}</h3>
+                  <h3 className="text-2xl font-display font-bold text-zenit-text-primary tracking-tighter uppercase italic">{plan.name}</h3>
                 </div>
                 <div className="flex items-baseline space-x-1">
-                  <span className="text-3xl font-bold text-zenith-text-primary">{plan.price}</span>
-                  {plan.id !== 'basic' && <span className="text-[10px] text-zenith-text-tertiary font-bold uppercase tracking-widest">{plan.id === 'master' ? '/yr' : '/mo'}</span>}
+                  <span className="text-3xl font-bold text-zenit-text-primary">{plan.price}</span>
+                  {plan.id !== 'basic' && <span className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-widest">{plan.id === 'master' ? '/yr' : '/mo'}</span>}
                 </div>
               </div>
             </div>
 
             <ul className="space-y-4 mb-10">
               {plan.features.map((feature: string, i: number) => (
-                <li key={i} className="flex items-center space-x-3 text-zenith-text-secondary group-hover:text-zenith-text-primary transition-colors">
-                  <div className="w-5 h-5 rounded-full bg-zenith-surface-1 flex items-center justify-center flex-shrink-0">
-                    <Check size={12} className={plan.id !== 'basic' ? 'text-zenith-accent' : 'text-zenith-text-tertiary/20'} />
+                <li key={i} className="flex items-center space-x-3 text-zenit-text-secondary group-hover:text-zenit-text-primary transition-colors">
+                  <div className="w-5 h-5 rounded-full bg-zenit-surface-1 flex items-center justify-center flex-shrink-0">
+                    <Check size={12} className={plan.id !== 'basic' ? 'text-zenit-accent' : 'text-zenit-text-tertiary/20'} />
                   </div>
                   <span className="text-xs font-medium tracking-tight">{feature}</span>
                 </li>

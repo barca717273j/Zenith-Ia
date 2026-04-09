@@ -88,14 +88,14 @@ export const Stats: React.FC = () => {
   if (!hasAccess) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6 min-h-[400px]">
-        <div className="w-20 h-20 bg-zenith-electric-blue/10 rounded-full flex items-center justify-center">
-          <Lock className="text-zenith-electric-blue" size={40} />
+        <div className="w-20 h-20 bg-zenit-accent/10 rounded-full flex items-center justify-center">
+          <Lock className="text-zenit-accent" size={40} />
         </div>
         <h2 className="text-2xl font-bold text-white">Advanced Analytics is Premium</h2>
         <p className="text-white/60 max-w-md">
           Upgrade your plan to unlock deep insights into your productivity patterns, habit consistency, and long-term progress tracking.
         </p>
-        <button className="px-8 py-3 bg-zenith-electric-blue text-white rounded-xl font-bold hover:bg-opacity-80 transition-all">
+        <button className="px-8 py-3 bg-zenit-accent text-white rounded-xl font-bold hover:bg-opacity-80 transition-all">
           Upgrade Now
         </button>
       </div>
@@ -121,7 +121,7 @@ export const Stats: React.FC = () => {
         <div className="glass-card p-4 h-64 w-full border-white/5 bg-white/[0.01]">
           {loading ? (
             <div className="h-full flex items-center justify-center">
-              <div className="w-6 h-6 border-2 border-zenith-scarlet border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-zenit-accent border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

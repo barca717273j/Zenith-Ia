@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Brain, Target, Zap, Loader2, Sparkles, History, Trash2, CheckCircle2, AlertTriangle, Scale, ChevronRight, Activity, Dumbbell, Wallet, Shield, ArrowUpRight } from 'lucide-react';
+import { Brain, Target, Zap, Loader2, Sparkles, History, Trash2, CheckCircle2, AlertTriangle, Scale, ChevronRight, Activity, Dumbbell, Wallet, Shield, ArrowUpRight, Crown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 import { askAI } from '../services/gemini';
@@ -183,18 +183,18 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
       label: axisT.areas.mind, 
       progress: areaProgress.mind, 
       icon: <Brain size={20} />, 
-      color: 'text-zenith-cyan', 
-      bg: 'bg-zenith-cyan/10',
-      border: 'border-zenith-cyan/20'
+      color: 'text-zenit-cyan', 
+      bg: 'bg-zenit-cyan/10',
+      border: 'border-zenit-cyan/20'
     },
     { 
       id: 'discipline', 
       label: axisT.areas.discipline, 
       progress: dailyProgress, 
       icon: <Shield size={20} />, 
-      color: 'text-zenith-scarlet', 
-      bg: 'bg-zenith-scarlet/10',
-      border: 'border-zenith-scarlet/20'
+      color: 'text-zenit-scarlet', 
+      bg: 'bg-zenit-scarlet/10',
+      border: 'border-zenit-scarlet/20'
     },
     { 
       id: 'financial', 
@@ -232,27 +232,31 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
   }, [areas, overallProgress, axisT.quotes]);
 
   return (
-    <div className="p-6 space-y-8 pb-32 max-w-2xl mx-auto min-h-screen bg-zenith-black text-zenith-text-primary">
-      <header className="space-y-2">
+    <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto min-h-screen bg-zenit-black text-zenit-text-primary relative overflow-hidden">
+      {/* Living Background Elements */}
+      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
+
+      <header className="space-y-4 relative z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-zenith-scarlet/10 flex items-center justify-center border border-zenith-scarlet/20">
-              <Scale size={20} className="text-zenith-scarlet" />
+          <div className="flex items-center space-x-5">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-zenit-accent to-zenit-crimson flex items-center justify-center">
+              <Scale size={28} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold font-display tracking-tight uppercase leading-none text-zenith-text-primary">{axisT.title}</h1>
-              <p className="text-[10px] font-bold text-zenith-text-tertiary uppercase tracking-widest">{axisT.subtitle}</p>
+              <h1 className="text-4xl font-bold font-display tracking-tighter uppercase italic leading-none text-zenit-text-primary">Axis <span className="text-zenit-accent">Neural</span></h1>
+              <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-[0.4em] mt-2">{axisT.subtitle}</p>
             </div>
           </div>
           <button 
             onClick={() => setShowDecisionEngine(!showDecisionEngine)}
-            className={`p-2 rounded-xl border transition-all ${
+            className={`w-14 h-14 rounded-2xl transition-all flex items-center justify-center group ${
               showDecisionEngine 
-                ? 'bg-zenith-scarlet text-white border-zenith-scarlet shadow-[0_0_15px_rgba(255,36,0,0.3)]' 
-                : 'bg-zenith-surface-1 border-zenith-border-primary text-zenith-text-tertiary hover:text-zenith-text-primary'
+                ? 'bg-zenit-accent text-white' 
+                : 'bg-zenit-surface-1 text-zenit-text-tertiary hover:text-zenit-text-primary'
             }`}
           >
-            <Brain size={20} />
+            <Brain size={24} className={`transition-transform duration-500 ${showDecisionEngine ? 'scale-110 rotate-12' : 'group-hover:scale-110'}`} />
           </button>
         </div>
       </header>
@@ -266,10 +270,13 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-8"
           >
-            <div className="flex items-center justify-between px-1">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-zenith-text-tertiary">{axisT.decisionEngine}</h3>
-              <button onClick={() => setShowHistory(!showHistory)} className="text-[10px] font-bold uppercase tracking-widest text-zenith-scarlet flex items-center space-x-1">
-                <History size={12} />
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center space-x-3">
+                <div className="w-1.5 h-5 bg-zenit-accent rounded-full" />
+                <h3 className="text-xs font-bold uppercase tracking-[0.4em] text-zenit-text-primary italic">{axisT.decisionEngine}</h3>
+              </div>
+              <button onClick={() => setShowHistory(!showHistory)} className="text-[10px] font-bold uppercase tracking-[0.3em] text-zenit-accent hover:text-zenit-crimson transition-colors flex items-center space-x-2">
+                <History size={14} />
                 <span>{axisT.history}</span>
               </button>
             </div>
@@ -277,36 +284,37 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
             {showHistory ? (
               <div className="space-y-4">
                 {history.length === 0 ? (
-                  <div className="glass-card p-12 text-center space-y-4 border-zenith-border-primary bg-zenith-surface-1">
-                    <div className="w-12 h-12 rounded-full bg-zenith-surface-2 flex items-center justify-center mx-auto">
-                      <History size={20} className="text-zenith-text-tertiary" />
+                  <div className="p-16 rounded-[3rem] text-center space-y-6 bg-zenit-surface-1/40 backdrop-blur-xl">
+                    <div className="w-20 h-20 rounded-full bg-zenit-surface-2 flex items-center justify-center mx-auto">
+                      <History size={32} className="text-zenit-text-tertiary opacity-30" />
                     </div>
-                    <p className="text-xs text-zenith-text-tertiary uppercase tracking-widest font-bold">{axisT.noHistory}</p>
+                    <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-bold">{axisT.noHistory}</p>
                   </div>
                 ) : (
                   history.map((item) => (
-                    <div key={item.id} className="glass-card p-4 border-zenith-border-primary bg-zenith-surface-1 group">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <p className="text-sm font-bold text-zenith-text-primary">{item.title}</p>
-                          <p className="text-[10px] text-zenith-text-tertiary uppercase font-bold">{new Date(item.created_at).toLocaleDateString()}</p>
+                    <div key={item.id} className="group relative p-6 rounded-[2rem] bg-zenit-surface-1 transition-all overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-zenit-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="flex justify-between items-center relative z-10">
+                        <div className="space-y-2">
+                          <p className="text-sm font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors">{item.title}</p>
+                          <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold opacity-60">{new Date(item.created_at).toLocaleDateString()}</p>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                           <button 
                             onClick={() => {
                               setResult(item.analysis);
                               setQuery(item.title);
                               setShowHistory(false);
                             }}
-                            className="p-2 rounded-lg bg-zenith-surface-2 text-zenith-text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="w-10 h-10 rounded-xl bg-zenit-surface-2 text-zenit-text-primary flex items-center justify-center hover:bg-zenit-accent hover:text-white transition-all"
                           >
-                            <ChevronRight size={14} />
+                            <ChevronRight size={18} />
                           </button>
                           <button 
                             onClick={() => deleteDecision(item.id)}
-                            className="p-2 rounded-lg bg-zenith-scarlet/10 text-zenith-scarlet opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="w-10 h-10 rounded-xl bg-zenit-accent/10 text-zenit-accent flex items-center justify-center hover:bg-zenit-accent hover:text-white transition-all"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={18} />
                           </button>
                         </div>
                       </div>
@@ -315,34 +323,35 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                 )}
               </div>
             ) : (
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <div className="relative">
+              <div className="space-y-10">
+                <div className="space-y-6">
+                  <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-zenit-accent/20 to-zenit-crimson/20 rounded-[2.5rem] blur opacity-0 group-focus-within:opacity-100 transition duration-1000" />
                     <textarea
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder={axisT.placeholder}
-                      className="w-full h-32 bg-zenith-surface-1 border border-zenith-border-primary rounded-2xl p-4 text-sm text-zenith-text-primary placeholder:text-zenith-text-tertiary focus:outline-none focus:border-zenith-scarlet/50 transition-all resize-none shadow-sm"
+                      className="relative w-full h-40 bg-zenit-surface-1/80 backdrop-blur-xl rounded-[2rem] p-6 text-sm text-zenit-text-primary placeholder:text-zenit-text-tertiary focus:outline-none focus:border-zenit-accent/50 transition-all resize-none"
                     />
-                    <div className="absolute bottom-4 right-4 flex items-center space-x-2">
-                      <span className="text-[8px] font-bold text-zenith-text-tertiary uppercase tracking-widest">{t.common.neuralLinkActive}</span>
-                      <div className="w-1.5 h-1.5 bg-zenith-cyan rounded-full animate-pulse" />
+                    <div className="absolute bottom-6 right-6 flex items-center space-x-3">
+                      <span className="text-[9px] font-bold text-zenit-text-tertiary uppercase tracking-[0.3em] opacity-60">{t.common.neuralLinkActive}</span>
+                      <div className="w-2 h-2 bg-zenit-cyan rounded-full animate-pulse" />
                     </div>
                   </div>
 
                   <button
                     onClick={handleAnalyze}
                     disabled={!query.trim() || isAnalyzing}
-                    className="w-full py-4 bg-zenith-scarlet text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-xs flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zenith-crimson transition-all shadow-[0_0_20px_rgba(255,36,0,0.2)]"
+                    className="w-full py-5 bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white rounded-full font-bold uppercase tracking-[0.4em] text-xs flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all"
                   >
                     {isAnalyzing ? (
                       <>
-                        <Loader2 size={16} className="animate-spin" />
+                        <Loader2 size={18} className="animate-spin" />
                         <span>{axisT.analyzing}</span>
                       </>
                     ) : (
                       <>
-                        <Brain size={16} />
+                        <Brain size={18} />
                         <span>{axisT.analyze}</span>
                       </>
                     )}
@@ -351,17 +360,17 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
 
                 {result && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="space-y-6"
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    className="space-y-10"
                   >
                     <div className="flex justify-center">
-                      <div className={`px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest flex items-center space-x-2 ${
-                        result.riskLevel === 'Low' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                        result.riskLevel === 'Medium' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' :
-                        'bg-zenith-scarlet/10 border-zenith-scarlet/20 text-zenith-scarlet'
+                      <div className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-[0.3em] flex items-center space-x-3 ${
+                        result.riskLevel === 'Low' ? 'bg-emerald-500/10 text-emerald-500' :
+                        result.riskLevel === 'Medium' ? 'bg-amber-500/10 text-amber-500' :
+                        'bg-zenit-accent/10 text-zenit-accent'
                       }`}>
-                        <AlertTriangle size={12} />
+                        <AlertTriangle size={14} />
                         <span>{axisT.riskLevel}: {
                           result.riskLevel === 'Low' ? axisT.low :
                           result.riskLevel === 'Medium' ? axisT.medium :
@@ -370,31 +379,37 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="glass-card p-5 border-emerald-500/10 bg-emerald-500/[0.02] space-y-4">
-                        <div className="flex items-center space-x-2 text-emerald-500">
-                          <CheckCircle2 size={14} />
-                          <h3 className="text-[10px] font-bold uppercase tracking-widest">{axisT.pros}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="relative p-8 rounded-[2.5rem] bg-emerald-500/[0.02] space-y-6 overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5">
+                          <CheckCircle2 size={60} className="text-emerald-500" />
                         </div>
-                        <ul className="space-y-2">
+                        <div className="flex items-center space-x-3 text-emerald-500 relative z-10">
+                          <CheckCircle2 size={18} />
+                          <h3 className="text-xs font-bold uppercase tracking-[0.3em] italic">{axisT.pros}</h3>
+                        </div>
+                        <ul className="space-y-4 relative z-10">
                           {result.pros.map((pro: string, i: number) => (
-                            <li key={i} className="text-xs text-zenith-text-secondary flex items-start space-x-2">
-                              <span className="w-1 h-1 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                            <li key={i} className="text-xs text-zenit-text-secondary flex items-start space-x-3 leading-relaxed">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
                               <span>{pro}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
 
-                      <div className="glass-card p-5 border-zenith-scarlet/10 bg-zenith-scarlet/[0.02] space-y-4">
-                        <div className="flex items-center space-x-2 text-zenith-scarlet">
-                          <AlertTriangle size={14} />
-                          <h3 className="text-[10px] font-bold uppercase tracking-widest">{axisT.cons}</h3>
+                      <div className="relative p-8 rounded-[2.5rem] bg-zenit-accent/[0.02] space-y-6 overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5">
+                          <AlertTriangle size={60} className="text-zenit-accent" />
                         </div>
-                        <ul className="space-y-2">
+                        <div className="flex items-center space-x-3 text-zenit-accent relative z-10">
+                          <AlertTriangle size={18} />
+                          <h3 className="text-xs font-bold uppercase tracking-[0.3em] italic">{axisT.cons}</h3>
+                        </div>
+                        <ul className="space-y-4 relative z-10">
                           {result.cons.map((con: string, i: number) => (
-                            <li key={i} className="text-xs text-zenith-text-secondary flex items-start space-x-2">
-                              <span className="w-1 h-1 rounded-full bg-zenith-scarlet mt-1.5 shrink-0" />
+                            <li key={i} className="text-xs text-zenit-text-secondary flex items-start space-x-3 leading-relaxed">
+                              <span className="w-1.5 h-1.5 rounded-full bg-zenit-accent mt-1.5 shrink-0" />
                               <span>{con}</span>
                             </li>
                           ))}
@@ -402,35 +417,39 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="glass-card p-6 border-zenith-border-primary bg-zenith-surface-1 space-y-4">
-                        <div className="flex items-center space-x-2 text-zenith-cyan">
-                          <Target size={14} />
-                          <h3 className="text-[10px] font-bold uppercase tracking-widest">{axisT.impact}</h3>
+                    <div className="space-y-6">
+                      <div className="p-8 rounded-[2.5rem] bg-zenit-surface-1 space-y-6 group transition-colors">
+                        <div className="flex items-center space-x-3 text-zenit-cyan">
+                          <Target size={18} />
+                          <h3 className="text-xs font-bold uppercase tracking-[0.3em] italic">{axisT.impact}</h3>
                         </div>
-                        <p className="text-xs text-zenith-text-secondary leading-relaxed">{result.longTermImpact}</p>
+                        <p className="text-sm text-zenit-text-secondary leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">{result.longTermImpact}</p>
                       </div>
 
-                      <div className="glass-card p-6 border-zenith-border-primary bg-zenith-surface-1 space-y-4">
-                        <div className="flex items-center space-x-2 text-amber-500">
-                          <Zap size={14} />
-                          <h3 className="text-[10px] font-bold uppercase tracking-widest">{axisT.alignment}</h3>
+                      <div className="p-8 rounded-[2.5rem] bg-zenit-surface-1 space-y-6 group transition-colors">
+                        <div className="flex items-center space-x-3 text-amber-500">
+                          <Zap size={18} />
+                          <h3 className="text-xs font-bold uppercase tracking-[0.3em] italic">{axisT.alignment}</h3>
                         </div>
-                        <p className="text-xs text-zenith-text-secondary leading-relaxed">{result.goalAlignment}</p>
+                        <p className="text-sm text-zenit-text-secondary leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">{result.goalAlignment}</p>
                       </div>
 
-                      <div className="glass-card p-8 border-zenith-scarlet/20 bg-gradient-to-br from-zenith-scarlet/5 to-transparent relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                          <Brain size={40} className="text-zenith-scarlet" />
+                      <div className="relative p-10 rounded-[3rem] bg-gradient-to-br from-zenit-accent/10 via-zenit-crimson/5 to-transparent overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-700">
+                          <Brain size={120} className="text-zenit-accent" />
                         </div>
-                        <div className="space-y-4 relative z-10">
-                          <div className="flex items-center space-x-2 text-zenith-scarlet">
-                            <Sparkles size={14} />
-                            <h3 className="text-[10px] font-bold uppercase tracking-widest">{axisT.insight}</h3>
+                        <div className="space-y-6 relative z-10">
+                          <div className="flex items-center space-x-3 text-zenit-accent">
+                            <Sparkles size={20} className="animate-pulse" />
+                            <h3 className="text-xs font-bold uppercase tracking-[0.4em] italic">{axisT.insight}</h3>
                           </div>
-                          <p className="text-sm text-zenith-text-primary font-medium italic leading-relaxed">
+                          <p className="text-lg text-zenit-text-primary font-medium italic leading-relaxed tracking-tight">
                             "{result.neuralInsight}"
                           </p>
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-[1px] bg-zenit-accent/40" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-zenit-text-tertiary">Neural Core Analysis</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -448,68 +467,78 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
             className="space-y-8"
           >
             {/* Overall Progress */}
-            <section className="glass-card p-8 border-zenith-border-primary bg-zenith-surface-1 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-6 opacity-5">
-                <Activity size={120} className="text-zenith-scarlet" />
+            <section className="relative p-10 rounded-[3rem] bg-zenit-surface-1/40 backdrop-blur-xl overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-700">
+                <Activity size={160} className="text-zenit-accent" />
               </div>
               
-              <div className="space-y-6 relative z-10">
+              <div className="space-y-8 relative z-10">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h2 className="text-3xl font-display font-bold text-zenith-text-primary uppercase tracking-tight">{overallProgress}%</h2>
-                    <p className="text-[10px] font-bold text-zenith-text-tertiary uppercase tracking-[0.2em]">{axisT.overallProgress}</p>
+                  <div className="space-y-2">
+                    <h2 className="text-6xl font-display font-bold text-zenit-text-primary uppercase tracking-tighter italic leading-none">{overallProgress}%</h2>
+                    <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-[0.5em] mt-2">{axisT.overallProgress}</p>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl bg-zenith-scarlet/10 flex items-center justify-center border border-zenith-scarlet/20">
-                    <Target size={24} className="text-zenith-scarlet" />
+                  <div className="w-16 h-16 rounded-[2rem] bg-zenit-accent/10 flex items-center justify-center">
+                    <Target size={32} className="text-zenit-accent" />
                   </div>
                 </div>
 
-                <div className="h-2 bg-zenith-surface-2 rounded-full overflow-hidden">
+                <div className="relative h-3 bg-zenit-surface-2 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${overallProgress}%` }}
-                    className="h-full bg-zenith-scarlet shadow-[0_0_15px_rgba(255,36,0,0.4)]"
+                    className="h-full bg-gradient-to-r from-zenit-accent/40 to-zenit-accent"
+                    transition={{ duration: 1.5, ease: "easeOut" }}
                   />
                 </div>
 
-                <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-zenith-text-tertiary">
-                  <span>{axisT.evolutionLevel} 04</span>
+                <div className="flex justify-between text-[9px] font-bold uppercase tracking-[0.3em] text-zenit-text-tertiary opacity-60">
+                  <span className="flex items-center space-x-2">
+                    <Crown size={10} className="text-zenit-accent" />
+                    <span>Evolution Level 04</span>
+                  </span>
                   <span>{axisT.nextMilestone}: 85%</span>
                 </div>
               </div>
             </section>
 
             {/* Life Areas Grid */}
-            <section className="space-y-4">
-              <div className="flex items-center justify-between px-1">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-zenith-text-tertiary">{axisT.lifeAreas}</h3>
-                <Sparkles size={12} className="text-zenith-scarlet" />
+            <section className="space-y-6">
+              <div className="flex items-center justify-between px-2">
+                <div className="flex items-center space-x-3">
+                  <div className="w-1.5 h-5 bg-zenit-accent rounded-full" />
+                  <h3 className="text-xs font-bold uppercase tracking-[0.4em] text-zenit-text-primary italic">{axisT.lifeAreas}</h3>
+                </div>
+                <Sparkles size={14} className="text-zenit-accent animate-pulse" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 {areas.map((area) => (
                   <motion.div
                     key={area.id}
-                    whileHover={{ y: -4 }}
-                    className="glass-card p-5 border-zenith-border-primary bg-zenith-surface-1 space-y-4 group"
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    className="relative group p-8 rounded-[2.5rem] bg-zenit-surface-1 transition-all overflow-hidden"
                   >
-                    <div className="flex justify-between items-start">
-                      <div className={`w-10 h-10 rounded-xl ${area.bg} ${area.border} flex items-center justify-center ${area.color} transition-all group-hover:scale-110`}>
-                        {area.icon}
+                    <div className="absolute inset-0 bg-gradient-to-br from-zenit-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    <div className="flex justify-between items-start relative z-10">
+                      <div className={`w-14 h-14 rounded-2xl ${area.bg} ${area.border} flex items-center justify-center ${area.color} transition-all group-hover:scale-110`}>
+                        {React.cloneElement(area.icon as any, { size: 24 })}
                       </div>
-                      <div className="flex items-center space-x-1 text-[10px] font-bold text-zenith-text-primary">
+                      <div className="flex items-center space-x-2 text-xs font-bold text-zenit-text-primary italic">
                         <span>{area.progress}%</span>
-                        <ArrowUpRight size={10} className="text-zenith-text-tertiary" />
+                        <ArrowUpRight size={12} className="text-zenit-text-tertiary opacity-40" />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-zenith-text-secondary">{area.label}</p>
-                      <div className="h-1 bg-zenith-surface-2 rounded-full overflow-hidden">
+                    <div className="space-y-4 mt-8 relative z-10">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zenit-text-tertiary group-hover:text-zenit-text-primary transition-colors">{area.label}</p>
+                      <div className="relative h-1.5 bg-zenit-surface-2 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${area.progress}%` }}
-                          className={`h-full ${area.progress > 0 ? area.color.replace('text-', 'bg-') : 'bg-zenith-text-tertiary/20'}`}
+                          className={`h-full ${area.progress > 0 ? area.color.replace('text-', 'bg-') : 'bg-zenit-text-tertiary/20'}`}
+                          transition={{ duration: 1, ease: "easeOut" }}
                         />
                       </div>
                     </div>
@@ -519,16 +548,22 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
             </section>
 
             {/* Neural Insight Quote */}
-            <section className="glass-card p-6 border-zenith-border-primary bg-zenith-surface-1 border-l-4 border-l-zenith-scarlet">
-              <div className="flex items-start space-x-4">
-                <div className="mt-1">
-                  <Brain size={16} className="text-zenith-scarlet" />
+            <section className="relative p-8 rounded-[2.5rem] bg-zenit-surface-1/60 backdrop-blur-xl border-l-4 border-l-zenit-accent overflow-hidden group">
+              <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Brain size={80} className="text-zenit-accent" />
+              </div>
+              <div className="flex items-start space-x-6 relative z-10">
+                <div className="mt-1 p-3 rounded-xl bg-zenit-accent/10">
+                  <Brain size={20} className="text-zenit-accent" />
                 </div>
-                <div className="space-y-2">
-                  <p className="text-xs text-zenith-text-primary font-medium italic leading-relaxed">
+                <div className="space-y-4">
+                  <p className="text-sm text-zenit-text-primary font-medium italic leading-relaxed opacity-90">
                     "{dynamicQuote}"
                   </p>
-                  <p className="text-[8px] font-bold uppercase tracking-widest text-zenith-text-tertiary">— Zenith Neural Link</p>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-[1px] bg-zenit-accent/30" />
+                    <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary">Zenit Neural Link</p>
+                  </div>
                 </div>
               </div>
             </section>

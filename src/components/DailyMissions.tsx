@@ -85,48 +85,48 @@ export const DailyMissions: React.FC<{ t: any; userData: any }> = ({ t, userData
       <div className="flex justify-between items-center">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <div className="w-1.5 h-1.5 bg-zenith-cyan rounded-full animate-pulse" />
-            <h3 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-zenith-text-primary">
+            <div className="w-1.5 h-1.5 bg-zenit-cyan rounded-full animate-pulse" />
+            <h3 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-zenit-text-primary">
               Objetivos Táticos
             </h3>
           </div>
-          <p className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold">Recompensas de XP Ativas</p>
+          <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold">Recompensas de XP Ativas</p>
         </div>
         <motion.div 
           whileHover={{ scale: 1.05 }}
-          className="flex items-center space-x-3 bg-zenith-surface-1 px-5 py-2.5 rounded-2xl border border-zenith-border-primary shadow-lg"
+          className="flex items-center space-x-3 bg-zenit-surface-1 px-5 py-2.5 rounded-2xl border border-zenit-border-primary shadow-lg"
         >
-          <Trophy size={16} className="text-zenith-electric-blue drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zenith-text-primary">Nível {level}</span>
+          <Trophy size={16} className="text-zenit-electric-blue drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-primary">Nível {level}</span>
         </motion.div>
       </div>
 
-      <div className="glass-card p-8 space-y-10 relative overflow-hidden border-zenith-border-primary bg-zenith-surface-1">
+      <div className="glass-card p-8 space-y-10 relative overflow-hidden border-zenit-border-primary bg-zenit-surface-1">
         {/* Background Glow */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-zenith-electric-blue/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-zenit-electric-blue/10 blur-[100px] rounded-full pointer-events-none" />
         
         {/* Progress Section */}
         <div className="space-y-4 relative z-10">
           <div className="flex justify-between items-end">
             <div className="space-y-1.5">
               <div className="flex items-center space-x-2">
-                <Award size={12} className="text-zenith-electric-blue" />
-                <span className="text-[10px] text-zenith-text-tertiary uppercase tracking-[0.2em] font-bold">Patente Atual</span>
+                <Award size={12} className="text-zenit-electric-blue" />
+                <span className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold">Patente Atual</span>
               </div>
-              <p className="text-xl font-display font-bold text-zenith-text-primary uppercase tracking-tight">{levelName}</p>
+              <p className="text-xl font-display font-bold text-zenit-text-primary uppercase tracking-tight">{levelName}</p>
             </div>
             <div className="text-right space-y-1">
-              <span className="text-zenith-electric-blue text-xs font-mono font-bold drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">
+              <span className="text-zenit-electric-blue text-xs font-mono font-bold drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">
                 {xp % 100} / 100 XP
               </span>
-              <div className="text-[8px] text-zenith-text-tertiary uppercase tracking-widest font-bold">Próximo Nível</div>
+              <div className="text-[8px] text-zenit-text-tertiary uppercase tracking-widest font-bold">Próximo Nível</div>
             </div>
           </div>
-          <div className="h-3 w-full bg-zenith-surface-2 rounded-full overflow-hidden border border-zenith-border-secondary p-[2px]">
+          <div className="h-3 w-full bg-zenit-surface-2 rounded-full overflow-hidden border border-zenit-border-secondary p-[2px]">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${xp % 100}%` }}
-              className="h-full bg-gradient-to-r from-zenith-electric-blue via-zenith-cyan to-zenith-electric-blue rounded-full relative"
+              className="h-full bg-gradient-to-r from-zenit-electric-blue via-zenit-cyan to-zenit-electric-blue rounded-full relative"
             >
               <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]" />
             </motion.div>
@@ -136,39 +136,39 @@ export const DailyMissions: React.FC<{ t: any; userData: any }> = ({ t, userData
         <div className="space-y-5 relative z-10">
           {loading ? (
             <div className="flex justify-center py-10">
-              <div className="w-6 h-6 border-2 border-zenith-electric-blue border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-zenit-electric-blue border-t-transparent rounded-full animate-spin" />
             </div>
           ) : missions.map((m) => (
             <motion.div 
               key={m.id} 
               whileHover={{ x: 4 }}
-              className="group flex items-center space-x-5 p-5 rounded-[28px] bg-zenith-surface-2 border border-zenith-border-secondary hover:border-zenith-border-primary hover:bg-zenith-surface-1 transition-all cursor-pointer"
+              className="group flex items-center space-x-5 p-5 rounded-[28px] bg-zenit-surface-2 border border-zenit-border-secondary hover:border-zenit-border-primary hover:bg-zenit-surface-1 transition-all cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-2xl bg-zenith-surface-1 flex items-center justify-center shrink-0 border border-zenith-border-primary group-hover:border-zenith-electric-blue/30 transition-all shadow-inner">
-                <div className="text-zenith-text-tertiary group-hover:text-zenith-electric-blue transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-zenit-surface-1 flex items-center justify-center shrink-0 border border-zenit-border-primary group-hover:border-zenit-electric-blue/30 transition-all shadow-inner">
+                <div className="text-zenit-text-tertiary group-hover:text-zenit-electric-blue transition-colors">
                   {m.icon}
                 </div>
               </div>
               <div className="flex-1 space-y-3">
                 <div className="flex justify-between items-center">
                   <div className="space-y-0.5">
-                    <p className="text-sm font-bold text-zenith-text-secondary group-hover:text-zenith-text-primary transition-colors tracking-tight">{m.title}</p>
-                    <p className="text-[9px] text-zenith-text-tertiary uppercase tracking-widest font-bold">{m.progress} de {m.total} Concluídos</p>
+                    <p className="text-sm font-bold text-zenit-text-secondary group-hover:text-zenit-text-primary transition-colors tracking-tight">{m.title}</p>
+                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest font-bold">{m.progress} de {m.total} Concluídos</p>
                   </div>
-                  <div className="flex items-center space-x-1.5 text-zenith-electric-blue bg-zenith-electric-blue/10 px-3 py-1 rounded-xl border border-zenith-electric-blue/10">
+                  <div className="flex items-center space-x-1.5 text-zenit-electric-blue bg-zenit-electric-blue/10 px-3 py-1 rounded-xl border border-zenit-electric-blue/10">
                     <Sparkles size={10} />
                     <span className="text-[10px] font-bold font-mono">+{m.xp} XP</span>
                   </div>
                 </div>
-                <div className="h-1.5 w-full bg-zenith-surface-1 rounded-full overflow-hidden p-[1px]">
+                <div className="h-1.5 w-full bg-zenit-surface-1 rounded-full overflow-hidden p-[1px]">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, (m.progress / m.total) * 100)}%` }}
-                    className={`h-full transition-all rounded-full ${m.progress >= m.total ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-zenith-surface-2 group-hover:bg-zenith-electric-blue/40'}`} 
+                    className={`h-full transition-all rounded-full ${m.progress >= m.total ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-zenit-surface-2 group-hover:bg-zenit-electric-blue/40'}`} 
                   />
                 </div>
               </div>
-              <ChevronRight size={16} className="text-zenith-text-tertiary opacity-20 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight size={16} className="text-zenit-text-tertiary opacity-20 group-hover:opacity-100 transition-opacity" />
             </motion.div>
           ))}
         </div>

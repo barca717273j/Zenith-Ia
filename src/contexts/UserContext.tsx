@@ -6,11 +6,12 @@ interface UserContextType {
   user: any;
   userData: UserProfile | null;
   loading: boolean;
+  isSupabaseConnected: boolean;
   refreshUserData: () => Promise<void>;
   signOut: () => Promise<void>;
   isPlanActive: boolean;
-  checkLimit: (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts') => Promise<{ allowed: boolean; message?: string }>;
-  incrementUsage: (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts') => Promise<void>;
+  checkLimit: (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts' | 'stories') => Promise<{ allowed: boolean; message?: string }>;
+  incrementUsage: (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts' | 'stories') => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -19,12 +20,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSupabaseConnected, setIsSupabaseConnected] = useState(true);
   const isMounted = useRef(true);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
       console.warn("Supabase is not configured. App will run in limited mode.");
       setLoading(false);
+      setIsSupabaseConnected(false);
       return;
     }
 
@@ -33,6 +36,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Check active session
     const checkSession = async () => {
       try {
+        // Test connection first
+        const { testSupabaseConnection } = await import('../lib/supabase');
+        const isConnected = await testSupabaseConnection();
+        if (isMounted.current) setIsSupabaseConnected(isConnected);
+
+        if (!isConnected) {
+          console.error("Supabase connection failed.");
+          if (isMounted.current) setLoading(false);
+          return;
+        }
+
         const { data: { session }, error } = await supabase.auth.getSession();
         if (!isMounted.current) return;
         
@@ -52,7 +66,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       } catch (err) {
         console.error("Critical session error:", err);
-        if (isMounted.current) setLoading(false);
+        if (isMounted.current) {
+          setLoading(false);
+          setIsSupabaseConnected(false);
+        }
       }
     };
 
@@ -182,7 +199,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     (!userData.plan_expires_at || new Date(userData.plan_expires_at) > new Date())
   ) : false;
 
-  const checkLimit = async (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts'): Promise<{ allowed: boolean; message?: string }> => {
+  const checkLimit = async (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts' | 'stories'): Promise<{ allowed: boolean; message?: string }> => {
     if (!userData) return { allowed: false, message: 'Usuário não carregado' };
 
     // Admin bypass
@@ -191,6 +208,28 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const tier = userData.subscription_tier;
     const limits = TIER_LIMITS[tier];
     const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+
+    // Special logic for Basic tier: 1 usage every 2 days (48 hours)
+    if (tier === 'basic') {
+      const lastUsageDate = type === 'ai_messages' ? userData.last_message_date :
+                           type === 'ai_generations' ? userData.last_generation_date :
+                           type === 'actions' ? userData.last_action_date :
+                           type === 'posts' ? userData.last_post_date : null;
+      
+      if (lastUsageDate) {
+        const lastUsage = new Date(lastUsageDate);
+        const hoursSinceLastUsage = (now.getTime() - lastUsage.getTime()) / (1000 * 60 * 60);
+        if (hoursSinceLastUsage < 48) {
+          const remainingHours = Math.ceil(48 - hoursSinceLastUsage);
+          return { 
+            allowed: false, 
+            message: `Plano Básico: Você pode usar esta função novamente em ${remainingHours} horas.` 
+          };
+        }
+      }
+      return { allowed: true };
+    }
 
     if (type === 'ai_messages') {
       const lastDate = userData.last_message_date?.split('T')[0];
@@ -215,6 +254,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const count = lastDate === today ? (userData.posts_count || 0) : 0;
       if (count >= limits.posts) {
         return { allowed: false, message: 'Você atingiu o limite de postagens diárias do seu plano.' };
+      }
+    } else if (type === 'stories') {
+      const lastDate = (userData as any).last_story_date?.split('T')[0];
+      const count = lastDate === today ? ((userData as any).stories_count || 0) : 0;
+      if (count >= limits.storiesPerDay) {
+        return { allowed: false, message: 'Você atingiu o limite de stories diários do seu plano.' };
       }
     } else if (type === 'routines') {
       // For routines, we check the total count of active routines
@@ -243,7 +288,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return { allowed: true };
   };
 
-  const incrementUsage = async (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts') => {
+  const incrementUsage = async (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts' | 'stories') => {
     if (!userData) return;
 
     const today = new Date().toISOString().split('T')[0];
@@ -269,6 +314,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const count = lastDate === today ? (userData.posts_count || 0) : 0;
       updates.posts_count = count + 1;
       updates.last_post_date = new Date().toISOString();
+    } else if (type === 'stories') {
+      const lastDate = (userData as any).last_story_date?.split('T')[0];
+      const count = lastDate === today ? ((userData as any).stories_count || 0) : 0;
+      updates.stories_count = count + 1;
+      updates.last_story_date = new Date().toISOString();
     }
 
     if (Object.keys(updates).length > 0) {
@@ -284,7 +334,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <UserContext.Provider value={{ user, userData, loading, refreshUserData, signOut, isPlanActive, checkLimit, incrementUsage }}>
+    <UserContext.Provider value={{ user, userData, loading, isSupabaseConnected, refreshUserData, signOut, isPlanActive, checkLimit, incrementUsage }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useUser } from '../contexts/UserContext';
 
 interface GamificationContextType {
   xp: number;
@@ -15,13 +16,15 @@ interface GamificationContextType {
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
 
 export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user: authUser } = useUser();
   const [xp, setXP] = useState(0);
   const [streak, setStreak] = useState(0);
   const [lifeScore, setLifeScore] = useState(0);
   const [dailyProgress, setDailyProgress] = useState(0);
 
   const fetchStats = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: userDataAuth } = await supabase.auth.getUser();
+    const user = userDataAuth?.user || authUser;
     if (user) {
       const { data: userData } = await supabase
         .from('users')
@@ -90,7 +93,8 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   const addXP = async (amount: number) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: userDataAuth } = await supabase.auth.getUser();
+    const user = userDataAuth?.user || authUser;
     if (!user) return;
 
     // Get current XP first to avoid stale state issues

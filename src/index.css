@@ -13,26 +13,26 @@
   --border-secondary: rgba(0, 0, 0, 0.05);
   --nav-bg: rgba(245, 245, 245, 0.95);
   --scrollbar-thumb: #CCCCCC;
-  --accent-color: #E63946;
-  --accent-glow: rgba(230, 57, 70, 0.15);
-  --secondary-glow: rgba(69, 123, 157, 0.1);
+  --accent-color: #FF0000;
+  --accent-glow: rgba(255, 0, 0, 0.25);
+  --secondary-glow: rgba(255, 0, 0, 0.1);
 }
 
 .dark {
-  --bg-color: #050505;
+  --bg-color: #020202;
   --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-tertiary: rgba(255, 255, 255, 0.45);
-  --surface-1: #0F0F0F;
-  --surface-2: #1A1A1A;
-  --surface-3: #242424;
-  --border-primary: rgba(255, 255, 255, 0.1);
-  --border-secondary: rgba(255, 255, 255, 0.05);
-  --nav-bg: rgba(5, 5, 5, 0.85);
-  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
-  --accent-color: #FF3B3B;
-  --accent-glow: rgba(255, 59, 59, 0.4);
-  --secondary-glow: rgba(168, 85, 247, 0.2);
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-tertiary: rgba(255, 255, 255, 0.5);
+  --surface-1: #0A0A0A;
+  --surface-2: #121212;
+  --surface-3: #181818;
+  --border-primary: rgba(255, 255, 255, 0.12);
+  --border-secondary: rgba(255, 255, 255, 0.06);
+  --nav-bg: rgba(2, 2, 2, 0.9);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --accent-color: #FF0000;
+  --accent-glow: rgba(255, 0, 0, 0.5);
+  --secondary-glow: rgba(255, 0, 0, 0.15);
 }
 
 @theme {
@@ -40,21 +40,21 @@
   --font-display: "Outfit", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-zenith-black: var(--bg-color);
-  --color-zenith-dark: var(--bg-color);
-  --color-zenith-text-primary: var(--text-primary);
-  --color-zenith-text-secondary: var(--text-secondary);
-  --color-zenith-text-tertiary: var(--text-tertiary);
-  --color-zenith-surface-1: var(--surface-1);
-  --color-zenith-surface-2: var(--surface-2);
-  --color-zenith-surface-3: var(--surface-3);
-  --color-zenith-border-primary: var(--border-primary);
-  --color-zenith-border-secondary: var(--border-secondary);
-  --color-zenith-nav: var(--nav-bg);
-  --color-zenith-accent: var(--accent-color);
-  --color-zenith-scarlet: #FF3B3B;
-  --color-zenith-crimson: #E63946;
-  --color-zenith-cyan: #00F5FF;
+  --color-zenit-black: var(--bg-color);
+  --color-zenit-dark: var(--bg-color);
+  --color-zenit-text-primary: var(--text-primary);
+  --color-zenit-text-secondary: var(--text-secondary);
+  --color-zenit-text-tertiary: var(--text-tertiary);
+  --color-zenit-surface-1: var(--surface-1);
+  --color-zenit-surface-2: var(--surface-2);
+  --color-zenit-surface-3: var(--surface-3);
+  --color-zenit-border-primary: var(--border-primary);
+  --color-zenit-border-secondary: var(--border-secondary);
+  --color-zenit-nav: var(--nav-bg);
+  --color-zenit-accent: var(--accent-color);
+  --color-zenit-scarlet: #FF0000;
+  --color-zenit-crimson: #D00000;
+  --color-zenit-cyan: #00F5FF;
   
   --animate-pulse-glow: pulse-glow 3s infinite ease-in-out;
   --animate-spin-slow: spin-slow 10s linear infinite;
@@ -72,7 +72,7 @@
 
 @layer base {
   body {
-    @apply bg-zenith-black text-zenith-text-primary font-sans antialiased overflow-x-hidden selection:bg-zenith-accent/30;
+    @apply bg-zenit-black text-zenit-text-primary font-sans antialiased overflow-x-hidden selection:bg-zenit-accent/30;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     background-color: var(--bg-color);
     color: var(--text-primary);
@@ -93,14 +93,14 @@
   }
 
   .glass-card {
-    @apply backdrop-blur-3xl border border-zenith-border-primary;
+    @apply backdrop-blur-3xl border border-zenit-border-primary;
     background-color: var(--surface-1);
   }
 }
 
 @layer components {
   .premium-card {
-    @apply rounded-3xl p-6 transition-all duration-300 border border-zenith-border-primary;
+    @apply rounded-3xl p-6 transition-all duration-300 border border-zenit-border-primary;
     background-color: var(--surface-1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 1px 8px rgba(0, 0, 0, 0.02);
   }
@@ -139,22 +139,22 @@
   }
 
   .neon-search {
-    @apply flex items-center rounded-2xl px-6 py-4 transition-all duration-300 border border-zenith-border-primary;
+    @apply flex items-center rounded-2xl px-6 py-4 transition-all duration-300 border border-zenit-border-primary;
     background-color: var(--surface-1);
   }
 
   .dark .neon-search {
-    @apply border-zenith-accent/30;
+    @apply border-zenit-accent/30;
     box-shadow: 0 0 15px var(--accent-glow);
   }
 
   .neon-search:focus-within {
-    @apply border-zenith-accent;
+    @apply border-zenit-accent;
     box-shadow: 0 0 20px var(--accent-glow);
   }
 
   .glass-nav {
-    @apply backdrop-blur-xl border-t border-zenith-border-primary;
+    @apply backdrop-blur-xl border-t border-zenit-border-primary;
     background-color: var(--nav-bg);
   }
 
@@ -163,12 +163,12 @@
   }
 
   .nav-active {
-    @apply text-zenith-accent;
+    @apply text-zenit-accent;
     text-shadow: 0 0 10px var(--accent-glow);
   }
 
   .nav-inactive {
-    @apply text-zenith-text-tertiary;
+    @apply text-zenit-text-tertiary;
   }
 
   .floating-plus {
