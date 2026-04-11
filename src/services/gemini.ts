@@ -1,76 +1,25 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-// Fallback to client-side if needed, but prefer backend
-const getClientAI = () => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    console.warn("VITE_GEMINI_API_KEY is not defined. AI features will be limited.");
-    return null;
-  }
-  return new GoogleGenerativeAI(apiKey);
-};
-
-const callBackendAI = async (data: any) => {
-  try {
-    const response = await fetch('/api/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Erro na comunicação com o servidor de IA');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Backend AI Error:', error);
-    throw error;
-  }
-};
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const generateLifeStrategy = async (userData: any, prompt: string) => {
   try {
-    // Try backend first
-    const result = await callBackendAI({
-      prompt: `Você é o ZENITH, uma IA de Sistema Operacional de Vida premium. 
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Você é o ZENITH, uma IA de Sistema Operacional de Vida premium. 
       Dados do Usuário: ${JSON.stringify(userData)}
       Solicitação do Usuário: ${prompt}
       Forneça uma resposta estruturada, futurista e altamente acionável em Português.`,
-      systemInstruction: "Você é o cérebro do ZENITH. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
-    });
-    return result.text;
-  } catch (backendError) {
-    // Fallback to client-side
-    const ai = getClientAI();
-    if (!ai) {
-      // Mock response if no AI is available
-      console.warn("Using mock response for generateLifeStrategy");
-      return "O ZENITH está em modo de manutenção neural. Sua solicitação foi registrada: '" + prompt + "'. Como recomendação geral, foque em blocos de 90 minutos de trabalho profundo e mantenha sua hidratação em níveis ótimos.";
-    }
-    
-    const model = ai.getGenerativeModel({ 
-      model: "gemini-3-flash-preview",
-      systemInstruction: "Você é o cérebro do ZENITH. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil."
-    });
-    
-    const result = await model.generateContent({
-      contents: [{ 
-        role: 'user', 
-        parts: [{ 
-          text: `Você é o ZENITH, uma IA de Sistema Operacional de Vida premium. 
-          Dados do Usuário: ${JSON.stringify(userData)}
-          Solicitação do Usuário: ${prompt}
-          Forneça uma resposta estruturada, futurista e altamente acionável em Português.` 
-        }] 
-      }],
-      generationConfig: {
+      config: {
+        systemInstruction: "Você é o cérebro do ZENITH. Seu objetivo é otimizar a vida do usuário em saúde, riqueza, conhecimento e relacionamentos. Seja conciso, futurista e encorajador. Responda sempre em Português do Brasil.",
         temperature: 0.7,
       }
     });
-
-    return result.response.text();
+    return response.text;
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    // Mock response if AI fails
+    return "O ZENITH está em modo de manutenção neural. Sua solicitação foi registrada: '" + prompt + "'. Como recomendação geral, foque em blocos de 90 minutos de trabalho profundo e mantenha sua hidratação em níveis ótimos.";
   }
 };
 
@@ -82,60 +31,42 @@ export const askAI = async (options: {
   responseSchema?: any
 }) => {
   try {
-    const result = await callBackendAI({
-      prompt: options.prompt,
-      systemInstruction: options.systemInstruction,
+    const response = await ai.models.generateContent({
       model: options.model || "gemini-3-flash-preview",
-      responseMimeType: options.responseMimeType,
-      responseSchema: options.responseSchema
-    });
-    
-    if (options.responseMimeType === "application/json") {
-      const cleanText = (result.text || "{}").replace(/```json|```/g, '').trim();
-      return JSON.parse(cleanText);
-    }
-    return result.text;
-  } catch (backendError) {
-    const ai = getClientAI();
-    if (!ai) {
-      // Mock response if no AI is available
-      console.warn("Using mock response for askAI");
-      if (options.responseMimeType === "application/json") {
-        // Return a generic valid JSON based on common patterns in the app
-        if (options.prompt.toLowerCase().includes("decisão") || options.prompt.toLowerCase().includes("dilema")) {
-          return {
-            pros: ["Aumento de produtividade", "Melhoria na saúde a longo prazo"],
-            cons: ["Esforço inicial elevado", "Necessidade de disciplina"],
-            longTermImpact: "Impacto positivo exponencial na sua trajetória de vida.",
-            goalAlignment: "Totalmente alinhado com sua busca pela excelência.",
-            neuralInsight: "A disciplina é a ponte entre seus objetivos e suas conquistas.",
-            riskLevel: "Medium"
-          };
-        }
-        return {};
-      }
-      return "O ZENITH está processando sua solicitação offline. Continue focado em seus objetivos.";
-    }
-    
-    const model = ai.getGenerativeModel({ 
-      model: options.model || "gemini-3-flash-preview",
-      systemInstruction: options.systemInstruction as any
-    });
-    
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: options.prompt }] }],
-      generationConfig: {
+      contents: options.prompt,
+      config: {
+        systemInstruction: options.systemInstruction,
         temperature: 0.7,
         responseMimeType: options.responseMimeType as any,
         responseSchema: options.responseSchema
       }
     });
-
-    const responseText = result.response.text();
+    
     if (options.responseMimeType === "application/json") {
-      const cleanText = (responseText || "{}").replace(/```json|```/g, '').trim();
-      return JSON.parse(cleanText);
+      try {
+        const cleanText = (response.text || "{}").replace(/```json|```/g, '').trim();
+        return JSON.parse(cleanText);
+      } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        return {};
+      }
     }
-    return responseText;
+    return response.text;
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    if (options.responseMimeType === "application/json") {
+      if (options.prompt.toLowerCase().includes("decisão") || options.prompt.toLowerCase().includes("dilema")) {
+        return {
+          pros: ["Aumento de produtividade", "Melhoria na saúde a longo prazo"],
+          cons: ["Esforço inicial elevado", "Disciplina necessária"],
+          longTermImpact: "Impacto positivo exponencial na sua trajetória de vida.",
+          goalAlignment: "Totalmente alinhado com sua busca pela excelência.",
+          neuralInsight: "A disciplina é a ponte entre seus objetivos e suas conquistas.",
+          riskLevel: "Medium"
+        };
+      }
+      return {};
+    }
+    return "O ZENITH está processando sua solicitação offline. Continue focado em seus objetivos.";
   }
 };

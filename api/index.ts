@@ -2,15 +2,11 @@ import express from 'express';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
-import geminiRouter from './gemini.ts';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-
-// --- AI INTEGRATION ---
-app.use('/api/gemini', geminiRouter);
 
 // --- SUPABASE SERVICE CLIENT ---
 const rawUrl = process.env.VITE_SUPABASE_URL || "";

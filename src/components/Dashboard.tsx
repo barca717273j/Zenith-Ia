@@ -108,15 +108,7 @@ const UsageStats: React.FC<{ t: any; userData: any }> = ({ t, userData }) => {
 };
 
 const QuickAction: React.FC<{ icon: React.ReactElement; label: string; onClick: () => void; color: 'scarlet' | 'cyan' }> = ({ icon, label, onClick, color }) => {
-  const { checkLimit, incrementUsage } = useUser();
-  
-  const handleAction = async () => {
-    const limitCheck = await checkLimit('actions');
-    if (!limitCheck.allowed) {
-      console.warn(limitCheck.message);
-      return;
-    }
-    await incrementUsage('actions');
+  const handleAction = () => {
     onClick();
   };
 

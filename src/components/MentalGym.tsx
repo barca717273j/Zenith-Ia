@@ -61,33 +61,25 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
   const exercises = [
     {
       id: 'memory',
-      title: t.gym.memoryTitle,
-      desc: t.gym.memoryDesc,
+      title: 'Memória',
+      desc: 'Protocolo de retenção neural e reconhecimento de padrões.',
       icon: <Brain size={24} />,
       color: 'text-zenit-electric-blue',
       bg: 'bg-zenit-electric-blue/10'
     },
     {
       id: 'focus',
-      title: t.gym.focusTitle,
-      desc: t.gym.focusDesc,
+      title: 'Foco',
+      desc: 'Treinamento de atenção sustentada e precisão cognitiva.',
       icon: <Target size={24} />,
       color: 'text-zenit-scarlet',
       bg: 'bg-zenit-scarlet/10'
     },
     {
       id: 'logic',
-      title: t.gym.logicTitle,
-      desc: t.gym.logicDesc,
-      icon: <Puzzle size={24} />,
-      color: 'text-emerald-400',
-      bg: 'bg-emerald-400/10'
-    },
-    {
-      id: 'tetris',
-      title: t.gym.tetrisTitle,
-      desc: t.gym.tetrisDesc,
-      icon: <Gamepad2 size={24} />,
+      title: 'Reflexo',
+      desc: 'Velocidade de processamento e resposta motora neural.',
+      icon: <Zap size={24} />,
       color: 'text-amber-400',
       bg: 'bg-amber-400/10'
     }
@@ -95,8 +87,6 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
 
   const renderExercise = () => {
     switch (mode) {
-      case 'tetris':
-        return <TetrisGame t={t} onGameOver={(score) => saveScore('tetris', score)} />;
       case 'memory':
         return <MemoryGame t={t} onBack={() => setMode('menu')} addXP={addXP} onGameOver={(score) => saveScore('memory', score)} />;
       case 'focus':
@@ -141,29 +131,38 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {exercises.map((ex) => (
-          <motion.button
-            key={ex.id}
-            whileHover={{ y: -5 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setMode(ex.id as GymMode)}
-            className="premium-card premium-card-hover flex items-start space-x-5 text-left group relative overflow-hidden"
-          >
-            <div className="absolute -top-10 -right-10 w-24 h-24 bg-zenit-accent/5 blur-[40px] rounded-full group-hover:bg-zenit-accent/10 transition-all duration-500" />
-            
-            <div className={`w-14 h-14 rounded-2xl ${ex.bg} flex items-center justify-center ${ex.color} group-hover:scale-110 transition-transform duration-500 border border-white/5 shadow-lg relative z-10`}>
-              {ex.icon}
-            </div>
-            <div className="flex-1 space-y-2 relative z-10">
-              <h3 className="text-lg font-bold text-zenit-text-primary uppercase tracking-wider group-hover:text-zenit-accent transition-colors">{ex.title}</h3>
-              <p className="text-xs text-zenit-text-tertiary leading-relaxed font-medium">{ex.desc}</p>
-              <div className="pt-2 flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zenit-accent opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
-                <span>Acessar Protocolo</span>
-                <Sparkles size={10} />
+        {exercises.map((ex) => {
+          const bestScore = scoresHistory.find(s => s.game_id === ex.id)?.score || 0;
+          return (
+            <motion.button
+              key={ex.id}
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setMode(ex.id as GymMode)}
+              className="premium-card premium-card-hover flex items-start space-x-5 text-left group relative overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-24 h-24 bg-zenit-accent/5 blur-[40px] rounded-full group-hover:bg-zenit-accent/10 transition-all duration-500" />
+              
+              <div className={`w-14 h-14 rounded-2xl ${ex.bg} flex items-center justify-center ${ex.color} group-hover:scale-110 transition-transform duration-500 border border-white/5 shadow-lg relative z-10`}>
+                {ex.icon}
               </div>
-            </div>
-          </motion.button>
-        ))}
+              <div className="flex-1 space-y-2 relative z-10">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-lg font-bold text-zenit-text-primary uppercase tracking-wider group-hover:text-zenit-accent transition-colors">{ex.title}</h3>
+                  <div className="text-right">
+                    <p className="text-[8px] text-zenit-text-tertiary uppercase font-black tracking-widest">Recorde</p>
+                    <p className="text-sm font-display font-bold text-zenit-accent">{bestScore}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-zenit-text-tertiary leading-relaxed font-medium">{ex.desc}</p>
+                <div className="pt-2 flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zenit-accent opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                  <span>Iniciar Protocolo</span>
+                  <Play size={10} />
+                </div>
+              </div>
+            </motion.button>
+          );
+        })}
       </div>
 
       <div className="premium-card p-10 border-zenit-accent/20 bg-gradient-to-br from-zenit-surface-1 to-zenit-surface-2 relative overflow-hidden group">

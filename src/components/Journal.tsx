@@ -182,7 +182,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
           <textarea
             value={entry}
             onChange={(e) => setEntry(e.target.value)}
-            placeholder={isNeural ? "O que sua mente está processando agora?" : "Registre seus pensamentos manualmente..."}
+            placeholder="Como foi seu dia? Descreva suas vitórias, aprendizados e desafios..."
             className="flex-1 bg-transparent border-none focus:ring-0 text-base leading-relaxed resize-none placeholder:text-white/10 text-white/80 font-medium"
           />
           
@@ -217,7 +217,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
                 className={`flex items-center space-x-2 text-white px-8 py-3 rounded-2xl font-bold text-[9px] uppercase tracking-widest transition-all disabled:opacity-50 active:scale-95 ${isNeural ? 'bg-zenit-accent shadow-[0_10px_30px_rgba(255,36,0,0.3)]' : 'bg-zenit-cyan shadow-[0_10px_30px_rgba(0,255,255,0.3)]'}`}
               >
                 <Send size={14} />
-                <span>{isSaving ? 'Salvando...' : 'Salvar'}</span>
+                <span>{isSaving ? 'Salvando...' : 'Salvar Entrada'}</span>
               </button>
             </div>
           </div>

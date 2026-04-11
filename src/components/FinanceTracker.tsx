@@ -468,6 +468,23 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
               </div>
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-4">
+            <button 
+              onClick={() => { setType('income'); setShowAddModal(true); }}
+              className="bg-emerald-500 text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center space-x-2"
+            >
+              <ArrowUpRight size={16} />
+              <span>Adicionar Ganho</span>
+            </button>
+            <button 
+              onClick={() => { setType('expense'); setShowAddModal(true); }}
+              className="bg-zenit-scarlet text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,59,59,0.2)] hover:shadow-[0_0_30px_rgba(255,59,59,0.4)] transition-all flex items-center justify-center space-x-2"
+            >
+              <ArrowDownLeft size={16} />
+              <span>Adicionar Gasto</span>
+            </button>
+          </div>
         </div>
       </div>
 

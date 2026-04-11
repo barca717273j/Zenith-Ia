@@ -55,26 +55,38 @@ export const Manual: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ManualSection 
-          icon={<Brain />}
-          title="IA Mentor Infinity"
-          description="Inteligência Artificial Central"
+          icon={<Zap />}
+          title="Biohacking"
+          description="Otimização Biológica"
           items={[
-            "O Mentor IA é seu guia para alta performance.",
-            "Use o chat para pedir conselhos, criar rotinas ou analisar dados.",
-            "Quanto mais você interage, mais o sistema se adapta ao seu perfil.",
-            "Acesse pelo botão central ou pelo card no Dashboard."
+            "Protocolos de sono profundo e ciclos circadianos.",
+            "Suplementação inteligente e nootrópicos.",
+            "Exposição ao frio e calor para resiliência celular.",
+            "Monitoramento de biomarcadores e performance física."
           ]}
         />
         
         <ManualSection 
-          icon={<Zap />}
-          title="Nexus Social"
-          description="Rede Neural de Evolução"
+          icon={<Brain />}
+          title="Mentalidade"
+          description="Engenharia de Pensamento"
           items={[
-            "Compartilhe seu progresso e conquistas no Fluxo.",
-            "O Pulse permite capturar momentos rápidos da sua jornada.",
-            "Mantenha o HOT Streak ativo interagindo com outros usuários.",
-            "Siga mentes alinhadas aos seus objetivos de evolução."
+            "Estoicismo aplicado e controle emocional.",
+            "Visualização criativa e reprogramação neural.",
+            "Meditação profunda e estados de Flow.",
+            "Desenvolvimento de antifragilidade mental."
+          ]}
+        />
+
+        <ManualSection 
+          icon={<Target />}
+          title="Produtividade"
+          description="Sistemas de Execução"
+          items={[
+            "Gestão de tempo via Deep Work.",
+            "Sistemas de priorização radical.",
+            "Eliminação de distrações e ruído digital.",
+            "Construção de hábitos atômicos e consistentes."
           ]}
         />
 

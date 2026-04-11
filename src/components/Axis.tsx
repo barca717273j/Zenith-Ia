@@ -330,7 +330,7 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                     <textarea
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder={axisT.placeholder}
+                      placeholder="Descreva sua decisão ou dilema aqui..."
                       className="relative w-full h-40 bg-zenit-surface-1/80 backdrop-blur-xl rounded-[2rem] p-6 text-sm text-zenit-text-primary placeholder:text-zenit-text-tertiary focus:outline-none focus:border-zenit-accent/50 transition-all resize-none"
                     />
                     <div className="absolute bottom-6 right-6 flex items-center space-x-3">
@@ -342,17 +342,17 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                   <button
                     onClick={handleAnalyze}
                     disabled={!query.trim() || isAnalyzing}
-                    className="w-full py-5 bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white rounded-full font-bold uppercase tracking-[0.4em] text-xs flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    className="w-full py-5 bg-zenit-accent text-white rounded-full font-bold uppercase tracking-[0.4em] text-xs flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(255,59,59,0.3)]"
                   >
                     {isAnalyzing ? (
                       <>
                         <Loader2 size={18} className="animate-spin" />
-                        <span>{axisT.analyzing}</span>
+                        <span>Analisando...</span>
                       </>
                     ) : (
                       <>
                         <Brain size={18} />
-                        <span>{axisT.analyze}</span>
+                        <span>Analisar Decisão</span>
                       </>
                     )}
                   </button>
@@ -434,21 +434,21 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                         <p className="text-sm text-zenit-text-secondary leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">{result.goalAlignment}</p>
                       </div>
 
-                      <div className="relative p-10 rounded-[3rem] bg-gradient-to-br from-zenit-accent/10 via-zenit-crimson/5 to-transparent overflow-hidden group">
+                      <div className="relative p-10 rounded-[3rem] bg-zenit-surface-1 border border-zenit-accent/30 shadow-[0_0_30px_rgba(255,59,59,0.1)] overflow-hidden group">
                         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-700">
                           <Brain size={120} className="text-zenit-accent" />
                         </div>
                         <div className="space-y-6 relative z-10">
                           <div className="flex items-center space-x-3 text-zenit-accent">
                             <Sparkles size={20} className="animate-pulse" />
-                            <h3 className="text-xs font-bold uppercase tracking-[0.4em] italic">{axisT.insight}</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-[0.4em] italic">Recomendação Final</h3>
                           </div>
                           <p className="text-lg text-zenit-text-primary font-medium italic leading-relaxed tracking-tight">
                             "{result.neuralInsight}"
                           </p>
                           <div className="flex items-center space-x-4">
                             <div className="w-12 h-[1px] bg-zenit-accent/40" />
-                            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-zenit-text-tertiary">Neural Core Analysis</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-zenit-text-tertiary">Zenit Neural Recommendation</span>
                           </div>
                         </div>
                       </div>

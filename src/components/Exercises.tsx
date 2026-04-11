@@ -39,7 +39,41 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
   const [activeTab, setActiveTab] = useState<'browse' | 'history'>('browse');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([
+    {
+      id: 'corrida',
+      title: 'Corrida de Alta Intensidade',
+      description: 'Protocolo de queima calórica e resistência cardiovascular.',
+      category: 'training',
+      duration: '30 min',
+      difficulty: 'intermediate',
+      video_url: 'https://www.youtube.com/watch?v=9L2b2khySLE',
+      is_premium: false,
+      xp_reward: 100
+    },
+    {
+      id: 'academia',
+      title: 'Musculação Hipertrófica',
+      description: 'Foco em força bruta e densidade muscular.',
+      category: 'training',
+      duration: '60 min',
+      difficulty: 'advanced',
+      video_url: 'https://www.youtube.com/watch?v=U9ENCvFf9yQ',
+      is_premium: false,
+      xp_reward: 150
+    },
+    {
+      id: 'alongamento',
+      title: 'Alongamento Neural',
+      description: 'Recuperação ativa e flexibilidade profunda.',
+      category: 'body',
+      duration: '15 min',
+      difficulty: 'beginner',
+      video_url: 'https://www.youtube.com/watch?v=g_tea8ZNk5A',
+      is_premium: false,
+      xp_reward: 50
+    }
+  ]);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { addXP } = useGamification();
@@ -60,7 +94,9 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
       .select('*')
       .order('created_at', { ascending: false });
     
-    if (!error) setExercises(data || []);
+    if (!error && data && data.length > 0) {
+      setExercises(data);
+    }
     setLoading(false);
   };
 
@@ -179,57 +215,30 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                       key={ex.id}
                       layoutId={`ex-${ex.id}`}
                       onClick={() => !isLocked && setSelectedExercise(ex)}
-                      className={`glass-card group cursor-pointer overflow-hidden border-zenit-border-secondary bg-zenit-surface-1 hover:bg-zenit-surface-2 transition-all relative ${isLocked ? 'opacity-60 grayscale' : ''}`}
+                      className={`premium-card group cursor-pointer overflow-hidden border-zenit-border-secondary bg-zenit-surface-1 hover:bg-zenit-surface-2 transition-all relative ${isLocked ? 'opacity-60 grayscale' : ''}`}
                     >
-                      <div className="aspect-video relative overflow-hidden">
-                        <img 
-                          src={`https://picsum.photos/seed/${ex.id}/800/450`} 
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                        
-                        {isLocked && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-                            <div className="bg-zenit-accent/20 border border-zenit-accent/40 p-4 rounded-3xl text-zenit-accent">
-                              <Lock size={32} />
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-2 text-zenit-accent">
-                              <span className="text-[9px] font-bold uppercase tracking-[0.3em]">{ex.category}</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-white tracking-tight leading-tight">{ex.title}</h3>
-                          </div>
-                          {!isLocked && (
-                            <div className="bg-zenit-accent p-3 rounded-2xl shadow-lg">
-                              <Play size={20} className="text-white" fill="currentColor" />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="p-6 flex items-center justify-between bg-zenit-surface-1 border-t border-zenit-border-primary/50">
+                      <div className="p-6 flex items-center justify-between">
                         <div className="flex items-center space-x-6">
-                          <div className="flex items-center space-x-2 text-zenit-text-secondary">
-                            <Clock size={14} className="text-zenit-accent" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">{ex.duration}</span>
+                          <div className="w-16 h-16 rounded-2xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent group-hover:scale-110 transition-transform duration-500 border border-zenit-accent/20 shadow-[0_0_15px_rgba(255,59,59,0.1)]">
+                            {ex.category === 'training' ? <Dumbbell size={28} /> : <Activity size={28} />}
                           </div>
-                          <div className="flex items-center space-x-2 text-zenit-text-secondary">
-                            <Award size={14} className="text-zenit-accent" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">{ex.difficulty}</span>
+                          <div className="space-y-1">
+                            <h3 className="text-xl font-bold text-zenit-text-primary tracking-tight group-hover:text-zenit-accent transition-colors">{ex.title}</h3>
+                            <div className="flex items-center space-x-4">
+                              <div className="flex items-center space-x-2 text-zenit-text-tertiary">
+                                <Clock size={12} className="text-zenit-accent" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{ex.duration}</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-zenit-text-tertiary">
+                                <Award size={12} className="text-zenit-accent" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{ex.difficulty}</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        {isLocked ? (
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-zenit-accent">Elite Only</span>
-                        ) : (
-                          <div className="flex items-center space-x-1 text-zenit-accent">
-                            <Zap size={12} />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">+{ex.xp_reward || 50} XP</span>
-                          </div>
-                        )}
+                        <button className="bg-zenit-accent text-white px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(255,59,59,0.3)] hover:shadow-[0_0_30px_rgba(255,59,59,0.5)] transition-all">
+                          Concluir
+                        </button>
                       </div>
                     </motion.div>
                   );

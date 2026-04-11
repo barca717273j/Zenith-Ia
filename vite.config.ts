@@ -8,8 +8,7 @@ export default defineConfig(({mode}) => {
   return {
     plugins: [react(), tailwindcss()],
     define: {
-      // process.env.GEMINI_API_KEY is no longer exposed to the frontend for security.
-      // Use VITE_GEMINI_API_KEY if needed for client-side fallback.
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
     resolve: {
       alias: {
