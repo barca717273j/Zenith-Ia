@@ -33,15 +33,21 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
     const checkAndResetLimits = async () => {
       if (!userData) return;
       
-      const lastDate = userData.last_message_date ? new Date(userData.last_message_date) : null;
-      const today = new Date();
-      
-      if (!lastDate || lastDate.toDateString() !== today.toDateString()) {
-        await supabase
-          .from('users')
-          .update({ ai_messages_count: 0 })
-          .eq('id', userData.id);
-        await refreshUserData();
+      try {
+        const lastDate = userData.last_message_date ? new Date(userData.last_message_date) : null;
+        const today = new Date();
+        
+        if (!lastDate || lastDate.toDateString() !== today.toDateString()) {
+          const { error } = await supabase
+            .from('users')
+            .update({ ai_messages_count: 0 })
+            .eq('id', userData.id);
+          
+          if (error) throw error;
+          await refreshUserData();
+        }
+      } catch (err) {
+        console.error('Error resetting limits:', err);
       }
     };
 

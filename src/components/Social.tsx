@@ -111,8 +111,11 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
 
       if (error) throw error;
       setStoryItems(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching stories:', error);
+      if (error.message === 'Failed to fetch') {
+        setError('Erro de conexão ao carregar stories.');
+      }
     }
   };
 
@@ -145,10 +148,12 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
       if (postsError) throw postsError;
 
       // Check if current user liked these posts
-      const { data: likesData } = await supabase
+      const { data: likesData, error: likesError } = await supabase
         .from('post_likes')
         .select('post_id')
         .eq('user_id', userData.id);
+
+      if (likesError) throw likesError;
 
       const likedPostIds = new Set(likesData?.map(l => l.post_id) || []);
 
@@ -158,8 +163,11 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
       }));
 
       setPosts(formattedPosts);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching posts:', error);
+      if (error.message === 'Failed to fetch') {
+        setError('Erro de conexão ao carregar o feed.');
+      }
     } finally {
       setLoading(false);
     }

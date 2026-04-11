@@ -91,35 +91,47 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
   const fetchHabits = async () => {
     if (!userData?.id) return;
 
-    const { data, error } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('user_id', userData.id);
+    try {
+      const { data, error } = await supabase
+        .from('habits')
+        .select('*')
+        .eq('user_id', userData.id);
 
-    if (Array.isArray(data)) {
-      const today = new Date().toDateString();
-      const updatedHabits = data.map(h => {
-        const lastDate = h.last_completed ? new Date(h.last_completed).toDateString() : null;
-        if (lastDate !== today) {
-          return { ...h, completed_today: false };
-        }
-        return h;
-      });
-      setHabits(updatedHabits);
+      if (error) throw error;
+
+      if (Array.isArray(data)) {
+        const today = new Date().toDateString();
+        const updatedHabits = data.map(h => {
+          const lastDate = h.last_completed ? new Date(h.last_completed).toDateString() : null;
+          if (lastDate !== today) {
+            return { ...h, completed_today: false };
+          }
+          return h;
+        });
+        setHabits(updatedHabits);
+      }
+    } catch (err) {
+      console.error('Error fetching habits:', err);
     }
   };
 
   const fetchTasks = async () => {
     if (!userData?.id) return;
 
-    const { data, error } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('user_id', userData.id)
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', userData.id)
+        .order('created_at', { ascending: false });
 
-    if (Array.isArray(data)) {
-      setTasks(data);
+      if (error) throw error;
+
+      if (Array.isArray(data)) {
+        setTasks(data);
+      }
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
     }
   };
 

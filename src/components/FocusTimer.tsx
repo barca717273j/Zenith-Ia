@@ -19,12 +19,14 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
   const saveFocusSession = async (duration: number) => {
     if (!userData?.id) return;
     try {
-      await supabase.from('focus_sessions').insert([{
+      const { error } = await supabase.from('focus_sessions').insert([{
         user_id: userData.id,
         duration: duration,
         mode: 'focus'
       }]);
-    } catch (err) {
+      
+      if (error) throw error;
+    } catch (err: any) {
       console.error('Error saving focus session:', err);
     }
   };

@@ -151,22 +151,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
     
     try {
       // Simulate synchronization logic
-      // In a real app, this would trigger backend calculations to update
-      // routine, finances, moral, and mental gym based on active protocols.
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      if (!userData?.id) return;
+
       const { error } = await supabase
         .from('users')
         .update({ last_sync: new Date().toISOString() })
-        .eq('id', userData?.id);
+        .eq('id', userData.id);
         
       if (error) throw error;
       
       await refreshUserData();
       setSyncSuccess(true);
       setTimeout(() => setSyncSuccess(false), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Sync error:', err);
+      const message = err.message === 'Failed to fetch' 
+        ? 'Erro de conexão. Verifique sua internet.' 
+        : 'Erro ao sincronizar dados.';
+      alert(message);
     } finally {
       setIsSyncing(false);
     }

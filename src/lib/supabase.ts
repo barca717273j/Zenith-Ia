@@ -100,7 +100,7 @@ export const testSupabaseConnection = async (retryCount = 0): Promise<{ connecte
     if (errorMessage.toLowerCase().includes('failed to fetch')) {
       return {
         connected: false,
-        error: 'Falha na comunicação com o Supabase (Failed to fetch). Isso geralmente ocorre se a URL estiver incorreta, o projeto estiver pausado ou houver um bloqueio de rede (CORS/Adblock).'
+        error: 'Falha na comunicação com o Supabase (Failed to fetch). Isso geralmente ocorre se a URL estiver incorreta (verifique se não há espaços extras), o projeto estiver pausado no painel do Supabase, ou se houver um bloqueio de rede por Adblock ou Firewall. Verifique as configurações no menu "Settings".'
       };
     }
 

@@ -64,6 +64,8 @@ export const Auth: React.FC = () => {
         } else if (error.message.includes('Email not confirmed')) {
           setError('Seu e-mail ainda não foi confirmado. Por favor, verifique sua caixa de entrada.');
           setShowResend(true);
+        } else if (error.message === 'Failed to fetch') {
+          setError('Erro de conexão com o servidor. Verifique sua internet ou se o Supabase está acessível.');
         } else {
           setError(error.message);
         }
@@ -75,7 +77,11 @@ export const Auth: React.FC = () => {
       }
     } catch (err: any) {
       console.error("UNEXPECTED LOGIN ERROR:", err);
-      setError('Ocorreu um erro inesperado. Tente novamente mais tarde.');
+      if (err.message === 'Failed to fetch') {
+        setError('Erro de conexão. Verifique sua internet ou se o Supabase está acessível.');
+      } else {
+        setError('Ocorreu um erro inesperado. Tente novamente mais tarde.');
+      }
     } finally {
       setLoading(false);
     }

@@ -16,8 +16,14 @@ export const generateLifeStrategy = async (userData: any, prompt: string) => {
       }
     });
     return response.text;
-  } catch (error) {
-    console.error('Gemini API Error:', error);
+  } catch (error: any) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Gemini API Error:', errorMessage);
+    
+    if (errorMessage.toLowerCase().includes('failed to fetch')) {
+      return "⚠️ **Erro de Conexão:** Não foi possível contatar o núcleo de IA (Failed to fetch). Verifique sua conexão com a internet ou se há algum bloqueio de rede (Adblock/Firewall) impedindo o acesso aos servidores do Google Gemini.";
+    }
+
     // Mock response if AI fails
     return "O ZENITH está em modo de manutenção neural. Sua solicitação foi registrada: '" + prompt + "'. Como recomendação geral, foque em blocos de 90 minutos de trabalho profundo e mantenha sua hidratação em níveis ótimos.";
   }

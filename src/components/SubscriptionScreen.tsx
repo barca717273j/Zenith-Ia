@@ -74,9 +74,12 @@ export const SubscriptionScreen: React.FC = () => {
   const { userData, refreshUserData } = useUser();
   const [loading, setLoading] = useState<SubscriptionTier | null>(null);
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleSubscribe = async (tier: SubscriptionTier) => {
     if (!userData) return;
     setLoading(tier);
+    setError(null);
     
     try {
       const response = await fetch('/api/checkout', {
@@ -89,6 +92,11 @@ export const SubscriptionScreen: React.FC = () => {
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Erro no servidor (${response.status})`);
+      }
+
       const session = await response.json();
 
       if (session.url) {
@@ -96,9 +104,14 @@ export const SubscriptionScreen: React.FC = () => {
       } else {
         throw new Error('Falha ao criar sessão de pagamento.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Subscription error:', err);
-      // In a real app, we would use a toast or a modal
+      const msg = err.message || String(err);
+      if (msg.toLowerCase().includes('failed to fetch')) {
+        setError('Falha na comunicação com o servidor de pagamentos. Verifique se o backend está ativo e se você tem conexão com a internet.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(null);
     }
@@ -119,6 +132,17 @@ export const SubscriptionScreen: React.FC = () => {
             <Crown size={14} className="text-zenit-scarlet" />
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">ZENITH Premium</span>
           </div>
+
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-xl mx-auto p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-xs font-bold uppercase tracking-widest"
+            >
+              {error}
+            </motion.div>
+          )}
+
           <h1 className="text-4xl md:text-6xl font-display font-bold tracking-tighter uppercase leading-none">
             Desbloqueie seu <span className="text-zenit-scarlet italic">Potencial Máximo</span>
           </h1>

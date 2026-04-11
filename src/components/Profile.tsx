@@ -86,31 +86,42 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
       return;
     }
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', currentProfileId)
         .single();
+      
+      if (error) throw error;
       if (data) setTargetUser(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching profile data:', err);
+      if (err.message === 'Failed to fetch') {
+        setMessage({ type: 'error', text: 'Erro de conexão ao carregar perfil.' });
+      }
     }
   };
 
   const fetchPosts = async () => {
-    const { data } = await supabase
-      .from('posts')
-      .select(`
-        *,
-        user:users (
-          display_name,
-          username,
-          avatar_url
-        )
-      `)
-      .eq('user_id', currentProfileId)
-      .order('created_at', { ascending: false });
-    if (data) setPosts(data);
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          user:users (
+            display_name,
+            username,
+            avatar_url
+          )
+        `)
+        .eq('user_id', currentProfileId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      if (data) setPosts(data);
+    } catch (err: any) {
+      console.error('Error fetching posts:', err);
+    }
   };
 
   const checkFollowStatus = async () => {
