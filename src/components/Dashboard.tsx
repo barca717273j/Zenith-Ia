@@ -187,30 +187,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
   };
 
   return (
-    <div className="p-6 space-y-12 pb-32 max-w-4xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
+    <div className="p-6 space-y-12 pb-32 max-w-7xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
       {/* Living Background Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
 
-      <header className="flex justify-between items-center bg-zenit-surface-1/40 backdrop-blur-2xl p-5 rounded-[2.5rem] relative z-20">
-        <div className="flex items-center space-x-8">
-          <div onClick={handleLogoClick} className="cursor-pointer flex items-center space-x-5 group">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-zenit-accent to-zenit-crimson flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-              <ZenitLogo size={36} />
+      <header className="flex justify-between items-center bg-zenit-surface-1/40 backdrop-blur-2xl p-3 sm:p-5 rounded-[2rem] sm:rounded-[2.5rem] relative z-20 mx-2 sm:mx-0 border border-zenit-border-primary overflow-hidden">
+        <div className="flex items-center space-x-2 sm:space-x-8 min-w-0">
+          <div onClick={handleLogoClick} className="cursor-pointer flex items-center space-x-2 sm:space-x-5 group flex-shrink-0">
+            <div className="w-9 h-9 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-zenit-accent to-zenit-crimson flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+              <ZenitLogo size={20} className="sm:hidden" />
+              <ZenitLogo size={36} className="hidden sm:block" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary leading-none italic">ZENITH</span>
-              <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary mt-1.5 opacity-50">Neural Interface</span>
+            <div className="hidden xs:flex flex-col">
+              <span className="text-base sm:text-xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary leading-none italic">ZENITH</span>
+              <span className="text-[6px] sm:text-[8px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary mt-1 sm:mt-1.5 opacity-50">Neural Interface</span>
             </div>
           </div>
           
-          <div className="h-10 w-[1px] bg-white/5" />
+          <div className="h-6 sm:h-10 w-[1px] bg-zenit-border-primary flex-shrink-0" />
 
           <button 
             onClick={() => setActiveTab('profile')}
-            className="flex items-center space-x-4 group"
+            className="flex items-center space-x-2 sm:space-x-4 group min-w-0 flex-shrink"
           >
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-zenit-surface-1 transition-all p-0.5">
+            <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-zenit-surface-1 transition-all p-0.5 flex-shrink-0">
               <div className="w-full h-full rounded-full overflow-hidden">
                 {(userData?.avatar_url || userData?.photo_url) ? (
                   <img src={userData.avatar_url || userData.photo_url} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -219,17 +220,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
                 )}
               </div>
             </div>
-            <div className="flex flex-col items-start">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-zenit-text-primary group-hover:text-zenit-accent transition-colors">{userData?.display_name?.split(' ')[0] || 'Usuário'}</span>
-              <div className="flex items-center space-x-2 mt-1">
-                <Crown size={8} className="text-zenit-accent" />
-                <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-zenit-text-tertiary">Nível {userData?.level || 1}</span>
+            <div className="flex flex-col items-start min-w-0 overflow-hidden">
+              <span className="text-[9px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-zenit-text-primary group-hover:text-zenit-accent transition-colors truncate w-full">{userData?.display_name?.split(' ')[0] || 'Usuário'}</span>
+              <div className="flex items-center space-x-1 sm:space-x-2 mt-0.5 sm:mt-1">
+                <Crown size={6} className="text-zenit-accent sm:hidden" />
+                <Crown size={8} className="text-zenit-accent hidden sm:block" />
+                <span className="text-[6px] sm:text-[8px] font-bold uppercase tracking-[0.3em] text-zenit-text-tertiary">Nível {userData?.level || 1}</span>
               </div>
             </div>
           </button>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
           <NotificationCenter userId={userData?.id || ''} />
         </div>
       </header>
@@ -271,17 +273,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               <button 
                 onClick={() => setIsAIOpen(true)}
-                className="px-8 py-4 bg-zenit-accent text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_10px_30px_rgba(255,36,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center space-x-3"
+                className="px-8 py-4 bg-zenit-accent text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_10px_30px_rgba(255,36,0,0.3)] active:scale-95 transition-all flex items-center space-x-3 min-h-[44px]"
               >
                 <MessageSquare size={16} />
                 <span>Iniciar Diálogo</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('manual')}
-                className="px-8 py-4 bg-zenit-surface-2 text-zenit-text-primary rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] border border-zenit-border-primary hover:bg-zenit-surface-1 transition-all flex items-center space-x-3"
-              >
-                <Sparkles size={16} className="text-zenit-accent" />
-                <span>Ver Diretrizes</span>
               </button>
             </div>
           </div>
@@ -304,19 +299,44 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
         <FocusTimer t={t} />
       </section>
 
-      {/* Quick Actions - Expanded to 9 buttons */}
+      {/* Quick Access - Bento Grid Style */}
       <section className="space-y-8 relative z-10">
-        <div className="flex items-center space-x-4 px-2">
-          <div className="w-2 h-6 bg-zenit-accent rounded-full shadow-[0_0_15px_var(--accent-glow)]" />
-          <h3 className="text-sm font-bold uppercase tracking-[0.4em] text-zenit-text-primary italic">Acesso Rápido</h3>
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center space-x-4">
+            <div className="w-2 h-6 bg-zenit-scarlet rounded-full shadow-[0_0_15px_rgba(255,0,0,0.5)]" />
+            <h3 className="text-sm font-black uppercase tracking-[0.4em] text-zenit-text-primary italic">Módulos de Elite</h3>
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-40">6 Ativos</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <QuickAction 
-            icon={<Brain />} 
-            label="Axis" 
-            onClick={() => setActiveTab('axis')} 
-            color="cyan"
-          />
+        
+        <div className="grid grid-cols-2 gap-4">
+          {/* Axis - Large Featured Card */}
+          <motion.div
+            whileHover={{ y: -8, scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveTab('axis')}
+            className="col-span-2 relative group p-1 rounded-[2.5rem] bg-gradient-to-br from-zenit-scarlet/20 via-transparent to-zenit-border-primary/10 overflow-hidden cursor-pointer"
+          >
+            <div className="p-8 rounded-[2.4rem] bg-zenit-surface-1/90 backdrop-blur-xl border border-white/5 flex items-center justify-between">
+              <div className="space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-scarlet border border-zenit-border-primary group-hover:scale-110 transition-transform duration-500">
+                  <Brain size={28} strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h4 className="text-2xl font-display font-bold text-zenit-text-primary tracking-tight italic">AXIS</h4>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary opacity-60">Mapeamento Neural</p>
+                </div>
+              </div>
+              <div className="flex -space-x-4 opacity-40 group-hover:opacity-100 transition-opacity">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="w-12 h-12 rounded-full border-2 border-zenit-black bg-zenit-surface-2 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-zenit-scarlet animate-pulse" style={{ animationDelay: `${i * 0.3}s` }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
           <QuickAction 
             icon={<Dumbbell />} 
             label="Exercícios" 
@@ -333,12 +353,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
             icon={<Wallet />} 
             label="Finanças" 
             onClick={() => setActiveTab('finance')} 
-            color="scarlet"
-          />
-          <QuickAction 
-            icon={<BookOpen />} 
-            label="Manual" 
-            onClick={() => setActiveTab('manual')} 
             color="scarlet"
           />
           <QuickAction 

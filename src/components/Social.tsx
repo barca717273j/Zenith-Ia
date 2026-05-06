@@ -50,10 +50,10 @@ interface Story {
   };
 }
 
-export const Social: React.FC<SocialProps> = ({ t }) => {
+export const Nexus: React.FC<SocialProps> = ({ t }) => {
   const { userData, refreshUserData, checkLimit, incrementUsage } = useUser();
   const [activeTab, setActiveTab] = useState<'feed' | 'discover' | 'profile'>('feed');
-  const [trendingTags, setTrendingTags] = useState<string[]>(['#ZenitIA', '#FocoTotal', '#Mindset', '#Biohacking', '#Disciplina']);
+  const [trendingTags, setTrendingTags] = useState<string[]>(['#ZenitElite', '#ProtocoloSicrano', '#NeuralMind', '#Performance']);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -470,7 +470,7 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
       <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-zenit-surface-1/80 backdrop-blur-3xl px-6 h-20 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-zenit-surface-1/80 backdrop-blur-3xl px-6 h-20 flex items-center justify-between border-b border-zenit-border-primary">
         <div className="flex items-center space-x-4">
           {selectedUserId && activeTab === 'profile' ? (
             <button 
@@ -484,8 +484,13 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
             </button>
           ) : (
             <div className="flex flex-col">
-              <h1 className="text-2xl font-display font-black tracking-tighter uppercase italic text-zenit-accent leading-none">Zenit <span className="text-white">Social</span></h1>
-              <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary mt-1.5 opacity-60">Neural Network v2.5</span>
+              <h1 className="text-2xl font-display font-medium tracking-tight text-zenit-text-primary italic leading-none">
+                NEXUS
+              </h1>
+              <div className="flex items-center space-x-2 mt-1.5">
+                <div className="w-1 h-1 rounded-full bg-zenit-scarlet animate-pulse" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary opacity-60">Neural Network v2.5</span>
+              </div>
             </div>
           )}
         </div>
@@ -499,7 +504,7 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
               placeholder={t.social.search}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zenit-surface-1/50 rounded-2xl py-3 pl-11 pr-4 text-xs focus:outline-none focus:border-zenit-accent/30 focus:bg-zenit-surface-2 transition-all placeholder:text-zenit-text-tertiary font-medium text-zenit-text-primary"
+              className="w-full bg-zenit-surface-1/50 rounded-2xl py-3 pl-11 pr-4 text-xs focus:outline-none focus:border-zenit-accent/30 focus:bg-zenit-surface-2 transition-all placeholder:text-zenit-text-tertiary font-medium text-zenit-text-primary border border-transparent focus:border-zenit-accent/20"
             />
           </div>
 
@@ -510,7 +515,7 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-zenit-surface-1 rounded-2xl overflow-hidden z-50"
+                className="absolute top-full left-0 right-0 mt-2 bg-zenit-surface-1 rounded-2xl overflow-hidden z-50 border border-zenit-border-primary shadow-2xl"
               >
                 {searchResults.map((user) => (
                   <button
@@ -538,56 +543,91 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
           </AnimatePresence>
         </div>
 
-        <button 
-          onClick={() => {
-            setSelectedUserId(null);
-            setActiveTab('profile');
-          }}
-          className={`relative w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-500 ${activeTab === 'profile' && !selectedUserId ? 'bg-zenit-accent text-white' : 'bg-zenit-surface-1 text-zenit-text-tertiary hover:bg-zenit-surface-2 hover:text-zenit-text-primary'}`}
-        >
-          <User size={20} />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={() => setIsFabOpen(!isFabOpen)}
+            className="text-zenit-text-primary p-2 hover:bg-zenit-surface-1 rounded-xl transition-all relative group"
+          >
+            <Plus size={22} strokeWidth={2.5} className={`transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`} />
+            
+            {/* FAB Dropdown Menu */}
+            <AnimatePresence>
+              {isFabOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  className="absolute top-full right-0 mt-4 w-48 bg-zenit-surface-1/95 backdrop-blur-2xl border border-zenit-border-primary rounded-3xl shadow-2xl overflow-hidden p-2 z-[60]"
+                >
+                  <button
+                    onClick={() => {
+                      setIsNexusModalOpen(true);
+                      setIsFabOpen(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-2xl transition-all group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-zenit-crimson flex items-center justify-center">
+                      <Camera size={14} className="text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-secondary group-hover:text-zenit-text-primary">Nexus</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setIsCreateModalOpen(true);
+                      setIsFabOpen(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-2xl transition-all group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-zenit-accent flex items-center justify-center">
+                      <ImageIcon size={14} className="text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-secondary group-hover:text-zenit-text-primary">{t.social.post}</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
+          <button className="text-zenit-text-primary p-2 hover:bg-zenit-surface-1 rounded-xl transition-all">
+            <Heart size={20} strokeWidth={2.5} />
+          </button>
+        </div>
       </header>
 
-      {/* Nexus Section (Stories) */}
+      {/* Nexus Section (Stories) - Horizontal Scrollable */}
       {activeTab === 'feed' && (
-        <div className="bg-zenit-black/40 backdrop-blur-md py-10 overflow-x-auto scrollbar-hide relative z-10 border-b border-zenit-border-secondary">
-          <div className="flex px-6 space-x-10">
+        <div className="bg-zenit-black/20 py-8 overflow-x-auto scrollbar-hide relative z-10 border-b border-zenit-border-primary/50">
+          <div className="flex px-6 space-x-8">
             {/* Create Nexus Button */}
-            <div className="flex flex-col items-center space-y-4 flex-shrink-0">
+            <div className="flex flex-col items-center space-y-3 flex-shrink-0">
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsNexusModalOpen(true)}
-                className="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-zenit-accent to-zenit-crimson relative group shadow-[0_0_20px_rgba(255,0,0,0.2)]"
+                className="w-16 h-16 rounded-full p-0.5 bg-zenit-border-primary relative group flex items-center justify-center bg-zenit-surface-1"
               >
-                <div className="w-full h-full rounded-full bg-zenit-black flex items-center justify-center border-2 border-zenit-black overflow-hidden relative">
-                  <div className="w-full h-full bg-zenit-surface-2 flex items-center justify-center">
-                    <User size={32} className="text-zenit-text-tertiary" />
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors">
-                    <Plus size={24} className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
-                  </div>
-                </div>
+                 <div className="w-14 h-14 rounded-full bg-zenit-surface-2 flex items-center justify-center border border-dashed border-zenit-border-primary">
+                    <Plus size={20} className="text-zenit-text-tertiary" />
+                 </div>
               </motion.button>
-              <span className="text-[10px] font-black text-zenit-text-primary uppercase tracking-[0.3em] italic">Capturar Momento</span>
+              <span className="text-[9px] font-black text-zenit-text-tertiary uppercase tracking-[0.2em] italic">Capturar</span>
             </div>
             
             {/* Real Story Items */}
             {storyItems.map((item) => (
               <motion.button 
                 key={item.id}
-                whileHover={{ scale: 1.05, y: -4 }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedStory(item)}
-                className="flex flex-col items-center space-y-4 flex-shrink-0"
+                className="flex flex-col items-center space-y-3 flex-shrink-0"
               >
-                <div className="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-zenit-accent to-zenit-crimson shadow-[0_0_20px_rgba(255,0,0,0.15)]">
+                <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-zenit-scarlet to-zenit-crimson ring-2 ring-transparent group-active:ring-zenit-accent transition-all">
                   <div className="w-full h-full rounded-full bg-zenit-black flex items-center justify-center border-2 border-zenit-black overflow-hidden">
                     <img src={item.user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.user?.username}`} className="w-full h-full object-cover" />
                   </div>
                 </div>
-                <span className="text-[10px] font-black text-zenit-text-primary uppercase tracking-[0.3em] italic truncate max-w-[90px]">
+                <span className="text-[9px] font-black text-zenit-text-primary uppercase tracking-[0.2em] italic truncate max-w-[70px]">
                   {item.user?.display_name.split(' ')[0]}
                 </span>
               </motion.button>
@@ -617,7 +657,7 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-lg mx-auto flex flex-col gap-4 p-4">
+      <main className="max-w-4xl mx-auto flex flex-col gap-4 p-4">
         {activeTab === 'feed' ? renderFeed() : activeTab === 'discover' ? renderDiscover() : renderProfile()}
       </main>
 
@@ -632,80 +672,6 @@ export const Social: React.FC<SocialProps> = ({ t }) => {
           />
         )}
       </AnimatePresence>
-
-      {/* FAB with Options */}
-      {(activeTab === 'feed' || activeTab === 'profile') && (
-        <div className="fixed bottom-44 right-6 flex flex-col items-end space-y-4 z-50">
-          <AnimatePresence>
-            {isFabOpen && (
-              <>
-                <motion.button
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setIsNexusModalOpen(true);
-                    setIsFabOpen(false);
-                  }}
-                  className="flex items-center space-x-3 bg-zenit-surface-1 border border-zenit-border-primary px-4 py-3 rounded-2xl shadow-2xl group"
-                >
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-zenit-text-secondary group-hover:text-zenit-text-primary transition-colors">Nexus</span>
-                  <div className="w-10 h-10 bg-zenit-crimson rounded-xl flex items-center justify-center">
-                    <Camera size={18} className="text-white" />
-                  </div>
-                </motion.button>
-
-                <motion.button
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setIsCreateModalOpen(true);
-                    setIsFabOpen(false);
-                  }}
-                  className="flex items-center space-x-3 bg-zenit-surface-1 border border-zenit-border-primary px-4 py-3 rounded-2xl shadow-2xl group"
-                >
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-zenit-text-secondary group-hover:text-zenit-text-primary transition-colors">{t.social.post}</span>
-                  <div className="w-10 h-10 bg-zenit-accent rounded-xl flex items-center justify-center">
-                    <ImageIcon size={18} className="text-white" />
-                  </div>
-                </motion.button>
-              </>
-            )}
-          </AnimatePresence>
-
-          <motion.button
-            whileHover={{ scale: 1.1, rotate: isFabOpen ? 45 : 5 }}
-            whileTap={{ scale: 0.9, rotate: isFabOpen ? 45 : -5 }}
-            onClick={() => setIsFabOpen(!isFabOpen)}
-            className={`w-14 h-14 flex items-center justify-center transition-all duration-300 relative z-10 group ${isFabOpen ? 'bg-zenit-surface-2' : 'bg-gradient-to-br from-zenit-accent via-zenit-crimson to-zenit-accent'}`}
-            style={{ 
-              clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)'
-            }}
-          >
-            <Plus size={28} className={`text-white transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`} />
-            
-            {/* Inner Glow */}
-            {!isFabOpen && (
-              <div className="absolute inset-1 bg-gradient-to-br from-white/20 to-transparent opacity-50 pointer-events-none" style={{ clipPath: 'inherit' }} />
-            )}
-            
-            {/* Animated Ring */}
-            {!isFabOpen && (
-              <motion.div 
-                animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-2 border-2 border-zenit-accent/20 -z-10 blur-sm"
-                style={{ clipPath: 'inherit' }}
-              />
-            )}
-          </motion.button>
-        </div>
-      )}
 
       {/* Create Post Modal */}
       <AnimatePresence>

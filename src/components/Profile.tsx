@@ -434,7 +434,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
                     value={editPhoto}
                     onChange={(e) => setEditPhoto(e.target.value)}
                     placeholder="https://exemplo.com/foto.jpg"
-                    className="w-full bg-[#1A1A1A] rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all placeholder:text-zenit-text-tertiary/20 text-zenit-text-primary"
+                    className="w-full bg-zenit-surface-2 rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all placeholder:text-zenit-text-tertiary/20 text-zenit-text-primary"
                   />
                 </div>
               </div>
@@ -451,7 +451,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
                       type="text" 
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      className="w-full bg-[#1A1A1A] rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary"
+                      className="w-full bg-zenit-surface-2 rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary"
                     />
                   </div>
 
@@ -467,7 +467,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
                         value={editUsername}
                         onChange={(e) => setEditUsername(e.target.value)}
                         placeholder="username"
-                        className="w-full bg-[#1A1A1A] rounded-2xl pl-12 pr-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary"
+                        className="w-full bg-zenit-surface-2 rounded-2xl pl-12 pr-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary"
                       />
                     </div>
                   </div>
@@ -482,7 +482,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
                     value={editBio}
                     onChange={(e) => setEditBio(e.target.value)}
                     placeholder={t.profile.bioPlaceholder}
-                    className="w-full bg-[#1A1A1A] rounded-3xl px-8 py-6 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all min-h-[140px] resize-none text-zenit-text-primary placeholder:text-zenit-text-tertiary/20"
+                    className="w-full bg-zenit-surface-2 rounded-3xl px-8 py-6 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all min-h-[140px] resize-none text-zenit-text-primary placeholder:text-zenit-text-tertiary/20"
                   />
                 </div>
 
@@ -496,7 +496,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
                       type="email" 
                       value={editEmail}
                       disabled
-                      className="w-full bg-black/40 rounded-2xl px-8 py-5 text-sm text-zenit-text-tertiary cursor-not-allowed"
+                      className="w-full bg-zenit-surface-2 rounded-2xl px-8 py-5 text-sm text-zenit-text-tertiary cursor-not-allowed"
                     />
                     <Lock size={14} className="absolute right-8 top-1/2 -translate-y-1/2 text-zenit-text-tertiary/30" />
                   </div>
@@ -603,7 +603,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-[#1A1A1A] rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary placeholder:text-zenit-text-tertiary/20"
+                    className="w-full bg-zenit-surface-2 rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary placeholder:text-zenit-text-tertiary/20"
                   />
                 </div>
 
@@ -617,7 +617,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-[#1A1A1A] rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary placeholder:text-zenit-text-tertiary/20"
+                    className="w-full bg-zenit-surface-2 rounded-2xl px-8 py-5 text-sm focus:outline-none focus:ring-1 focus:ring-zenit-accent/30 transition-all text-zenit-text-primary placeholder:text-zenit-text-tertiary/20"
                   />
                 </div>
               </div>
@@ -701,7 +701,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                           className={`p-6 rounded-2xl transition-all text-[11px] font-bold uppercase tracking-[0.3em] relative overflow-hidden group ${
                             userData?.language === lang 
                               ? 'bg-zenit-accent text-white' 
-                              : 'bg-[#1A1A1A] text-zenit-text-tertiary hover:text-zenit-text-primary'
+                              : 'bg-zenit-surface-2 text-zenit-text-tertiary hover:text-zenit-text-primary'
                           }`}
                         >
                           {userData?.language === lang && (
@@ -718,8 +718,8 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                     </div>
                   </div>
 
-                  <div className="pt-8">
-                    <div className="flex items-center justify-between p-6 rounded-3xl bg-[#1A1A1A]">
+                  <div className="pt-12 border-t border-zenit-border-primary/30">
+                    <div className="flex items-center justify-between p-8 rounded-[2rem] bg-zenit-surface-2 border border-zenit-border-primary/50 shadow-inner">
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 rounded-xl bg-zenit-accent/10 flex items-center justify-center">
                           {theme === 'dark' ? <Moon size={18} className="text-zenit-accent" /> : <Sun size={18} className="text-zenit-accent" />}
@@ -731,11 +731,11 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                       </div>
                       <button 
                         onClick={toggleTheme}
-                        className="w-14 h-8 rounded-full bg-black relative p-1 transition-all"
+                        className="w-14 h-8 rounded-full bg-zenit-black relative p-1 transition-all border border-zenit-border-primary"
                       >
                         <motion.div 
                           animate={{ x: theme === 'dark' ? 24 : 0 }}
-                          className="w-6 h-6 rounded-full bg-zenit-accent"
+                          className="w-6 h-6 rounded-full bg-zenit-accent shadow-[0_0_10px_var(--accent-glow)]"
                         />
                       </button>
                     </div>
@@ -755,7 +755,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
             <header className="relative flex items-center space-x-6 mb-12">
               <button 
                 onClick={() => setView('main')} 
-                className="w-12 h-12 rounded-2xl bg-[#1A1A1A] flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-90"
+                className="w-12 h-12 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-90"
               >
                 <ChevronRight className="rotate-180" size={20} />
               </button>
@@ -774,7 +774,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="p-4 flex items-center justify-between rounded-3xl bg-black/20 transition-all group"
+                  className="p-4 flex items-center justify-between rounded-3xl bg-zenit-surface-2/40 transition-all group"
                 >
                   <div className="flex items-center space-x-4">
                     <div className="relative">
@@ -792,14 +792,14 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                       <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold mt-0.5">@{user.username || 'user'}</p>
                     </div>
                   </div>
-                  <button className="px-6 py-3 rounded-2xl bg-[#1A1A1A] text-[10px] font-bold uppercase tracking-[0.2em] text-zenit-text-secondary hover:bg-zenit-accent hover:text-white transition-all active:scale-95">
+                  <button className="px-6 py-3 rounded-2xl bg-zenit-surface-2 text-[10px] font-bold uppercase tracking-[0.2em] text-zenit-text-secondary hover:bg-zenit-accent hover:text-white transition-all active:scale-95">
                     {t.profile.follow}
                   </button>
                 </motion.div>
               ))}
               {followList.length === 0 && (
                 <div className="text-center py-32 space-y-6">
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto bg-[#1A1A1A]">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto bg-zenit-surface-2">
                     <User size={32} className="text-zenit-text-tertiary/20" />
                   </div>
                   <div className="space-y-2">
@@ -814,7 +814,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
       default:
         if (loading) return <div className="flex items-center justify-center min-h-screen bg-zenit-black"><div className="w-8 h-8 border-2 border-zenit-scarlet border-t-transparent rounded-full animate-spin" /></div>;
         return (
-          <div className="pb-32 max-w-2xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
+          <div className="pb-32 max-w-6xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
             {/* Background Glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-zenit-crimson/5 rounded-full blur-[100px] pointer-events-none" />
@@ -909,7 +909,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                     {/* Glow Effect */}
                     <div className="absolute inset-0 bg-zenit-accent/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                   </motion.div>
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#1A1A1A] rounded-full z-20">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-zenit-surface-2 rounded-full z-20 border border-zenit-border-primary shadow-lg">
                     <span className="text-[10px] font-bold text-zenit-accent uppercase tracking-[0.2em]">LVL {level}</span>
                   </div>
                 </div>
@@ -931,18 +931,18 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                 </div>
 
                 {/* Stats Grid */}
-                <div className="flex items-center justify-center space-x-12 pt-6">
+                <div className="flex items-center justify-center space-x-8 sm:space-x-12 pt-6">
                   <div className="text-center group cursor-default">
-                    <p className="text-2xl font-display font-bold text-zenit-text-primary tracking-tighter group-hover:text-zenit-accent transition-colors">{socialStats.posts}</p>
-                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.flow}</p>
+                    <p className="text-xl sm:text-2xl font-display font-bold text-zenit-text-primary tracking-tighter group-hover:text-zenit-accent transition-colors">{socialStats.posts}</p>
+                    <p className="text-[8px] sm:text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.flow}</p>
                   </div>
                   <button onClick={fetchFollowers} className="text-center group transition-transform active:scale-95">
-                    <p className="text-2xl font-display font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors tracking-tighter">{socialStats.followers}</p>
-                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.followers}</p>
+                    <p className="text-xl sm:text-2xl font-display font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors tracking-tighter">{socialStats.followers}</p>
+                    <p className="text-[8px] sm:text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.followers}</p>
                   </button>
                   <button onClick={fetchFollowing} className="text-center group transition-transform active:scale-95">
-                    <p className="text-2xl font-display font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors tracking-tighter">{socialStats.following}</p>
-                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.following}</p>
+                    <p className="text-xl sm:text-2xl font-display font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors tracking-tighter">{socialStats.following}</p>
+                    <p className="text-[8px] sm:text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.following}</p>
                   </button>
                 </div>
 
@@ -952,13 +952,13 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                     <>
                       <button 
                         onClick={() => setView('edit-profile')}
-                        className="flex-1 py-4 rounded-2xl bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all active:scale-[0.98]"
+                        className="flex-1 py-4 rounded-2xl bg-zenit-accent text-white text-[10px] font-bold uppercase tracking-[0.3em] hover:brightness-110 transition-all active:scale-[0.98] shadow-lg shadow-zenit-accent/20"
                       >
                         {t.profile.editProfile}
                       </button>
                       <button 
                         onClick={() => setView('preferences')}
-                        className="p-4 rounded-2xl bg-[#1A1A1A] text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-[0.98]"
+                        className="p-4 rounded-2xl bg-zenit-surface-2 text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-[0.98] border border-zenit-border-primary"
                       >
                         <Settings size={20} />
                       </button>
@@ -968,7 +968,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                       onClick={toggleFollow}
                       className={`flex-1 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.3em] transition-all active:scale-[0.98] ${
                         isFollowing 
-                          ? 'bg-[#1A1A1A] text-zenit-text-tertiary' 
+                          ? 'bg-zenit-surface-2 text-zenit-text-tertiary' 
                           : 'bg-zenit-accent text-white hover:brightness-110'
                       }`}
                     >
@@ -980,7 +980,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
             </div>
 
             {/* Post Grid */}
-            <div className="mt-12 bg-black/20">
+            <div className="mt-12 bg-zenit-surface-2/20">
               <div className="flex justify-center py-8">
                 <div className="flex items-center space-x-4 text-zenit-accent">
                   <div className="w-1 h-1 rounded-full bg-zenit-accent animate-ping" />
@@ -996,16 +996,16 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                     whileHover={{ opacity: 0.9, scale: 0.98 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSelectedPost(post)}
-                    className="aspect-square bg-[#1A1A1A] relative group cursor-pointer overflow-hidden"
+                    className="aspect-square bg-zenit-surface-2 relative group cursor-pointer overflow-hidden"
                   >
                     {post.image_url ? (
                       <img src={post.image_url} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center p-6 bg-gradient-to-br from-[#1A1A1A] to-black">
+                      <div className="w-full h-full flex items-center justify-center p-6 bg-gradient-to-br from-zenit-surface-1 to-zenit-black">
                         <p className="text-[10px] text-zenit-text-tertiary text-center line-clamp-4 italic font-medium leading-relaxed opacity-60">"{post.caption || post.content}"</p>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-zenit-accent/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center space-x-6 backdrop-blur-[4px]">
+                    <div className="absolute inset-0 bg-zenit-accent/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center space-x-6 backdrop-blur-[4px]">
                       <div className="flex flex-col items-center space-y-1 text-white">
                         <Heart size={20} fill="currentColor" />
                         <span className="text-[11px] font-bold">{post.likes_count || 0}</span>
@@ -1019,7 +1019,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                 ))}
                 {posts.length === 0 && (
                   <div className="col-span-3 py-32 text-center space-y-8">
-                    <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto bg-[#1A1A1A] relative group">
+                    <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto bg-zenit-surface-2 relative group">
                       <Camera size={32} className="text-zenit-text-tertiary/20 group-hover:text-zenit-accent transition-colors" />
                       <div className="absolute inset-0 bg-zenit-accent/5 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
@@ -1135,7 +1135,7 @@ const MenuButton: React.FC<{ icon: React.ReactNode; label: string; sublabel: str
       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${
         danger 
           ? 'bg-red-500/10 text-red-500 group-hover:bg-red-500/20' 
-          : 'bg-black/40 text-zenit-text-tertiary group-hover:bg-zenit-accent group-hover:text-white'
+          : 'bg-zenit-surface-2 text-zenit-text-tertiary group-hover:bg-zenit-accent group-hover:text-white'
       }`}>
         {icon}
       </div>
@@ -1144,7 +1144,7 @@ const MenuButton: React.FC<{ icon: React.ReactNode; label: string; sublabel: str
         <p className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em]">{sublabel}</p>
       </div>
     </div>
-    <div className="relative z-10 w-10 h-10 rounded-full bg-black/20 flex items-center justify-center group-hover:bg-zenit-accent group-hover:text-white transition-all">
+    <div className="relative z-10 w-10 h-10 rounded-full bg-zenit-surface-1/50 flex items-center justify-center group-hover:bg-zenit-accent group-hover:text-white transition-all">
       <ChevronRight size={18} className="transition-all translate-x-0 group-hover:translate-x-0.5" />
     </div>
   </motion.button>
@@ -1227,16 +1227,16 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-black/90 backdrop-blur-2xl"
+        className="absolute inset-0 bg-zenit-black/90 backdrop-blur-2xl"
       />
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-5xl bg-[#0F0F0F] rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
+        className="relative w-full max-w-5xl bg-zenit-surface-1 rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-zenit-border-primary shadow-2xl"
       >
         {/* Post Media */}
-        <div className="md:w-[60%] bg-black flex items-center justify-center relative overflow-hidden group">
+        <div className="md:w-[60%] bg-zenit-black flex items-center justify-center relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-zenit-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           {post.image_url ? (
             <img src={post.image_url} className="w-full h-full object-contain relative z-10" referrerPolicy="no-referrer" />
@@ -1248,8 +1248,8 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
         </div>
 
         {/* Post Info & Comments */}
-        <div className="md:w-[40%] flex flex-col bg-[#0F0F0F]">
-          <div className="p-6 flex items-center justify-between bg-black/20 backdrop-blur-md">
+        <div className="md:w-[40%] flex flex-col bg-zenit-surface-2">
+          <div className="p-6 flex items-center justify-between bg-zenit-surface-1/50 backdrop-blur-md">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-zenit-accent to-zenit-crimson">
                 <img 
@@ -1344,14 +1344,14 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
           </div>
 
           {/* Comment Input */}
-          <div className="p-6 bg-black/40 backdrop-blur-2xl relative">
+          <div className="p-6 bg-zenit-surface-1/80 backdrop-blur-2xl relative">
             <div className="relative group">
               <input 
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder={t.profile.addToFlow}
-                className="w-full bg-[#1A1A1A] rounded-2xl py-4 pl-5 pr-14 text-xs focus:outline-none focus:bg-black/40 transition-all placeholder:text-zenit-text-tertiary/50 backdrop-blur-sm"
+                className="w-full bg-zenit-surface-2 rounded-2xl py-4 pl-5 pr-14 text-xs focus:outline-none focus:bg-zenit-surface-1 transition-all placeholder:text-zenit-text-tertiary/50 backdrop-blur-sm"
                 onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
               />
               <motion.button 

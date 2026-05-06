@@ -11,12 +11,11 @@ import { Exercises } from './components/Exercises';
 import { FocusTimer } from './components/FocusTimer';
 import { Onboarding } from './components/Onboarding';
 import { MentalGym } from './components/MentalGym';
-import { Social } from './components/Social';
+import { Nexus as Social } from './components/Social';
 import { AdminPanel } from './components/AdminPanel';
 import { Journal } from './components/Journal';
 import { NewProtocolModal } from './components/NewProtocolModal';
 import { Stats } from './components/Stats';
-import { Manual } from './components/Manual';
 import { Protocols } from './components/Protocols';
 import { SubscriptionScreen } from './components/SubscriptionScreen';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
@@ -39,7 +38,7 @@ export default function App() {
 }
 
 function AppContent() {
-  const { user, userData, loading, isSupabaseConnected, connectionError, refreshUserData } = useUser();
+  const { user, userData, loading, isSupabaseConnected, connectionError, refreshUserData, isDemoMode } = useUser();
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState('home');
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -198,8 +197,6 @@ function AppContent() {
         return <Social key="social" t={t} />;
       case 'journal':
         return <Journal key="journal" t={t} />;
-      case 'manual':
-        return <Manual key="manual" />;
       case 'protocols':
         return <Protocols key="protocols" t={t} />;
       case 'stats':
@@ -234,6 +231,16 @@ function AppContent() {
         </AnimatePresence>
 
         {!showOnboarding && <FloatingThemeToggle />}
+
+        {isDemoMode && (
+          <div className="fixed top-4 right-4 z-50">
+            <div className="bg-zenit-scarlet/20 backdrop-blur-md border border-zenit-scarlet/30 px-3 py-1.5 rounded-full flex items-center space-x-2 shadow-lg">
+              <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+              <span className="text-[10px] font-bold text-white uppercase tracking-widest">Neural Offline / Demo</span>
+            </div>
+          </div>
+        )}
+
         <Navigation activeTab={activeTab} setActiveTab={setActiveTab} onPlusClick={() => setIsNewProtocolOpen(true)} t={t} />
         <NewProtocolModal isOpen={isNewProtocolOpen} onClose={() => setIsNewProtocolOpen(false)} t={t} />
 

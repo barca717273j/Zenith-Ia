@@ -77,6 +77,8 @@
     background-color: var(--bg-color);
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -111,20 +113,28 @@
   }
 
   .premium-card-hover {
-    @apply hover:-translate-y-1 hover:shadow-xl transition-all duration-300;
+    @apply transition-all duration-300;
+  }
+
+  @media (min-width: 768px) {
+    .premium-card-hover:hover {
+      @apply -translate-y-1 shadow-xl;
+    }
   }
 
   .neon-button {
-    @apply relative overflow-hidden rounded-2xl px-8 py-4 font-bold text-white transition-all duration-300 active:scale-95 flex items-center justify-center gap-2;
+    @apply relative overflow-hidden rounded-2xl px-8 py-4 font-bold text-white transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 min-h-[44px];
     background-color: #FF0000;
     border: none;
     box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
   }
 
-  .neon-button:hover {
-    background-color: #FF3333;
-    box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
-    transform: translateY(-1px);
+  @media (min-width: 768px) {
+    .neon-button:hover {
+      background-color: #FF3333;
+      box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+      transform: translateY(-1px);
+    }
   }
 
   .neon-button:active {
@@ -182,9 +192,11 @@
     box-shadow: 0 0 20px var(--accent-glow);
   }
 
-  .floating-plus:hover {
-    @apply scale-110 -translate-y-4;
-    box-shadow: 0 0 30px var(--accent-glow);
+  @media (min-width: 768px) {
+    .floating-plus:hover {
+      @apply scale-110 -translate-y-4;
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
   }
 }
 

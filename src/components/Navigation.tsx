@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, ListTodo, Dumbbell, Wallet, User, Zap, Plus } from 'lucide-react';
+import { Home, ListTodo, Dumbbell, Wallet, User, Zap, Plus, Scale, Users } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface NavItemProps {
@@ -12,32 +12,32 @@ interface NavItemProps {
 const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => (
   <button
     onClick={onClick}
-    className="flex flex-col items-center justify-center py-2 px-3 relative group outline-none transition-all duration-500"
+    className="flex flex-col items-center justify-center py-2 px-1 relative outline-none transition-all duration-500 min-h-[44px] min-w-[44px]"
   >
-    <div className={`transition-all duration-500 flex flex-col items-center ${isActive ? 'scale-110' : 'group-hover:scale-105'}`}>
-      <div className={`p-2.5 rounded-2xl transition-all duration-500 relative ${isActive ? 'text-zenit-accent' : 'text-zenit-text-tertiary opacity-60 group-hover:opacity-100'}`}>
+    <div className={`transition-all duration-500 flex flex-col items-center ${isActive ? 'scale-105' : ''}`}>
+      <div className={`p-2 rounded-xl transition-all duration-500 relative ${isActive ? 'text-zenit-accent' : 'text-zenit-text-tertiary opacity-60'}`}>
         {isActive && (
           <motion.div
             layoutId="nav-glow"
-            className="absolute inset-0 bg-zenit-accent/20 blur-2xl rounded-full"
+            className="absolute inset-0 bg-zenit-accent/10 blur-xl rounded-full"
           />
         )}
         <div className="relative z-10">
           {React.cloneElement(icon as any, { 
-            size: 20,
+            size: 18,
             strokeWidth: isActive ? 2.5 : 2,
-            className: isActive ? 'drop-shadow-[0_0_12px_var(--accent-glow)]' : ''
+            className: isActive ? 'drop-shadow-[0_0_8px_var(--accent-glow)]' : ''
           })}
         </div>
       </div>
-      <span className={`text-[9px] mt-1.5 font-bold uppercase tracking-[0.2em] transition-all duration-500 ${isActive ? 'text-zenit-accent opacity-100' : 'text-zenit-text-tertiary opacity-70 group-hover:opacity-100'}`}>
+      <span className={`text-[7px] mt-1 font-bold uppercase tracking-widest transition-all duration-500 ${isActive ? 'text-zenit-accent opacity-100' : 'text-zenit-text-tertiary opacity-70'}`}>
         {label}
       </span>
     </div>
     {isActive && (
       <motion.div
         layoutId="nav-indicator"
-        className="absolute -bottom-1 w-1.5 h-1.5 bg-zenit-accent rounded-full shadow-[0_0_15px_var(--accent-glow)]"
+        className="absolute -bottom-0.5 w-1 h-1 bg-zenit-accent rounded-full shadow-[0_0_10px_var(--accent-glow)]"
       />
     )}
   </button>
@@ -53,18 +53,18 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, onPlusClick, t }) => {
-  const { userData } = useUser();
-  
   return (
-    <div className="fixed bottom-8 left-0 right-0 px-4 z-50 flex justify-center pointer-events-none">
-      <nav className="rounded-[2.5rem] px-4 py-2 flex justify-between items-center w-full max-w-lg relative shadow-[0_20px_60px_rgba(0,0,0,0.6)] border border-zenit-border-primary bg-zenit-nav backdrop-blur-3xl pointer-events-auto">
-        <div className="flex items-center justify-around flex-1">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-lg">
+      <nav className="bg-zenit-surface-1/80 backdrop-blur-3xl border border-zenit-border-primary rounded-[2.5rem] p-1.5 flex items-center shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="flex-1 flex justify-center">
           <NavItem
             icon={<Home />}
             label={t.nav.home}
             isActive={activeTab === 'home'}
             onClick={() => setActiveTab('home')}
           />
+        </div>
+        <div className="flex-1 flex justify-center">
           <NavItem
             icon={<ListTodo />}
             label={t.nav.routine}
@@ -73,24 +73,25 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab,
           />
         </div>
         
-        {/* Central Action Button */}
-        <div className="relative mx-4">
+        {/* Central Plus Button */}
+        <div className="flex-shrink-0 px-2">
           <button
             onClick={onPlusClick}
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-white transition-all duration-300 bg-gradient-to-br from-zenit-accent to-zenit-crimson border border-white/20 shadow-[0_0_20px_var(--accent-glow)] relative group active:scale-95"
+            className="w-14 h-14 rounded-full bg-gradient-to-br from-zenit-accent to-zenit-crimson flex items-center justify-center text-white shadow-[0_0_20px_rgba(255,36,0,0.4)] active:scale-90 transition-all -translate-y-4 border-4 border-zenit-black"
           >
-            <Plus size={28} className="relative z-10" />
-            <div className="absolute inset-0 border border-white/20 rounded-2xl pointer-events-none" />
+            <Plus size={32} strokeWidth={3} />
           </button>
         </div>
 
-        <div className="flex items-center justify-around flex-1">
+        <div className="flex-1 flex justify-center">
           <NavItem
-            icon={<Zap />}
-            label={t.social.title}
+            icon={<Users />}
+            label={t.nav.nexus}
             isActive={activeTab === 'social'}
             onClick={() => setActiveTab('social')}
           />
+        </div>
+        <div className="flex-1 flex justify-center">
           <NavItem
             icon={<User />}
             label={t.nav.profile}

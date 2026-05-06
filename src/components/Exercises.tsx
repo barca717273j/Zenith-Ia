@@ -150,27 +150,37 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
     : exercises.filter(ex => ex.category === activeCategory);
 
   return (
-    <div className="flex flex-col gap-4 p-4 pb-32 max-w-2xl mx-auto min-h-screen">
-      <header className="flex justify-between items-end mb-4">
+    <div className="flex flex-col gap-6 p-6 pb-32 max-w-2xl mx-auto min-h-screen">
+      <header className="flex justify-between items-end">
         <div className="space-y-2">
-          <h2 className="text-3xl font-display font-bold tracking-tighter uppercase text-zenit-text-primary">
-            Bio <span className="text-zenit-accent">Hacking</span>
+          <h2 className="text-4xl font-display font-medium tracking-tight uppercase text-zenit-text-primary italic leading-none">
+            Bio <span className="text-zenit-scarlet">Hacking</span>
           </h2>
-          <p className="text-zenit-text-secondary text-[10px] font-bold uppercase tracking-[0.3em]">Otimize seu hardware biológico</p>
+          <div className="flex items-center space-x-3">
+             <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+             <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary opacity-60">Otimize seu hardware biológico</p>
+          </div>
         </div>
-        <div className="flex bg-zenit-surface-1 p-1 rounded-xl border border-zenit-border-primary">
-          <button 
-            onClick={() => setActiveTab('browse')}
-            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-zenit-accent text-white' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
-          >
-            Explorar
-          </button>
-          <button 
-            onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-zenit-accent text-white' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
-          >
-            Histórico
-          </button>
+        <div className="flex bg-zenit-surface-1/40 backdrop-blur-xl p-1.5 rounded-[1.5rem] border border-zenit-border-primary">
+          {(['browse', 'history'] as const).map((tab) => (
+            <button 
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 relative ${
+                activeTab === tab 
+                  ? 'text-white' 
+                  : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'
+              }`}
+            >
+              {activeTab === tab && (
+                <motion.div 
+                  layoutId="active-tab-bg"
+                  className="absolute inset-0 bg-zenit-scarlet rounded-xl -z-10 shadow-[0_0_20px_rgba(255,0,0,0.3)]"
+                />
+              )}
+              {tab === 'browse' ? 'Explorar' : 'Registros'}
+            </button>
+          ))}
         </div>
       </header>
 
@@ -178,36 +188,39 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
         {activeTab === 'browse' ? (
           <motion.div
             key="browse"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="space-y-8"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            className="space-y-10"
           >
-            {/* Categories */}
-            <div className="flex space-x-3 overflow-x-auto pb-4 no-scrollbar">
+            {/* Categories - Premium Chip Interface */}
+            <div className="flex space-x-3 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
               {categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`flex items-center space-x-2 px-5 py-3 rounded-2xl border whitespace-nowrap transition-all ${
+                  className={`flex items-center space-x-3 px-5 py-3 rounded-2xl border whitespace-nowrap transition-all duration-300 ${
                     activeCategory === cat.id 
-                      ? 'bg-zenit-accent text-white border-zenit-accent shadow-[0_0_20px_rgba(255,38,33,0.3)]' 
-                      : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-2'
+                      ? 'bg-zenit-surface-1 text-zenit-scarlet border-zenit-scarlet/30 shadow-[0_10px_25px_rgba(0,0,0,0.2)]' 
+                      : 'bg-zenit-surface-1/20 border-zenit-border-primary/50 text-zenit-text-tertiary hover:bg-zenit-surface-1'
                   }`}
                 >
-                  {cat.icon}
-                  <span className="text-[10px] font-bold uppercase tracking-widest">{cat.label}</span>
+                  <span className={activeCategory === cat.id ? 'text-zenit-scarlet' : 'opacity-40'}>
+                    {React.cloneElement(cat.icon as any, { size: 14 })}
+                  </span>
+                  <span className="text-[9px] font-black uppercase tracking-widest">{cat.label}</span>
                 </button>
               ))}
             </div>
 
-            {/* Exercise Grid */}
+            {/* Exercise Grid - Sleek List View */}
             {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="w-8 h-8 border-2 border-zenit-accent border-t-transparent rounded-full animate-spin" />
+              <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                <div className="w-10 h-10 border-2 border-zenit-scarlet border-t-transparent rounded-full animate-spin" />
+                <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest font-black animate-pulse">Syncing Protocols...</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-4">
                 {filteredExercises.map(ex => {
                   const isLocked = ex.is_premium && !hasAccessToPremium;
                   return (
@@ -215,30 +228,50 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                       key={ex.id}
                       layoutId={`ex-${ex.id}`}
                       onClick={() => !isLocked && setSelectedExercise(ex)}
-                      className={`premium-card group cursor-pointer overflow-hidden border-zenit-border-secondary bg-zenit-surface-1 hover:bg-zenit-surface-2 transition-all relative ${isLocked ? 'opacity-60 grayscale' : ''}`}
+                      className={`glass-card p-5 rounded-[2rem] flex items-center transition-all duration-500 border border-zenit-border-primary/50 relative overflow-hidden group ${
+                        isLocked ? 'opacity-40 grayscale pointer-events-none' : 'bg-zenit-surface-1/60 active:scale-[0.98]'
+                      }`}
                     >
-                      <div className="p-6 flex items-center justify-between">
-                        <div className="flex items-center space-x-6">
-                          <div className="w-16 h-16 rounded-2xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent group-hover:scale-110 transition-transform duration-500 border border-zenit-accent/20 shadow-[0_0_15px_rgba(255,59,59,0.1)]">
-                            {ex.category === 'training' ? <Dumbbell size={28} /> : <Activity size={28} />}
+                      <div className="flex items-center space-x-5 flex-1 relative z-10 min-w-0">
+                        <div className="w-16 h-16 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary group-hover:scale-105 group-hover:text-zenit-scarlet transition-all duration-500 border border-zenit-border-primary">
+                          {ex.category === 'training' ? <Dumbbell size={24} /> : React.cloneElement((categories.find(c => c.id === ex.category)?.icon || <Activity />) as any, { size: 24 })}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0 space-y-1.5">
+                          <div className="flex items-center justify-between gap-3">
+                             <h3 className="text-base font-bold text-zenit-text-primary tracking-tight truncate group-hover:text-zenit-scarlet transition-colors">
+                               {ex.title}
+                             </h3>
+                             {ex.is_premium && !isLocked && (
+                                <Sparkles size={12} className="text-yellow-500 flex-shrink-0" />
+                             )}
                           </div>
-                          <div className="space-y-1">
-                            <h3 className="text-xl font-bold text-zenit-text-primary tracking-tight group-hover:text-zenit-accent transition-colors">{ex.title}</h3>
-                            <div className="flex items-center space-x-4">
-                              <div className="flex items-center space-x-2 text-zenit-text-tertiary">
-                                <Clock size={12} className="text-zenit-accent" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">{ex.duration}</span>
-                              </div>
-                              <div className="flex items-center space-x-2 text-zenit-text-tertiary">
-                                <Award size={12} className="text-zenit-accent" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">{ex.difficulty}</span>
-                              </div>
-                            </div>
+
+                          <div className="flex items-center space-x-3 text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-60">
+                             <div className="flex items-center gap-1.5">
+                               <Clock size={10} className="text-zenit-scarlet" />
+                               <span>{ex.duration}</span>
+                             </div>
+                             <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
+                             <div className="flex items-center gap-1.5">
+                               <Award size={10} className="text-zenit-scarlet" />
+                               <span>{ex.difficulty}</span>
+                             </div>
+                             {(ex as any).tags?.[0] && (
+                               <>
+                                 <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
+                                 <span className="truncate">#{(ex as any).tags[0]}</span>
+                               </>
+                             )}
                           </div>
                         </div>
-                        <button className="bg-zenit-accent text-white px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(255,59,59,0.3)] hover:shadow-[0_0_30px_rgba(255,59,59,0.5)] transition-all">
-                          Concluir
-                        </button>
+                      </div>
+                      
+                      <div className="ml-4 flex flex-col items-end space-y-3">
+                         <div className="text-[10px] font-black font-mono text-zenit-scarlet bg-zenit-scarlet/5 px-3 py-1 rounded-full border border-zenit-scarlet/10">
+                           +{ex.xp_reward || 100} XP
+                         </div>
+                         <ChevronRight size={16} className="text-zenit-text-tertiary group-hover:text-zenit-scarlet group-hover:translate-x-1 transition-all" />
                       </div>
                     </motion.div>
                   );
@@ -249,34 +282,34 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
         ) : (
           <motion.div
             key="history"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="space-y-6"
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            className="space-y-4"
           >
             {history.length > 0 ? history.map((item) => (
-              <div key={item.id} className="glass-card p-6 border-zenit-border-secondary bg-zenit-surface-1 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent">
-                    <CheckCircle2 size={24} />
+              <div key={item.id} className="glass-card p-5 rounded-[2rem] border border-zenit-border-primary/50 bg-zenit-surface-1/40 flex items-center justify-between group">
+                <div className="flex items-center space-x-5">
+                  <div className="w-12 h-12 rounded-xl bg-zenit-surface-2 flex items-center justify-center text-zenit-scarlet border border-zenit-border-primary">
+                    <CheckCircle2 size={20} />
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-zenit-text-primary">{item.exercises?.title || 'Exercício Concluído'}</h4>
-                    <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest">
-                      {new Date(item.completed_at).toLocaleDateString()} às {new Date(item.completed_at).toLocaleTimeString()}
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold text-zenit-text-primary tracking-tight">{item.exercises?.title || 'Protocolo Concluído'}</h4>
+                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-black opacity-40">
+                      {new Date(item.completed_at).toLocaleDateString()} • {new Date(item.completed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-zenit-accent uppercase tracking-widest">+{item.exercises?.xp_reward || 50} XP</span>
+                  <span className="text-[10px] font-black font-mono text-zenit-scarlet bg-zenit-scarlet/5 px-3 py-1 rounded-full border border-zenit-scarlet/10">
+                    +{item.exercises?.xp_reward || 50} XP
+                  </span>
                 </div>
               </div>
             )) : (
-              <div className="py-24 text-center space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto opacity-20">
-                  <History size={32} />
-                </div>
-                <p className="text-white/20 text-xs font-bold uppercase tracking-[0.3em]">Nenhum registro neural</p>
+              <div className="py-24 text-center space-y-6 opacity-30 italic">
+                <History size={48} className="mx-auto text-zenit-text-tertiary" />
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary">Aguardando Execução...</p>
               </div>
             )}
           </motion.div>

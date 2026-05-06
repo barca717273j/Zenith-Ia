@@ -234,29 +234,32 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
   return (
     <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto min-h-screen bg-zenit-black text-zenit-text-primary relative overflow-hidden">
       {/* Living Background Elements */}
-      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-zenit-scarlet/5 rounded-full blur-[120px] animate-pulse-glow" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-zenit-scarlet/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
       <header className="space-y-4 relative z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-5">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-zenit-accent to-zenit-crimson flex items-center justify-center">
-              <Scale size={28} className="text-white" />
+          <div className="flex items-center space-x-6">
+            <div className="w-16 h-16 rounded-[2rem] bg-zenit-surface-1/40 backdrop-blur-xl border border-zenit-border-primary flex items-center justify-center shadow-2xl">
+              <Scale size={32} className="text-zenit-scarlet" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold font-display tracking-tighter uppercase italic leading-none text-zenit-text-primary">Axis <span className="text-zenit-accent">Neural</span></h1>
-              <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-[0.4em] mt-2">{axisT.subtitle}</p>
+              <h1 className="text-4xl font-display font-medium tracking-tight uppercase italic leading-none text-zenit-text-primary">Nexus <span className="text-zenit-scarlet">Neural</span></h1>
+              <div className="flex items-center space-x-3 mt-2">
+                 <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+                 <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-[0.45em] opacity-60">{axisT.subtitle}</p>
+              </div>
             </div>
           </div>
           <button 
             onClick={() => setShowDecisionEngine(!showDecisionEngine)}
-            className={`w-14 h-14 rounded-2xl transition-all flex items-center justify-center group ${
+            className={`w-14 h-14 rounded-[1.5rem] transition-all duration-500 flex items-center justify-center border ${
               showDecisionEngine 
-                ? 'bg-zenit-accent text-white' 
-                : 'bg-zenit-surface-1 text-zenit-text-tertiary hover:text-zenit-text-primary'
+                ? 'bg-zenit-scarlet border-zenit-scarlet text-white shadow-[0_10px_30px_rgba(255,0,0,0.3)]' 
+                : 'bg-zenit-surface-1/40 backdrop-blur-xl border-zenit-border-primary text-zenit-text-tertiary hover:text-zenit-text-primary'
             }`}
           >
-            <Brain size={24} className={`transition-transform duration-500 ${showDecisionEngine ? 'scale-110 rotate-12' : 'group-hover:scale-110'}`} />
+            <Brain size={24} className={`transition-transform duration-700 ${showDecisionEngine ? 'scale-110 rotate-12' : ''}`} />
           </button>
         </div>
       </header>
@@ -292,11 +295,10 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                   </div>
                 ) : (
                   history.map((item) => (
-                    <div key={item.id} className="group relative p-6 rounded-[2rem] bg-zenit-surface-1 transition-all overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-zenit-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div key={item.id} className="relative p-6 rounded-[2rem] bg-zenit-surface-1 transition-all overflow-hidden">
                       <div className="flex justify-between items-center relative z-10">
                         <div className="space-y-2">
-                          <p className="text-sm font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors">{item.title}</p>
+                          <p className="text-sm font-bold text-zenit-text-primary">{item.title}</p>
                           <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold opacity-60">{new Date(item.created_at).toLocaleDateString()}</p>
                         </div>
                         <div className="flex items-center space-x-3">
@@ -306,13 +308,13 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
                               setQuery(item.title);
                               setShowHistory(false);
                             }}
-                            className="w-10 h-10 rounded-xl bg-zenit-surface-2 text-zenit-text-primary flex items-center justify-center hover:bg-zenit-accent hover:text-white transition-all"
+                            className="w-10 h-10 rounded-xl bg-zenit-surface-2 text-zenit-text-primary flex items-center justify-center active:bg-zenit-accent active:text-white transition-all min-h-[44px] min-w-[44px]"
                           >
                             <ChevronRight size={18} />
                           </button>
                           <button 
                             onClick={() => deleteDecision(item.id)}
-                            className="w-10 h-10 rounded-xl bg-zenit-accent/10 text-zenit-accent flex items-center justify-center hover:bg-zenit-accent hover:text-white transition-all"
+                            className="w-10 h-10 rounded-xl bg-zenit-accent/10 text-zenit-accent flex items-center justify-center active:bg-zenit-accent active:text-white transition-all min-h-[44px] min-w-[44px]"
                           >
                             <Trash2 size={18} />
                           </button>
@@ -466,79 +468,80 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-8"
           >
-            {/* Overall Progress */}
-            <section className="relative p-10 rounded-[3rem] bg-zenit-surface-1/40 backdrop-blur-xl overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-700">
-                <Activity size={160} className="text-zenit-accent" />
+            <section className="relative p-10 rounded-[3rem] bg-zenit-surface-1/60 backdrop-blur-xl border border-zenit-border-primary overflow-hidden group shadow-[0_30px_60px_rgba(0,0,0,0.4)]">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-1000">
+                <Activity size={180} className="text-zenit-scarlet" />
               </div>
               
-              <div className="space-y-8 relative z-10">
+              <div className="space-y-10 relative z-10">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <h2 className="text-6xl font-display font-bold text-zenit-text-primary uppercase tracking-tighter italic leading-none">{overallProgress}%</h2>
-                    <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-[0.5em] mt-2">{axisT.overallProgress}</p>
+                  <div className="space-y-3">
+                    <h2 className="text-7xl font-display font-medium text-zenit-text-primary uppercase tracking-tighter italic leading-none">{overallProgress}%</h2>
+                    <div className="flex items-center space-x-3">
+                       <div className="w-1 h-3 bg-zenit-scarlet rounded-full" />
+                       <p className="text-[10px] font-black text-zenit-text-tertiary uppercase tracking-[0.5em]">{axisT.overallProgress}</p>
+                    </div>
                   </div>
-                  <div className="w-16 h-16 rounded-[2rem] bg-zenit-accent/10 flex items-center justify-center">
-                    <Target size={32} className="text-zenit-accent" />
+                  <div className="w-20 h-20 rounded-[2.5rem] bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center shadow-xl">
+                    <Target size={36} className="text-zenit-scarlet" />
                   </div>
                 </div>
 
-                <div className="relative h-3 bg-zenit-surface-2 rounded-full overflow-hidden">
+                <div className="relative h-2 bg-zenit-surface-2 rounded-full overflow-hidden border border-zenit-border-primary/30">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${overallProgress}%` }}
-                    className="h-full bg-gradient-to-r from-zenit-accent/40 to-zenit-accent"
-                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="h-full bg-gradient-to-r from-zenit-scarlet/40 to-zenit-scarlet"
+                    transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
                   />
                 </div>
 
-                <div className="flex justify-between text-[9px] font-bold uppercase tracking-[0.3em] text-zenit-text-tertiary opacity-60">
-                  <span className="flex items-center space-x-2">
-                    <Crown size={10} className="text-zenit-accent" />
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary">
+                  <span className="flex items-center space-x-2 text-zenit-scarlet bg-zenit-scarlet/5 px-4 py-2 rounded-full border border-zenit-scarlet/10">
+                    <Crown size={12} />
                     <span>Evolution Level 04</span>
                   </span>
-                  <span>{axisT.nextMilestone}: 85%</span>
+                  <span className="opacity-40">{axisT.nextMilestone}: 85%</span>
                 </div>
               </div>
             </section>
 
             {/* Life Areas Grid */}
-            <section className="space-y-6">
+            <section className="space-y-8">
               <div className="flex items-center justify-between px-2">
-                <div className="flex items-center space-x-3">
-                  <div className="w-1.5 h-5 bg-zenit-accent rounded-full" />
-                  <h3 className="text-xs font-bold uppercase tracking-[0.4em] text-zenit-text-primary italic">{axisT.lifeAreas}</h3>
+                <div className="flex items-center space-x-4">
+                  <div className="w-2 h-6 bg-zenit-scarlet rounded-full" />
+                  <h3 className="text-sm font-bold uppercase tracking-[0.4em] text-zenit-text-primary italic">{axisT.lifeAreas}</h3>
                 </div>
-                <Sparkles size={14} className="text-zenit-accent animate-pulse" />
+                <Sparkles size={16} className="text-zenit-scarlet animate-pulse" />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 {areas.map((area) => (
                   <motion.div
                     key={area.id}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative group p-8 rounded-[2.5rem] bg-zenit-surface-1 transition-all overflow-hidden"
+                    whileHover={{ y: -5 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="relative p-8 rounded-[2.5rem] bg-zenit-surface-1/60 backdrop-blur-xl border border-zenit-border-primary transition-all duration-500 overflow-hidden shadow-xl"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-zenit-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
                     <div className="flex justify-between items-start relative z-10">
-                      <div className={`w-14 h-14 rounded-2xl ${area.bg} ${area.border} flex items-center justify-center ${area.color} transition-all group-hover:scale-110`}>
+                      <div className={`w-14 h-14 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center text-zenit-text-tertiary transition-all duration-500 group-hover:text-zenit-scarlet`}>
                         {React.cloneElement(area.icon as any, { size: 24 })}
                       </div>
-                      <div className="flex items-center space-x-2 text-xs font-bold text-zenit-text-primary italic">
+                      <div className="flex items-center space-x-2 text-[11px] font-black text-zenit-text-primary italic font-mono">
                         <span>{area.progress}%</span>
-                        <ArrowUpRight size={12} className="text-zenit-text-tertiary opacity-40" />
+                        <ArrowUpRight size={14} className="text-zenit-text-tertiary opacity-40 shrink-0" />
                       </div>
                     </div>
 
-                    <div className="space-y-4 mt-8 relative z-10">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zenit-text-tertiary group-hover:text-zenit-text-primary transition-colors">{area.label}</p>
-                      <div className="relative h-1.5 bg-zenit-surface-2 rounded-full overflow-hidden">
+                    <div className="space-y-5 mt-10 relative z-10">
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary opacity-60 leading-tight">{area.label}</p>
+                      <div className="relative h-1 bg-zenit-surface-2 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${area.progress}%` }}
-                          className={`h-full ${area.progress > 0 ? area.color.replace('text-', 'bg-') : 'bg-zenit-text-tertiary/20'}`}
-                          transition={{ duration: 1, ease: "easeOut" }}
+                          className={`h-full ${area.progress > 0 ? (area.id === 'discipline' ? 'bg-zenit-scarlet' : 'bg-zenit-text-tertiary/60') : 'bg-zenit-text-tertiary/20'}`}
+                          transition={{ duration: 1.5, ease: "easeOut" }}
                         />
                       </div>
                     </div>

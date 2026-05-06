@@ -51,16 +51,36 @@ export const Auth: React.FC = () => {
     setError('');
     setShowResend(false);
 
+    const identifier = email.trim();
+    let loginEmail = identifier;
+
     try {
+      // If it doesn't look like an email, try to find the email by username
+      if (!identifier.includes('@')) {
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('email')
+          .eq('username', identifier.toLowerCase())
+          .single();
+        
+        if (!userError && userData?.email) {
+          loginEmail = userData.email;
+        } else {
+          // If username not found, we still try to login with the identifier as email 
+          // (Supabase will return the correct error)
+          console.warn("Username not found or error:", userError);
+        }
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: loginEmail,
+        password: password,
       });
 
       if (error) {
         console.error("LOGIN ERROR:", error);
         if (error.message === 'Invalid login credentials') {
-          setError('E-mail ou senha incorretos. Por favor, verifique suas credenciais.');
+          setError('E-mail/Usuário ou senha incorretos. Por favor, verifique suas credenciais.');
         } else if (error.message.includes('Email not confirmed')) {
           setError('Seu e-mail ainda não foi confirmado. Por favor, verifique sua caixa de entrada.');
           setShowResend(true);
@@ -402,20 +422,20 @@ export const Auth: React.FC = () => {
             >
               <form onSubmit={handleAuth} className="space-y-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.email}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">E-mail ou Usuário</label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
                       <Mail size={20} />
                     </div>
                     <input
-                      type="email"
+                      type="text"
                       name="email"
-                      autoComplete="email"
+                      autoComplete="username"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-14 pr-5 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
-                      placeholder="seu@email.com"
+                      placeholder="seu@email.com ou username"
                     />
                   </div>
                 </div>

@@ -97,10 +97,10 @@ export const testSupabaseConnection = async (retryCount = 0): Promise<{ connecte
       };
     }
     
-    if (errorMessage.toLowerCase().includes('failed to fetch')) {
+    if (errorMessage.toLowerCase().includes('failed to fetch') || errorMessage.toLowerCase().includes('load failed')) {
       return {
         connected: false,
-        error: 'Falha na comunicação com o Supabase (Failed to fetch). Isso geralmente ocorre se a URL estiver incorreta (verifique se não há espaços extras), o projeto estiver pausado no painel do Supabase, ou se houver um bloqueio de rede por Adblock ou Firewall. Verifique as configurações no menu "Settings".'
+        error: 'Falha na comunicação com o Supabase. Isso ocorre se:\n1. O projeto estiver PAUSADO (veja no painel do Supabase).\n2. A URL estiver incorreta.\n3. Bloqueio de rede (Adblock/Firewall/VPN).\n\nVerifique se o seu projeto está ativo em https://supabase.com/dashboard'
       };
     }
 
@@ -109,16 +109,50 @@ export const testSupabaseConnection = async (retryCount = 0): Promise<{ connecte
   }
 };
 
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseAnonKey || 'placeholder',
-  {
+const createSafeClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
+    console.warn("Supabase credentials missing. App running in Demo Mode.");
+    // Return a proxy that logs warnings instead of crashing
+    return {
+      auth: {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        signOut: async () => {},
+        getUser: async () => ({ data: { user: null }, error: null }),
+        signInWithPassword: async () => ({ data: { user: null, session: null }, error: new Error("Demo Mode") }),
+        signUp: async () => ({ data: { user: null, session: null }, error: new Error("Demo Mode") }),
+      },
+      from: (table: string) => ({
+        select: () => ({ 
+          eq: () => ({ 
+            single: async () => ({ data: null, error: null }), 
+            limit: () => ({ abortSignal: async () => ({ data: null, error: null }) }),
+            order: () => ({ data: [], error: null })
+          }),
+          order: () => ({ limit: () => ({ data: [], error: null }) })
+        }),
+        insert: () => ({ select: () => ({ single: async () => ({ data: null, error: null }) }) }),
+        update: () => ({ eq: async () => ({ data: null, error: null }) }),
+        delete: () => ({ eq: async () => ({ data: null, error: null }) }),
+      }),
+      rpc: async () => ({ data: null, error: null }),
+      storage: {
+        from: () => ({
+          upload: async () => ({ data: null, error: null }),
+          getPublicUrl: () => ({ data: { publicUrl: '' } }),
+        })
+      }
+    } as any;
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
       storageKey: 'zenit-auth-token',
-      lock: (name: string, timeout: number, acquire: () => Promise<any>) => acquire(),
     },
-  }
-);
+  });
+};
+
+export const supabase = createSafeClient();

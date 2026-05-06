@@ -397,121 +397,292 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   };
 
   return (
-    <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto min-h-screen">
+    <div className="p-4 space-y-8 pb-32 max-w-2xl mx-auto min-h-screen">
       <header className="flex justify-between items-end">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary">
-            Fluxo <span className="text-zenit-scarlet">Capital</span>
+        <div className="space-y-1.5">
+          <h1 className="text-3xl font-bold font-display tracking-tight text-zenit-text-primary">
+            Fluxo <span className="text-zenit-scarlet italic">Capital</span>
           </h1>
-          <div className="flex items-center space-x-3">
-            <div className="h-1 w-16 bg-gradient-to-r from-zenit-scarlet to-transparent rounded-full" />
-            <p className="text-zenit-text-tertiary text-[10px] font-bold uppercase tracking-[0.3em]">
-              Gestão de Ativos e Liquidez
+          <div className="flex items-center space-x-2 opacity-80">
+            <div className="h-0.5 w-10 bg-zenit-scarlet rounded-full" />
+            <p className="text-zenit-text-tertiary text-[9px] font-black uppercase tracking-[0.2em]">
+              Sistema de Liquidez Neural
             </p>
           </div>
         </div>
-        <div className="flex space-x-4">
+        <div className="flex items-center space-x-3">
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAIChat(true)}
-            className="w-16 h-16 rounded-[24px] bg-zenit-scarlet/5 border border-zenit-scarlet/20 flex items-center justify-center text-zenit-scarlet hover:bg-zenit-scarlet/10 transition-all shadow-2xl shadow-zenit-scarlet/5"
+            className="w-12 h-12 rounded-2xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center text-zenit-scarlet shadow-lg shadow-zenit-scarlet/5 active:bg-zenit-surface-2 transition-all min-h-[44px] min-w-[44px]"
           >
-            <Bot size={32} />
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.05, rotate: 90 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowAddModal(true)}
-            className="w-16 h-16 rounded-[24px] bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center hover:bg-zenit-surface-3 hover:border-zenit-scarlet/50 transition-all duration-500 group shadow-2xl"
-          >
-            <Plus size={32} className="text-zenit-text-tertiary group-hover:text-zenit-scarlet transition-colors" />
+            <Zap size={22} className="drop-shadow-[0_0_8px_var(--accent-glow)]" />
           </motion.button>
         </div>
       </header>
 
-      {/* Balance Card */}
-      <div className="glass-card p-10 border-zenit-border-primary bg-zenit-surface-1 relative overflow-hidden group rounded-[40px]">
-        <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity duration-1000 text-zenit-text-primary">
-          <Wallet size={120} />
-        </div>
-        <div className="absolute -top-32 -left-32 w-80 h-80 bg-zenit-scarlet/10 blur-[120px] rounded-full pointer-events-none" />
-        
-        <div className="relative z-10 space-y-8">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 rounded-full bg-zenit-scarlet animate-pulse" />
-              <p className="text-zenit-text-tertiary text-[10px] uppercase tracking-[0.4em] font-black">{t.finance.balance}</p>
-            </div>
-            <h2 className="text-6xl font-display font-bold tracking-tighter text-zenit-text-primary">
-              {formatCurrency(balance)}
-            </h2>
+      {/* Main Balance Card - Instagram/Notion Hybrid Style */}
+      <div className="relative group perspective-1000">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card p-8 rounded-[2.5rem] border-zenit-border-primary bg-zenit-surface-1 relative overflow-hidden shadow-2xl shadow-black/20"
+        >
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 p-8 opacity-5 text-zenit-text-primary translate-x-4 -translate-y-4">
+            <PiggyBank size={140} />
           </div>
+          <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-zenit-scarlet/10 blur-[80px] rounded-full pointer-events-none" />
           
-          <div className="grid grid-cols-2 gap-8 pt-8 border-t border-zenit-border-secondary">
-            <div className="space-y-2">
-              <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold">{t.finance.income}</p>
-              <div className="flex items-baseline space-x-2">
-                <ArrowUpRight size={14} className="text-zenit-scarlet" />
-                <p className="text-2xl font-display font-bold text-zenit-text-primary tracking-tight">
-                  {formatCurrency(totalIncome)}
-                </p>
+          <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+            <div className="space-y-1">
+              <span className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black">{t.finance.balance}</span>
+              <h2 className="text-5xl font-display font-medium tracking-tight text-zenit-text-primary truncate max-w-full">
+                {formatCurrency(balance)}
+              </h2>
+            </div>
+            
+            <div className="flex w-full divide-x divide-zenit-border-secondary pt-4 border-t border-zenit-border-secondary/50">
+              <div className="flex-1 flex flex-col items-center">
+                <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold mb-1">Entradas</span>
+                <div className="flex items-center text-emerald-500 space-x-1">
+                  <TrendingUp size={12} />
+                  <span className="text-sm font-bold font-mono">{formatCurrency(totalIncome)}</span>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col items-center">
+                <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold mb-1">Saídas</span>
+                <div className="flex items-center text-zenit-scarlet space-x-1">
+                  <TrendingDown size={12} />
+                  <span className="text-sm font-bold font-mono">{formatCurrency(totalExpense)}</span>
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold">{t.finance.expenses}</p>
-              <div className="flex items-baseline space-x-2">
-                <ArrowDownLeft size={14} className="text-zenit-text-tertiary" />
-                <p className="text-2xl font-display font-bold text-zenit-text-secondary tracking-tight">
-                  {formatCurrency(totalExpense)}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4 pt-4">
-            <button 
-              onClick={() => { setType('income'); setShowAddModal(true); }}
-              className="bg-emerald-500 text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center space-x-2"
-            >
-              <ArrowUpRight size={16} />
-              <span>Adicionar Ganho</span>
-            </button>
-            <button 
-              onClick={() => { setType('expense'); setShowAddModal(true); }}
-              className="bg-zenit-scarlet text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,59,59,0.2)] hover:shadow-[0_0_30px_rgba(255,59,59,0.4)] transition-all flex items-center justify-center space-x-2"
-            >
-              <ArrowDownLeft size={16} />
-              <span>Adicionar Gasto</span>
-            </button>
+            {/* Quick Actions Integration */}
+            <div className="flex w-full gap-3 pt-2">
+              <button 
+                onClick={() => { setType('income'); setShowAddModal(true); }}
+                className="flex-1 bg-zenit-surface-2 border border-zenit-border-primary text-zenit-text-primary py-3.5 rounded-2xl text-[9px] font-bold uppercase tracking-widest hover:bg-zenit-surface-3 transition-all flex items-center justify-center space-x-2 active:scale-95"
+              >
+                <Plus size={14} className="text-emerald-500" />
+                <span>Provimento</span>
+              </button>
+              <button 
+                onClick={() => { setType('expense'); setShowAddModal(true); }}
+                className="flex-1 bg-zenit-text-primary text-zenit-black py-3.5 rounded-2xl text-[9px] font-bold uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center space-x-2 active:scale-95"
+              >
+                <Plus size={14} className="text-zenit-scarlet" />
+                <span>Alocação</span>
+              </button>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* View Switcher */}
-        <div className="flex bg-zenit-surface-1 p-1.5 rounded-[24px] border border-zenit-border-primary backdrop-blur-xl">
-          {(['flow', 'budget', 'goals'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-4 text-[10px] uppercase tracking-[0.2em] font-black rounded-[18px] transition-all duration-500 relative overflow-hidden ${
-                activeTab === tab 
-                  ? 'text-white' 
-                  : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'
-              }`}
-            >
-              {activeTab === tab && (
-                <motion.div 
-                  layoutId="active-tab-bg"
-                  className="absolute inset-0 bg-gradient-to-br from-zenit-scarlet to-zenit-crimson shadow-lg"
-                />
-              )}
-              <span className="relative z-10">
-                {tab === 'flow' ? t.finance.flow : tab === 'budget' ? t.finance.budgets : t.finance.goals}
-              </span>
-            </button>
-          ))}
+      {/* Tab Switcher - More Subtle & App-like */}
+      <div className="flex bg-zenit-surface-1/50 p-1 rounded-2xl border border-zenit-border-primary/50 backdrop-blur-xl mx-2">
+        {(['flow', 'budget', 'goals'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 py-3 text-[9px] uppercase tracking-[0.2em] font-bold rounded-xl transition-all duration-300 relative ${
+              activeTab === tab 
+                ? 'text-white' 
+                : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'
+            }`}
+          >
+            {activeTab === tab && (
+              <motion.div 
+                layoutId="finance-tab-active"
+                className="absolute inset-0 bg-zenit-scarlet shadow-lg shadow-zenit-scarlet/10"
+                style={{ borderRadius: 'inherit' }}
+              />
+            )}
+            <span className="relative z-10">
+              {tab === 'flow' ? t.finance.flow : tab === 'budget' ? t.finance.budgets : t.finance.goals}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Dynamic Content Area */}
+      <div className="space-y-6">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="w-6 h-6 border-2 border-zenit-scarlet border-t-transparent rounded-full animate-spin" />
+            <p className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-black">Escaneando Dataset...</p>
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            {activeTab === 'flow' && (
+              <motion.div 
+                key="flow"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="space-y-4"
+              >
+                {/* Flow List */}
+                <div className="flex items-center justify-between px-2">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary">{t.finance.recentTransactions}</h3>
+                  <div className="flex items-center space-x-1 text-zenit-scarlet">
+                    <Activity size={10} />
+                    <span className="text-[8px] font-bold uppercase tracking-widest">Tempo Real</span>
+                  </div>
+                </div>
+
+                {transactions.length === 0 ? (
+                  <div className="glass-card p-10 rounded-[2.5rem] border-dashed border-2 border-zenit-border-primary text-center space-y-4 opacity-50">
+                    <p className="text-[10px] text-zenit-text-tertiary uppercase font-bold tracking-widest">{t.finance.noTransactions}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {transactions.map((t_item, idx) => (
+                      <motion.div 
+                        key={t_item.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="glass-card p-5 rounded-3xl flex items-center justify-between border-zenit-border-primary bg-zenit-surface-1/40 hover:bg-zenit-surface-1 transition-all group"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${
+                            t_item.type === 'income' 
+                              ? 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10' 
+                              : 'bg-zenit-scarlet/5 text-zenit-scarlet border-zenit-scarlet/10'
+                          }`}>
+                            {t_item.type === 'income' ? <ArrowUpRight size={18} /> : <ArrowDownLeft size={18} />}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-zenit-text-primary tracking-tight">{t_item.title}</p>
+                            <p className="text-[9px] text-zenit-text-tertiary uppercase font-black tracking-widest opacity-60">
+                              {t_item.category || 'Geral'} • {new Date(t_item.date).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={`text-base font-display font-medium ${t_item.type === 'income' ? 'text-emerald-500' : 'text-zenit-text-primary'}`}>
+                            {t_item.type === 'income' ? '+' : '-'} {formatCurrency(t_item.amount)}
+                          </p>
+                          <button 
+                            onClick={() => deleteTransaction(t_item.id)}
+                            className="text-[7px] text-zenit-text-tertiary hover:text-zenit-scarlet uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-opacity mt-1"
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {activeTab === 'budget' && (
+              <motion.div 
+                key="budget"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center justify-between px-2">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary uppercase">Alocação de Tetos</h3>
+                  <button onClick={() => setShowAddBudgetModal(true)} className="p-2 bg-zenit-surface-1 rounded-xl border border-zenit-border-primary text-zenit-scarlet">
+                    <Plus size={16} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {budgets.map((b) => (
+                    <div key={b.id} className="glass-card p-6 rounded-[2rem] border-zenit-border-primary bg-zenit-surface-1/40 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <p className="text-lg font-bold text-zenit-text-primary tracking-tight">{b.category}</p>
+                          <p className="text-[9px] text-zenit-text-tertiary uppercase font-black tracking-widest">
+                            Consumo: {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`text-xl font-display font-bold ${b.spent > b.limit ? 'text-zenit-scarlet' : 'text-zenit-text-primary'}`}>
+                            {Math.round((b.spent / b.limit) * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 w-full bg-zenit-surface-2 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min((b.spent / b.limit) * 100, 100)}%` }}
+                          className={`h-full ${b.spent > b.limit ? 'bg-zenit-scarlet shadow-[0_0_10px_rgba(255,0,0,0.3)]' : 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'goals' && (
+              <motion.div 
+                key="goals"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center justify-between px-2">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary uppercase">Projeção de Ativos</h3>
+                  <button onClick={() => setShowAddGoalModal(true)} className="p-2 bg-zenit-surface-1 rounded-xl border border-zenit-border-primary text-zenit-scarlet">
+                    <Plus size={16} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {goals.map((goal) => (
+                    <div key={goal.id} className="glass-card p-6 rounded-[2rem] border-zenit-border-primary bg-zenit-surface-1/40 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <p className="text-lg font-bold text-zenit-text-primary tracking-tight">{goal.name}</p>
+                          <p className="text-[9px] text-zenit-text-tertiary uppercase font-black tracking-widest">
+                            Aportado: {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 rounded-2xl bg-zenit-scarlet/5 border border-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet">
+                          <PiggyBank size={24} />
+                        </div>
+                      </div>
+                      <div className="h-1.5 w-full bg-zenit-surface-2 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}
+                          className="h-full bg-zenit-scarlet shadow-[0_0_10px_rgba(255,0,0,0.3)]"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+      </div>
+
+      {/* Simplified AI Chat Entry */}
+      {!loading && (
+        <div className="fixed bottom-32 left-4 right-4 z-40 lg:hidden">
+          <button 
+            onClick={() => setShowAIChat(true)}
+            className="w-full h-14 bg-zenit-surface-1/80 backdrop-blur-3xl border border-zenit-border-primary rounded-2xl flex items-center px-5 space-x-3 shadow-xl active:scale-[0.98] transition-all"
+          >
+            <div className="w-8 h-8 rounded-xl bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet">
+              <Bot size={18} />
+            </div>
+            <span className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-[0.2em]">{t.finance.aiFinancePlaceholder?.split(' ')[0]} AI Mentor...</span>
+          </button>
         </div>
+      )}
 
       {/* Chart Section */}
       <div className="glass-card p-10 border-zenit-border-primary bg-zenit-surface-1 rounded-[40px] relative overflow-hidden">
@@ -654,10 +825,9 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
               <h3 className="text-xs font-display font-bold text-zenit-text-secondary uppercase tracking-[0.2em]">{t.finance.budgets}</h3>
             </div>
             <motion.button 
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowAddBudgetModal(true)}
-              className="w-10 h-10 rounded-xl bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet border border-zenit-scarlet/20"
+              className="w-10 h-10 rounded-xl bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet border border-zenit-scarlet/20 min-h-[44px] min-w-[44px]"
             >
               <Plus size={20} />
             </motion.button>
@@ -727,10 +897,9 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
               <h3 className="text-xs font-display font-bold text-zenit-text-secondary uppercase tracking-[0.2em]">{t.finance.goals}</h3>
             </div>
             <motion.button 
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowAddGoalModal(true)}
-              className="w-10 h-10 rounded-xl bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet border border-zenit-scarlet/20"
+              className="w-10 h-10 rounded-xl bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet border border-zenit-scarlet/20 min-h-[44px] min-w-[44px]"
             >
               <Plus size={20} />
             </motion.button>

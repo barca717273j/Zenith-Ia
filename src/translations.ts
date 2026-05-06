@@ -124,6 +124,7 @@ export const translations = {
       exercises: 'Exercises',
       finance: 'Finance',
       profile: 'Profile',
+      nexus: 'Nexus',
       admin: 'Admin',
     },
     dashboard: {
@@ -149,9 +150,9 @@ export const translations = {
     },
     social: {
       title: 'Nexus',
-      feed: 'Fluxo',
-      pulse: 'Pulse',
-      profile: 'Profile',
+      feed: 'Nexus Feed',
+      pulse: 'Nexus Activity',
+      profile: 'Nexus Profile',
       followers: 'Followers',
       following: 'Following',
       boost: 'Boost',
@@ -443,7 +444,7 @@ export const translations = {
       }
     },
     axis: {
-      title: 'Axis',
+      title: 'Nexus',
       subtitle: 'Neural Evolution Dashboard',
       overallProgress: 'Overall Progress',
       lifeAreas: 'Life Areas',
@@ -604,6 +605,7 @@ export const translations = {
       exercises: 'Exercícios',
       finance: 'Finanças',
       profile: 'Perfil',
+      nexus: 'Nexus',
       admin: 'Admin',
     },
     dashboard: {
@@ -629,9 +631,9 @@ export const translations = {
     },
     social: {
       title: 'Nexus',
-      feed: 'Fluxo',
-      pulse: 'Nexus',
-      profile: 'Perfil',
+      feed: 'Fluxo Nexus',
+      pulse: 'Atividade Nexus',
+      profile: 'Perfil Nexus',
       followers: 'Seguidores',
       following: 'Seguindo',
       boost: 'Boost',
@@ -923,7 +925,7 @@ export const translations = {
       }
     },
     axis: {
-      title: 'Axis',
+      title: 'Nexus',
       subtitle: 'Dashboard de Evolução Neural',
       overallProgress: 'Progresso Geral',
       lifeAreas: 'Áreas da Vida',

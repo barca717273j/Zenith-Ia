@@ -125,88 +125,95 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
   };
 
   return (
-    <div className="p-6 space-y-8 pb-32 max-w-2xl mx-auto">
+    <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
       <header className="flex justify-between items-end">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-black font-display tracking-tighter uppercase italic text-white leading-none">
-            {isNeural ? 'Diário Neural' : 'Diário Manual'}
+        <div className="space-y-2">
+          <h1 className="text-4xl font-display font-medium tracking-tight text-zenit-text-primary italic leading-none uppercase">
+            {isNeural ? 'Neural' : 'Manual'} <span className="text-zenit-scarlet">LOG</span>
           </h1>
-          <p className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/30">
-            {isNeural ? 'Neural Reflection Log' : 'Manual Consciousness Record'}
-          </p>
+          <div className="flex items-center space-x-3">
+             <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+             <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary opacity-60">
+               {isNeural ? 'Neural Reflection Protocol' : 'Manual Consciousness Record'}
+             </p>
+          </div>
         </div>
-        <div className="flex items-center space-x-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/10 backdrop-blur-md">
-          <Calendar size={14} className={isNeural ? "text-zenit-accent" : "text-zenit-cyan"} />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">
+        <div className="flex items-center space-x-4 bg-zenit-surface-1/40 backdrop-blur-xl px-5 py-3 rounded-2xl border border-zenit-border-primary">
+          <Calendar size={16} className={isNeural ? "text-zenit-scarlet" : "text-blue-500"} />
+          <span className="text-[11px] font-black uppercase tracking-widest text-zenit-text-primary">
             {new Date().toLocaleDateString(userData?.language?.startsWith('pt') ? 'pt-BR' : 'en-US', { month: 'short', day: 'numeric' })}
           </span>
         </div>
       </header>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {isNeural && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-[2rem] bg-gradient-to-br from-zenit-accent/10 to-transparent border border-zenit-accent/20 relative overflow-hidden group"
+            className="p-8 rounded-[2.5rem] bg-zenit-surface-1/60 border border-zenit-border-primary relative overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
           >
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Zap size={40} className="text-zenit-accent" />
+            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+              <Zap size={60} className="text-zenit-scarlet" />
             </div>
-            <div className="flex items-center space-x-3 mb-2">
-              <Sparkles size={14} className="text-zenit-accent animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zenit-accent">Insight do Dia</span>
+            <div className="flex items-center space-x-3 mb-4">
+              <Sparkles size={16} className="text-zenit-scarlet animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zenit-scarlet">Neural Insight</span>
             </div>
-            <p className="text-sm text-white/80 italic font-medium leading-relaxed">
+            <p className="text-base text-zenit-text-primary italic font-medium leading-relaxed">
               "{currentPhrase}"
             </p>
           </motion.div>
         )}
 
-        {/* Mood Selector */}
-        <div className="flex justify-between items-center p-2 bg-white/5 rounded-[2rem] border border-white/5 backdrop-blur-sm">
+        {/* Mood Selector - Premium Grid */}
+        <div className="grid grid-cols-5 gap-3">
           {moods.map((m) => (
             <button
               key={m.id}
               onClick={() => setMood(m.id)}
-              className={`flex-1 flex flex-col items-center py-3 rounded-[1.8rem] transition-all duration-500 ${mood === m.id ? `${m.color} shadow-lg scale-105` : 'text-white/20 hover:text-white/40'}`}
+              className={`flex flex-col items-center justify-center py-4 rounded-3xl transition-all duration-300 border ${
+                mood === m.id 
+                  ? 'bg-zenit-surface-2 border-zenit-border-primary scale-105 shadow-xl' 
+                  : 'bg-transparent border-transparent grayscale opacity-40 hover:opacity-100 hover:grayscale-0 active:scale-95'
+              }`}
             >
-              <span className="text-xl mb-1">{m.icon}</span>
-              <span className="text-[7px] font-black uppercase tracking-widest">{m.label}</span>
+              <span className="text-2xl mb-2">{m.icon}</span>
+              <span className="text-[8px] font-black uppercase tracking-tight text-zenit-text-tertiary">{m.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="glass-card p-8 min-h-[300px] flex flex-col border-white/5 bg-white/[0.02] relative group">
-          <div className={`absolute top-0 left-0 w-1 h-full transition-colors ${isNeural ? 'bg-zenit-accent/30 group-focus-within:bg-zenit-accent' : 'bg-zenit-cyan/30 group-focus-within:bg-zenit-cyan'}`} />
+        <div className="glass-card p-8 min-h-[350px] flex flex-col border-zenit-border-primary bg-zenit-surface-1/60 relative group rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
+          <div className={`absolute top-10 left-0 w-1.5 h-16 rounded-r-full transition-all duration-500 ${isNeural ? 'bg-zenit-scarlet' : 'bg-blue-500'}`} />
           <textarea
             value={entry}
             onChange={(e) => setEntry(e.target.value)}
             placeholder="Como foi seu dia? Descreva suas vitórias, aprendizados e desafios..."
-            className="flex-1 bg-transparent border-none focus:ring-0 text-base leading-relaxed resize-none placeholder:text-white/10 text-white/80 font-medium"
+            className="flex-1 bg-transparent border-none focus:ring-0 text-lg leading-relaxed resize-none placeholder:text-zenit-text-tertiary/20 text-zenit-text-primary font-medium"
           />
           
-          <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/5">
-            <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full animate-pulse ${isNeural ? 'bg-zenit-accent' : 'bg-zenit-cyan'}`} />
-              <span className="text-[8px] font-bold uppercase tracking-widest text-white/20">
-                {isNeural ? 'Neural Link Active' : 'Manual Mode Active'}
+          <div className="flex items-center justify-between mt-8 pt-8 border-t border-zenit-border-primary/50">
+            <div className="flex items-center space-x-3">
+              <div className={`w-2 h-2 rounded-full animate-pulse ${isNeural ? 'bg-zenit-scarlet shadow-[0_0_10px_rgba(255,0,0,0.5)]' : 'bg-blue-500'}`} />
+              <span className="text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-40">
+                {isNeural ? 'Neural Link v4.0' : 'Manual Registry Mode'}
               </span>
             </div>
             
-            <div className="flex space-x-3">
+            <div className="flex space-x-4">
               {isNeural && (
                 <button
                   onClick={handleAnalyze}
                   disabled={!entry.trim() || isAnalyzing}
-                  className="flex items-center space-x-2 bg-white/5 hover:bg-white/10 text-white px-5 py-3 rounded-2xl font-bold text-[9px] uppercase tracking-widest transition-all disabled:opacity-50 border border-white/5"
+                  className="flex items-center space-x-3 bg-zenit-surface-2 hover:bg-zenit-surface-1 text-zenit-text-primary px-6 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 border border-zenit-border-primary"
                 >
                   {isAnalyzing ? (
                     <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
-                      <Sparkles size={14} className="text-zenit-accent" />
+                      <Sparkles size={16} className="text-zenit-scarlet" />
                     </motion.div>
                   ) : (
-                    <Sparkles size={14} className="text-zenit-accent" />
+                    <Sparkles size={16} className="text-zenit-scarlet" />
                   )}
                   <span>Analisar</span>
                 </button>
@@ -214,10 +221,10 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
               <button
                 onClick={handleSave}
                 disabled={!entry.trim() || isSaving}
-                className={`flex items-center space-x-2 text-white px-8 py-3 rounded-2xl font-bold text-[9px] uppercase tracking-widest transition-all disabled:opacity-50 active:scale-95 ${isNeural ? 'bg-zenit-accent shadow-[0_10px_30px_rgba(255,36,0,0.3)]' : 'bg-zenit-cyan shadow-[0_10px_30px_rgba(0,255,255,0.3)]'}`}
+                className={`flex items-center space-x-3 text-white px-10 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 active:scale-95 ${isNeural ? 'bg-gradient-to-br from-zenit-scarlet to-zenit-crimson shadow-[0_10px_40px_rgba(255,36,0,0.3)]' : 'bg-blue-600 shadow-[0_10px_40px_rgba(59,130,246,0.3)]'}`}
               >
-                <Send size={14} />
-                <span>{isSaving ? 'Salvando...' : 'Salvar Entrada'}</span>
+                <Send size={16} />
+                <span>{isSaving ? 'Salvando...' : 'Registrar'}</span>
               </button>
             </div>
           </div>

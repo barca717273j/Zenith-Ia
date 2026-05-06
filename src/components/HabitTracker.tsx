@@ -336,7 +336,6 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
           </div>
         </div>
         <motion.button 
-          whileHover={{ scale: 1.05, rotate: 90 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsAdding(true)}
           disabled={activeView === 'habits' && habits.length >= habitLimit}
@@ -373,116 +372,101 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
         {activeView === 'habits' && (
           <motion.div 
             key="habits"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-8"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="space-y-6"
           >
-            {/* Stats Summary */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="premium-card premium-card-hover flex flex-col items-center justify-center space-y-4 group">
-                <div className="w-14 h-14 rounded-2xl bg-zenit-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 border border-zenit-accent/20">
-                  <Flame className="text-zenit-accent drop-shadow-[0_0_15px_var(--accent-glow)]" size={32} />
+            {/* Stats Summary - More Compact & Elegant */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="glass-card p-6 rounded-[2rem] border-zenit-border-primary bg-zenit-surface-1 flex flex-col items-center justify-center space-y-2 group">
+                <div className="w-10 h-10 rounded-xl bg-zenit-scarlet/5 flex items-center justify-center border border-zenit-scarlet/10 group-hover:scale-110 transition-transform">
+                  <Flame className="text-zenit-scarlet drop-shadow-[0_0_10px_rgba(255,0,0,0.4)]" size={20} />
                 </div>
                 <div className="text-center">
-                  <p className="text-5xl font-display font-bold tracking-tighter text-zenit-text-primary">
+                  <p className="text-2xl font-display font-medium text-zenit-text-primary tracking-tight">
                     {Math.max(0, ...habits.map(h => h.streak), 0)}
                   </p>
-                  <p className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Recorde de Streak</p>
+                  <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.2em]">Peak Streak</p>
                 </div>
               </div>
-              <div className="premium-card premium-card-hover flex flex-col items-center justify-center space-y-4 group">
-                <div className="w-14 h-14 rounded-2xl bg-zenit-surface-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 border border-zenit-border-primary">
-                  <Trophy className="text-zenit-text-tertiary group-hover:text-zenit-accent transition-colors" size={32} />
+              <div className="glass-card p-6 rounded-[2rem] border-zenit-border-primary bg-zenit-surface-1 flex flex-col items-center justify-center space-y-2 group">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/5 flex items-center justify-center border border-blue-500/10 group-hover:scale-110 transition-transform">
+                  <Activity className="text-blue-500 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]" size={20} />
                 </div>
                 <div className="text-center">
-                  <p className="text-5xl font-display font-bold tracking-tighter text-zenit-text-primary">
+                  <p className="text-2xl font-display font-medium text-zenit-text-primary tracking-tight">
                     {habits.length > 0 ? Math.round((habits.filter(h => h.completed_today).length / habits.length) * 100) : 0}%
                   </p>
-                  <p className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] mt-2">Sincronia Diária</p>
+                  <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.2em]">Sincronia</p>
                 </div>
               </div>
             </div>
 
             {/* Habits List */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {habits.map((habit) => (
                 <motion.div
                   key={habit.id}
                   layout
-                  className={`premium-card premium-card-hover flex items-center justify-between group transition-all duration-700 relative overflow-hidden ${
-                    habit.completed_today ? 'opacity-60 grayscale' : ''
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`glass-card p-4 sm:p-5 rounded-[2rem] flex items-center transition-all duration-500 border border-zenit-border-primary/50 relative overflow-hidden group ${
+                    habit.completed_today ? 'bg-zenit-surface-1/30 grayscale-[0.8] opacity-60' : 'bg-zenit-surface-1 active:scale-[0.98]'
                   }`}
                 >
-                  {!habit.completed_today && (
-                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-zenit-accent/5 blur-[60px] rounded-full group-hover:bg-zenit-accent/10 transition-all duration-700" />
-                  )}
-                  
-                  <div className="flex items-center space-x-8 flex-1 relative z-10">
+                  <div className="flex items-center space-x-5 flex-1 relative z-10 min-w-0">
                     <button
                       onClick={() => toggleHabit(habit)}
-                      className={`w-20 h-20 rounded-[28px] flex items-center justify-center transition-all duration-700 relative group/btn border-2 ${
+                      className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 relative border min-h-[44px] min-w-[44px] flex-shrink-0 ${
                         habit.completed_today 
-                          ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_40px_var(--accent-glow)] scale-110' 
-                          : 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary hover:border-zenit-accent/50 hover:scale-110'
+                          ? 'bg-zenit-scarlet border-zenit-scarlet text-white shadow-[0_0_25px_rgba(255,0,0,0.4)]' 
+                          : 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary'
                       }`}
                     >
                       {habit.completed_today ? (
-                        <Check size={40} strokeWidth={3.5} />
+                        <Check size={24} strokeWidth={3} />
                       ) : (
-                        <Sparkles size={32} className="opacity-20 group-hover/btn:opacity-100 group-hover/btn:text-zenit-accent transition-all duration-500" />
-                      )}
-                      {habit.completed_today && (
-                        <motion.div 
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1.8, opacity: 0 }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                          className="absolute inset-0 bg-zenit-accent rounded-[28px] -z-10"
-                        />
+                        <Plus size={24} className="opacity-40 group-hover:opacity-100 transition-opacity" />
                       )}
                     </button>
 
-                    <div className="space-y-4 flex-1">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <p className={`text-2xl font-display font-bold tracking-tight transition-all duration-700 ${habit.completed_today ? 'text-zenit-text-tertiary line-through italic' : 'text-zenit-text-primary'}`}>
-                            {habit.title}
-                          </p>
-                          <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary">
-                            <span className="px-2 py-0.5 bg-zenit-surface-2 rounded-md border border-zenit-border-primary">{habit.frequency}</span>
-                            <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
-                            <span>Meta: {habit.target_value} {habit.target_unit}</span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end space-y-2">
-                          <div className="flex items-center space-x-2 bg-zenit-surface-2 px-3 py-1.5 rounded-xl border border-zenit-border-primary group-hover:border-zenit-accent/30 transition-colors">
-                            <Flame size={16} className={habit.streak > 0 ? 'text-zenit-accent drop-shadow-[0_0_8px_var(--accent-glow)]' : 'text-zenit-text-tertiary'} />
-                            <span className={`text-xs font-black font-mono ${habit.streak > 0 ? 'text-zenit-text-primary' : 'text-zenit-text-tertiary'}`}>{habit.streak}</span>
-                          </div>
-                          <p className="text-[9px] font-bold uppercase tracking-widest text-zenit-text-tertiary">Streak Atual</p>
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className={`text-base font-bold tracking-tight truncate transition-all duration-500 ${habit.completed_today ? 'text-zenit-text-tertiary font-medium italic' : 'text-zenit-text-primary'}`}>
+                          {habit.title}
+                        </p>
+                        <div className="flex items-center px-2 py-1 bg-zenit-surface-2 rounded-lg border border-zenit-border-primary/50 flex-shrink-0">
+                          <Flame size={12} className={habit.streak > 0 ? 'text-zenit-scarlet' : 'text-zenit-text-tertiary opacity-40'} />
+                          <span className="text-[10px] font-bold font-mono ml-1">{habit.streak}</span>
                         </div>
                       </div>
+                      
+                      <div className="flex items-center space-x-3 text-[8px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-60">
+                        <span className="flex items-center gap-1.5">
+                          <Star size={10} />
+                          {habit.frequency}
+                        </span>
+                        <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
+                        <span className="truncate">Ciclo: {habit.target_value || 1} {habit.target_unit || 'un'}</span>
+                      </div>
 
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                          <span className="text-zenit-text-tertiary">Progresso Mensal</span>
-                          <span className="text-zenit-accent">{Math.round((habit.streak / 30) * 100)}%</span>
-                        </div>
-                        <div className="h-2 bg-zenit-surface-2 rounded-full overflow-hidden border border-zenit-border-primary">
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${Math.min((habit.streak / 30) * 100, 100)}%` }}
-                            className="h-full bg-gradient-to-r from-zenit-crimson via-zenit-accent to-zenit-accent shadow-[0_0_15px_var(--accent-glow)]"
-                          />
-                        </div>
+                      {/* Micro Progress Bar */}
+                      <div className="h-1 w-full bg-zenit-surface-2 rounded-full overflow-hidden mt-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                         <motion.div 
+                           initial={{ width: 0 }}
+                           animate={{ width: `${Math.min((habit.streak / 30) * 100, 100)}%` }}
+                           className="h-full bg-zenit-scarlet"
+                         />
                       </div>
                     </div>
                   </div>
+                  
                   <button 
                     onClick={() => deleteHabit(habit.id)}
-                    className="ml-6 opacity-0 group-hover:opacity-100 w-12 h-12 rounded-2xl bg-zenit-accent/5 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-accent hover:bg-zenit-accent/10 transition-all duration-500"
+                    className="ml-4 p-3 text-zenit-text-tertiary hover:text-zenit-scarlet opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={16} />
                   </button>
                 </motion.div>
               ))}
@@ -493,77 +477,51 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
         {activeView === 'tasks' && (
           <motion.div 
             key="tasks"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-8"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="space-y-4"
           >
-            {/* Task Stats */}
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: 'Pendentes', value: tasks.filter(t => !t.completed).length, color: 'text-zenit-text-primary' },
-                { label: 'Concluídas', value: tasks.filter(t => t.completed).length, color: 'text-zenit-accent' },
-                { label: 'Total', value: tasks.length, color: 'text-zenit-text-tertiary' }
-              ].map((stat, i) => (
-                <div key={i} className="premium-card p-4 text-center">
-                  <p className={`text-2xl font-display font-bold ${stat.color}`}>{stat.value}</p>
-                  <p className="text-[9px] text-zenit-text-tertiary font-bold uppercase tracking-widest mt-1">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-4">
-              {tasks.map((task) => (
-                <motion.div
-                  key={task.id}
-                  layout
-                  className={`premium-card premium-card-hover flex items-center justify-between group transition-all duration-700 relative overflow-hidden ${
-                    task.completed ? 'opacity-40 grayscale' : ''
-                  }`}
-                >
-                  {!task.completed && (
-                    <div className="absolute -top-10 -right-10 w-20 h-20 bg-zenit-accent/5 blur-[40px] rounded-full group-hover:bg-zenit-accent/10 transition-all duration-700" />
-                  )}
-                  
-                  <div className="flex items-center space-x-6 flex-1 relative z-10">
-                    <button
-                      onClick={() => toggleTask(task)}
-                      className={`w-14 h-14 rounded-[20px] flex items-center justify-center transition-all duration-500 border-2 ${
-                        task.completed 
-                          ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_20px_var(--accent-glow)]' 
-                          : 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary hover:border-zenit-accent/50 hover:scale-110'
-                      }`}
-                    >
-                      {task.completed ? <Check size={28} strokeWidth={3} /> : <div className="w-2 h-2 rounded-full bg-zenit-border-primary group-hover:bg-zenit-accent transition-colors" />}
-                    </button>
-                    <div className="space-y-1.5">
-                      <p className={`text-lg font-bold tracking-tight transition-all duration-500 ${task.completed ? 'text-zenit-text-tertiary line-through italic' : 'text-zenit-text-primary'}`}>
-                        {task.title}
-                      </p>
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-zenit-accent shadow-[0_0_8px_var(--accent-glow)]' : task.priority === 'medium' ? 'bg-orange-500' : 'bg-zenit-border-primary'}`} />
-                        <span className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-widest">{task.priority} Priority</span>
-                        {task.due_date && (
-                          <>
-                            <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
-                            <div className="flex items-center space-x-1.5 text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary">
-                              <Clock size={12} />
-                              <span>{task.due_date}</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
+            {tasks.map((task, idx) => (
+              <motion.div
+                key={task.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.03 }}
+                className={`glass-card p-4 rounded-2xl flex items-center justify-between border border-zenit-border-primary/50 relative overflow-hidden group ${
+                  task.completed ? 'opacity-40 grayscale' : 'bg-zenit-surface-1'
+                }`}
+              >
+                <div className="flex items-center space-x-4 flex-1 relative z-10">
+                  <button
+                    onClick={() => toggleTask(task)}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border-2 ${
+                      task.completed 
+                        ? 'bg-zenit-scarlet border-zenit-scarlet text-white' 
+                        : 'bg-zenit-surface-2 border-zenit-border-primary'
+                    }`}
+                  >
+                    {task.completed ? <Check size={18} strokeWidth={4} /> : <div className="w-1.5 h-1.5 rounded-full bg-zenit-border-primary" />}
+                  </button>
+                  <div className="space-y-0.5 min-w-0">
+                    <p className={`text-sm font-bold tracking-tight truncate ${task.completed ? 'text-zenit-text-tertiary line-through italic' : 'text-zenit-text-primary'}`}>
+                      {task.title}
+                    </p>
+                    <div className="flex items-center space-x-2 text-[8px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-60">
+                      <div className={`w-1.5 h-1.5 rounded-full ${task.priority === 'high' ? 'bg-zenit-scarlet' : task.priority === 'medium' ? 'bg-emerald-500' : 'bg-zenit-text-tertiary'}`} />
+                      <span>{task.priority || 'Normal'}</span>
+                      {task.due_date && <span>• {task.due_date}</span>}
                     </div>
                   </div>
-                  <button 
-                    onClick={() => deleteTask(task.id)}
-                    className="ml-4 opacity-0 group-hover:opacity-100 w-10 h-10 rounded-xl bg-zenit-accent/5 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-accent hover:bg-zenit-accent/10 transition-all duration-500"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </motion.div>
-              ))}
-            </div>
+                </div>
+                <button 
+                  onClick={() => deleteTask(task.id)}
+                  className="p-2 text-zenit-text-tertiary hover:text-zenit-scarlet opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </motion.div>
+            ))}
           </motion.div>
         )}
 

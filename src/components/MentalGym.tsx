@@ -115,19 +115,21 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
 
   return (
     <div className="p-6 space-y-12 pb-32 max-w-4xl mx-auto min-h-screen">
-      <header className="space-y-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent border border-zenit-accent/20 shadow-[0_0_20px_rgba(255,59,59,0.1)]">
-            <Brain size={28} />
+      <header className="space-y-6">
+        <div className="flex items-center space-x-6">
+          <div className="w-16 h-16 rounded-[2rem] bg-zenit-surface-1/40 backdrop-blur-xl border border-zenit-border-primary flex items-center justify-center text-zenit-scarlet shadow-2xl">
+            <Brain size={32} />
           </div>
-          <div className="space-y-1">
-            <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary italic">
-              Academia <span className="text-zenit-accent">Mental</span>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-display font-medium tracking-tight text-zenit-text-primary italic leading-none uppercase">
+              Mental <span className="text-zenit-scarlet">Gym</span>
             </h1>
-            <p className="text-zenit-text-tertiary text-[11px] font-bold uppercase tracking-[0.3em]">{t.gym.subtitle}</p>
+            <div className="flex items-center space-x-3">
+               <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+               <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-[0.4em] opacity-60">{t.gym.subtitle}</p>
+            </div>
           </div>
         </div>
-        <div className="h-px w-full bg-gradient-to-r from-zenit-accent/30 via-zenit-accent/5 to-transparent" />
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,25 +141,25 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
               whileHover={{ y: -5 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setMode(ex.id as GymMode)}
-              className="premium-card premium-card-hover flex items-start space-x-5 text-left group relative overflow-hidden"
+              className="glass-card p-8 rounded-[2.5rem] border border-zenit-border-primary flex items-start space-x-6 text-left group relative overflow-hidden bg-zenit-surface-1/60 backdrop-blur-xl shadow-xl transition-all duration-500"
             >
-              <div className="absolute -top-10 -right-10 w-24 h-24 bg-zenit-accent/5 blur-[40px] rounded-full group-hover:bg-zenit-accent/10 transition-all duration-500" />
+              <div className="absolute -top-10 -right-10 w-24 h-24 bg-zenit-scarlet/5 blur-[40px] rounded-full group-hover:bg-zenit-scarlet/10 transition-all duration-500" />
               
-              <div className={`w-14 h-14 rounded-2xl ${ex.bg} flex items-center justify-center ${ex.color} group-hover:scale-110 transition-transform duration-500 border border-white/5 shadow-lg relative z-10`}>
+              <div className={`w-14 h-14 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary group-hover:scale-110 group-hover:text-zenit-scarlet transition-transform duration-500 border border-zenit-border-primary shadow-lg relative z-10`}>
                 {ex.icon}
               </div>
-              <div className="flex-1 space-y-2 relative z-10">
+              <div className="flex-1 space-y-3 relative z-10">
                 <div className="flex justify-between items-start">
-                  <h3 className="text-lg font-bold text-zenit-text-primary uppercase tracking-wider group-hover:text-zenit-accent transition-colors">{ex.title}</h3>
+                  <h3 className="text-xl font-bold text-zenit-text-primary tracking-tight group-hover:text-zenit-scarlet transition-colors">{ex.title}</h3>
                   <div className="text-right">
-                    <p className="text-[8px] text-zenit-text-tertiary uppercase font-black tracking-widest">Recorde</p>
-                    <p className="text-sm font-display font-bold text-zenit-accent">{bestScore}</p>
+                    <p className="text-[9px] text-zenit-text-tertiary uppercase font-black tracking-widest opacity-40">Best</p>
+                    <p className="text-base font-mono font-bold text-zenit-scarlet leading-none">{bestScore}</p>
                   </div>
                 </div>
-                <p className="text-xs text-zenit-text-tertiary leading-relaxed font-medium">{ex.desc}</p>
-                <div className="pt-2 flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zenit-accent opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                <p className="text-xs text-zenit-text-tertiary leading-relaxed font-medium opacity-60 group-hover:opacity-100 transition-opacity">{ex.desc}</p>
+                <div className="pt-2 flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-zenit-scarlet opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
                   <span>Iniciar Protocolo</span>
-                  <Play size={10} />
+                  <Play size={10} fill="currentColor" />
                 </div>
               </div>
             </motion.button>
@@ -165,26 +167,29 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
         })}
       </div>
 
-      <div className="premium-card p-10 border-zenit-accent/20 bg-gradient-to-br from-zenit-surface-1 to-zenit-surface-2 relative overflow-hidden group">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-zenit-accent/10 blur-[100px] rounded-full group-hover:bg-zenit-accent/20 transition-all duration-1000" />
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/10 blur-[100px] rounded-full group-hover:bg-purple-500/20 transition-all duration-1000" />
+      <div className="glass-card p-10 rounded-[3rem] border border-zenit-border-primary bg-zenit-surface-1/40 backdrop-blur-xl relative overflow-hidden group shadow-[0_30px_60px_rgba(0,0,0,0.3)]">
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-zenit-scarlet/5 blur-[100px] rounded-full group-hover:bg-zenit-scarlet/10 transition-all duration-1000" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full group-hover:bg-blue-500/10 transition-all duration-1000" />
 
         <div className="flex items-center justify-between relative z-10">
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.4em]">Status Cognitivo</p>
-              <h2 className="text-6xl font-display font-bold text-zenit-text-primary tracking-tighter italic">
-                Nível <span className="text-zenit-accent">Elite</span>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-3">
+                 <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+                 <p className="text-[10px] text-zenit-text-tertiary uppercase font-black tracking-[0.4em]">Status Cognitivo</p>
+              </div>
+              <h2 className="text-6xl font-display font-medium text-zenit-text-primary tracking-tighter italic leading-none">
+                Nível <span className="text-zenit-scarlet">Elite</span>
               </h2>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-zenit-accent/10 px-4 py-2 rounded-xl border border-zenit-accent/20 text-zenit-accent text-[11px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(255,59,59,0.1)]">
-                <Zap size={14} />
-                <span>Foco: 94%</span>
+              <div className="flex items-center space-x-3 bg-zenit-surface-2 px-5 py-3 rounded-2xl border border-zenit-border-primary text-zenit-scarlet text-[10px] font-black uppercase tracking-widest shadow-xl">
+                <Zap size={14} fill="currentColor" />
+                <span className="font-mono">Foco: 94%</span>
               </div>
-              <div className="flex items-center space-x-2 bg-purple-500/10 px-4 py-2 rounded-xl border border-purple-500/20 text-purple-400 text-[11px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+              <div className="flex items-center space-x-3 bg-zenit-surface-2 px-5 py-3 rounded-2xl border border-zenit-border-primary text-blue-400 text-[10px] font-black uppercase tracking-widest shadow-xl">
                 <Brain size={14} />
-                <span>Memória: 88%</span>
+                <span className="font-mono">Memória: 88%</span>
               </div>
             </div>
           </div>
@@ -194,9 +199,10 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
               rotate: [0, 5, -5, 0]
             }}
             transition={{ duration: 4, repeat: Infinity }}
-            className="w-24 h-24 rounded-3xl bg-zenit-surface-2 border border-zenit-accent/30 flex items-center justify-center shadow-[0_0_40px_rgba(255,59,59,0.15)]"
+            className="w-28 h-28 rounded-[2.5rem] bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center shadow-2xl relative"
           >
-            <Sparkles size={48} className="text-zenit-accent" />
+             <div className="absolute inset-0 bg-zenit-scarlet/5 blur-2xl rounded-full animate-pulse" />
+            <Sparkles size={56} className="text-zenit-scarlet relative z-10" />
           </motion.div>
         </div>
       </div>

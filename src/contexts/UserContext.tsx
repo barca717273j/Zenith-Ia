@@ -11,6 +11,7 @@ interface UserContextType {
   refreshUserData: () => Promise<void>;
   signOut: () => Promise<void>;
   isPlanActive: boolean;
+  isDemoMode: boolean;
   checkLimit: (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts' | 'stories' | 'axis' | 'exercises' | 'finances' | 'journal' | 'gym') => Promise<{ allowed: boolean; message?: string }>;
   incrementUsage: (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts' | 'stories' | 'axis' | 'exercises' | 'finances' | 'journal' | 'gym') => Promise<void>;
   checkUserAccess: (module: string) => Promise<{ allowed: boolean; message?: string }>;
@@ -18,19 +19,50 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+const MOCK_USER = {
+  id: 'mock-user-id',
+  email: 'demo@zenith.app',
+  user_metadata: {
+    full_name: 'Usuário Demo',
+    username: 'demouser'
+  }
+};
+
+const MOCK_USER_DATA: UserProfile = {
+  id: 'mock-user-id',
+  email: 'demo@zenith.app',
+  username: 'demouser',
+  display_name: 'Usuário Zenith',
+  language: 'pt-BR',
+  subscription_tier: 'lifetime',
+  energy_level: 100,
+  xp: 1500,
+  level: 10,
+  streak: 7,
+  onboarding_completed: true,
+  life_score: 85,
+  is_private: false,
+  is_admin: true,
+  role: 'admin'
+};
+
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSupabaseConnected, setIsSupabaseConnected] = useState(true);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const isMounted = useRef(true);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      console.warn("Supabase is not configured. App will run in limited mode.");
+      console.warn("Supabase is not configured. App will run in DEMO mode.");
+      setIsDemoMode(true);
+      setUser(MOCK_USER);
+      setUserData(MOCK_USER_DATA);
       setLoading(false);
-      setIsSupabaseConnected(false);
+      setIsSupabaseConnected(true); // Treat as connected for UI purposes
       return;
     }
 
@@ -51,8 +83,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
         if (!connectionResult.connected) {
-          console.error("Supabase connection failed:", connectionResult.error);
-          if (isMounted.current) setLoading(false);
+          console.warn("Supabase connection failed, entering DEMO mode:", connectionResult.error);
+          if (isMounted.current) {
+            setIsDemoMode(true);
+            setUser(MOCK_USER);
+            setUserData(MOCK_USER_DATA);
+            setLoading(false);
+            setIsSupabaseConnected(true); // Allow traversal
+          }
           return;
         }
 
@@ -114,9 +152,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       console.log('Fetching user data for:', userId);
       setLoading(true);
+      
+      // Buscamos na tabela 'profiles' que criamos no SQL Editor
       const { data, error } = await supabase
-        .from('users')
-        .select('*, subscriptions(plan, status)')
+        .from('profiles')
+        .select('*')
         .eq('id', userId)
         .single();
 
@@ -125,66 +165,38 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       if (data) {
-        console.log('User data found:', data.username);
-        // Flatten subscription data
-        const subscription = (data as any).subscriptions;
+        console.log('Profile found:', data.username);
         const profile = {
           ...data,
-          subscription_tier: subscription?.plan || data.subscription_tier || 'basic',
-          subscription_status: subscription?.status || 'active'
-        } as UserProfile;
+          subscription_tier: data.plan || 'free', // Etapa 6: Mapeando plano real
+          id: data.id,
+          email: userEmail || data.email
+        } as any;
         setUserData(profile);
       } else {
-        console.log('User data not found, creating record...');
-        // Create user record if it doesn't exist
+        console.log('Profile not found, creating real record...');
+        // Etapa 2: Criando o registro inicial se não existir
         const { data: newUser, error: insertError } = await supabase
-          .from('users')
+          .from('profiles')
           .insert([{
             id: userId,
-            email: userEmail || '',
-            username: metadata?.username || userEmail?.split('@')[0] || `user_${Math.floor(Math.random() * 1000)}`,
-            display_name: metadata?.full_name || userEmail?.split('@')[0] || 'User',
-            subscription_tier: 'basic',
-            energy_level: 100,
-            xp: 0,
-            level: 1,
-            streak: 0,
-            onboarding_completed: false,
-            ai_messages_count: 0,
-            actions_count: 0,
-            ai_generations_count: 0,
-            posts_count: 0,
-            last_message_date: new Date().toISOString(),
-            last_action_date: new Date().toISOString(),
-            last_generation_date: new Date().toISOString(),
-            last_post_date: new Date().toISOString()
+            username: metadata?.username || userEmail?.split('@')[0] || `zenith_${Math.floor(Math.random() * 1000)}`,
+            display_name: metadata?.full_name || userEmail?.split('@')[0] || 'Novo Zenith',
+            plan: 'free', // Inicia no Free (Etapa 6)
+            xp: 0
           }])
           .select()
           .single();
 
         if (newUser) {
-          console.log('User record created successfully');
-          // Also create initial subscription record
-          await supabase.from('subscriptions').insert([{
-            user_id: userId,
-            plan: 'basic',
-            status: 'active'
-          }]);
-          
-          setUserData({ ...newUser, subscription_tier: 'basic' } as UserProfile);
-        } else if (insertError) {
-          console.error('Failed to create user record:', insertError);
+          setUserData({ ...newUser, subscription_tier: 'free' } as any);
         }
       }
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
-      // Small delay to ensure state updates are processed
       setTimeout(() => {
-        if (isMounted.current) {
-          setLoading(false);
-          console.log('Loading state set to false');
-        }
+        if (isMounted.current) setLoading(false);
       }, 500);
     }
   };
@@ -196,6 +208,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const refreshUserData = async () => {
+    if (isDemoMode) return;
     if (user?.id) {
       await fetchUserData(user.id, user.email, user.user_metadata);
     }
@@ -258,6 +271,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const incrementUsage = async (type: 'ai_messages' | 'routines' | 'actions' | 'ai_generations' | 'habits' | 'posts' | 'stories' | 'axis' | 'exercises' | 'finances' | 'journal' | 'gym') => {
     if (!userData) return;
+    if (isDemoMode) {
+      // Just update local state for demo purposes
+      const today = new Date().toISOString().split('T')[0];
+      const updates: any = { actions_count: (userData.actions_count || 0) + 1, last_action_date: new Date().toISOString() };
+      setUserData(prev => prev ? { ...prev, ...updates } : null);
+      return;
+    }
 
     const today = new Date().toISOString().split('T')[0];
     const updates: any = {};
@@ -293,7 +313,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <UserContext.Provider value={{ user, userData, loading, isSupabaseConnected, connectionError, refreshUserData, signOut, isPlanActive, checkLimit, incrementUsage, checkUserAccess }}>
+    <UserContext.Provider value={{ user, userData, loading, isSupabaseConnected, connectionError, isDemoMode, refreshUserData, signOut, isPlanActive, checkLimit, incrementUsage, checkUserAccess }}>
       {children}
     </UserContext.Provider>
   );
