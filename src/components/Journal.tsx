@@ -138,7 +138,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
              </p>
           </div>
         </div>
-        <div className="flex items-center space-x-4 bg-zenit-surface-1/40 backdrop-blur-xl px-5 py-3 rounded-2xl border border-zenit-border-primary">
+        <div className="flex items-center space-x-4 bg-zenit-surface-1 px-5 py-3 rounded-2xl border border-zenit-border-primary shadow-sm">
           <Calendar size={16} className={isNeural ? "text-zenit-scarlet" : "text-blue-500"} />
           <span className="text-[11px] font-black uppercase tracking-widest text-zenit-text-primary">
             {new Date().toLocaleDateString(userData?.language?.startsWith('pt') ? 'pt-BR' : 'en-US', { month: 'short', day: 'numeric' })}
@@ -151,7 +151,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-8 rounded-[2.5rem] bg-zenit-surface-1/60 border border-zenit-border-primary relative overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+            className="p-8 rounded-[2.5rem] bg-zenit-surface-1 border border-zenit-border-primary relative overflow-hidden group shadow-xl"
           >
             <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
               <Zap size={60} className="text-zenit-scarlet" />
@@ -184,7 +184,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
           ))}
         </div>
 
-        <div className="glass-card p-8 min-h-[350px] flex flex-col border-zenit-border-primary bg-zenit-surface-1/60 relative group rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
+        <div className="glass-card p-8 min-h-[350px] flex flex-col border-zenit-border-primary bg-zenit-surface-1 relative group rounded-[2.5rem] shadow-xl">
           <div className={`absolute top-10 left-0 w-1.5 h-16 rounded-r-full transition-all duration-500 ${isNeural ? 'bg-zenit-scarlet' : 'bg-blue-500'}`} />
           <textarea
             value={entry}
@@ -193,7 +193,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
             className="flex-1 bg-transparent border-none focus:ring-0 text-lg leading-relaxed resize-none placeholder:text-zenit-text-tertiary/20 text-zenit-text-primary font-medium"
           />
           
-          <div className="flex items-center justify-between mt-8 pt-8 border-t border-zenit-border-primary/50">
+          <div className="flex items-center justify-between mt-8 pt-8 border-t border-zenit-border-primary">
             <div className="flex items-center space-x-3">
               <div className={`w-2 h-2 rounded-full animate-pulse ${isNeural ? 'bg-zenit-scarlet shadow-[0_0_10px_rgba(255,0,0,0.5)]' : 'bg-blue-500'}`} />
               <span className="text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-40">
@@ -247,7 +247,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
                 </div>
                 <span className="text-[10px] font-display font-bold uppercase tracking-[0.3em]">{t.journal.insight}</span>
               </div>
-              <p className="text-base text-white/90 italic leading-relaxed font-serif">
+              <p className="text-base text-zenit-text-primary/90 italic leading-relaxed font-serif">
                 "{feedback}"
               </p>
             </motion.div>
@@ -259,7 +259,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center space-x-3">
                 <div className="w-1 h-4 bg-zenit-accent rounded-full shadow-[0_0_10px_var(--accent-glow)]" />
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">Treinamento Cognitivo</h3>
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zenit-text-tertiary">Treinamento Cognitivo</h3>
               </div>
               {mathScore > 0 && (
                 <span className="text-[9px] font-black text-zenit-accent uppercase tracking-widest">Score: {mathScore}</span>
@@ -270,18 +270,18 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
               {!showMathGame ? (
                 <button 
                   onClick={() => setShowMathGame(true)}
-                  className="p-6 rounded-[2rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center space-x-4 group"
+                  className="p-6 rounded-[2rem] bg-zenit-surface-1 border border-zenit-border-primary hover:bg-zenit-surface-2 transition-all flex items-center space-x-4 group"
                 >
                   <div className="w-12 h-12 rounded-2xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent group-hover:scale-110 transition-transform">
                     <Puzzle size={24} />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold text-white">Matemática</p>
-                    <p className="text-[9px] text-white/40 uppercase tracking-widest">Processamento</p>
+                    <p className="text-sm font-bold text-zenit-text-primary">Matemática</p>
+                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest">Processamento</p>
                   </div>
                 </button>
               ) : (
-                <div className="col-span-full glass-card p-8 border-zenit-accent/20 bg-zenit-accent/5 relative overflow-hidden">
+                <div className="col-span-full glass-card p-8 border border-zenit-border-primary bg-zenit-surface-1 relative overflow-hidden rounded-[2.5rem]">
                   <MathGame 
                     onClose={() => setShowMathGame(false)} 
                     onScoreUpdate={(s) => {
@@ -295,20 +295,20 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
               {!showMemoryGame && !showMathGame && (
                 <button 
                   onClick={() => setShowMemoryGame(true)}
-                  className="p-6 rounded-[2rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center space-x-4 group"
+                  className="p-6 rounded-[2rem] bg-zenit-surface-1 border border-zenit-border-primary hover:bg-zenit-surface-2 transition-all flex items-center space-x-4 group"
                 >
                   <div className="w-12 h-12 rounded-2xl bg-zenit-cyan/10 flex items-center justify-center text-zenit-cyan group-hover:scale-110 transition-transform">
                     <Brain size={24} />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold text-white">Memória</p>
-                    <p className="text-[9px] text-white/40 uppercase tracking-widest">Retenção Neural</p>
+                    <p className="text-sm font-bold text-zenit-text-primary">Memória</p>
+                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest">Retenção Neural</p>
                   </div>
                 </button>
               )}
 
               {showMemoryGame && (
-                <div className="col-span-full glass-card p-8 border-zenit-cyan/20 bg-zenit-cyan/5 relative overflow-hidden">
+                <div className="col-span-full glass-card p-8 border border-zenit-border-primary bg-zenit-surface-1 relative overflow-hidden rounded-[2.5rem]">
                   <MemoryGame 
                     onClose={() => setShowMemoryGame(false)} 
                     onScoreUpdate={(s) => {
@@ -324,8 +324,8 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
 
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-display font-bold text-white/60 uppercase tracking-[0.4em]">{t.journal.pastReflections}</h3>
-          <div className="h-[1px] flex-1 bg-white/5 mx-4" />
+          <h3 className="text-[10px] font-display font-bold text-zenit-text-tertiary uppercase tracking-[0.4em]">{t.journal.pastReflections}</h3>
+          <div className="h-[1px] flex-1 bg-zenit-border-primary mx-4" />
         </div>
         <div className="grid gap-4">
           {pastEntries.length > 0 ? (
@@ -338,9 +338,9 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
               />
             ))
           ) : (
-            <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-[2rem] opacity-20">
+            <div className="text-center py-12 border-2 border-dashed border-zenit-border-primary rounded-[2rem] opacity-20">
               <Book size={32} className="mx-auto mb-4" />
-              <p className="text-[10px] font-bold uppercase tracking-widest">Nenhuma reflexão anterior</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-primary">Nenhuma reflexão anterior</p>
             </div>
           )}
         </div>
@@ -355,22 +355,22 @@ const PastEntry: React.FC<{ date: string; preview: string; mood?: string }> = ({
   return (
     <motion.div 
       whileHover={{ x: 10 }}
-      className="glass-card p-5 flex items-center space-x-5 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all cursor-pointer group"
+      className="glass-card p-5 flex items-center space-x-5 border border-zenit-border-primary bg-zenit-surface-1 hover:bg-zenit-surface-2 transition-all cursor-pointer group rounded-[1.5rem]"
     >
       <div className="text-center min-w-[50px] space-y-1">
         <p className="text-[10px] font-black text-zenit-accent uppercase tracking-tighter">{date.split(' ')[0]}</p>
-        <p className="text-[14px] font-bold text-white/40">{date.split(' ')[1]}</p>
+        <p className="text-[14px] font-bold text-zenit-text-tertiary">{date.split(' ')[1]}</p>
       </div>
-      <div className="w-[1px] h-8 bg-white/5" />
+      <div className="w-[1px] h-8 bg-zenit-border-primary" />
       <div className="flex-1 overflow-hidden">
         <div className="flex items-center space-x-2 mb-1">
           <span className="text-xs">{moodIcon}</span>
-          <div className="h-[1px] w-4 bg-white/10" />
+          <div className="h-[1px] w-4 bg-zenit-border-primary" />
         </div>
-        <p className="text-xs text-white/40 truncate italic leading-relaxed">"{preview}"</p>
+        <p className="text-xs text-zenit-text-tertiary truncate italic leading-relaxed">"{preview}"</p>
       </div>
-      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <Book size={16} className="text-white/40" />
+      <div className="w-10 h-10 rounded-xl bg-zenit-surface-2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <Book size={16} className="text-zenit-text-tertiary" />
       </div>
     </motion.div>
   );
@@ -432,20 +432,20 @@ const MemoryGame: React.FC<{ onClose: () => void; onScoreUpdate: (score: number)
     <div className="space-y-8 text-center">
       <div className="flex justify-center items-center space-x-4">
         <div className="text-center">
-          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Score</p>
+          <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-widest">Score</p>
           <p className="text-2xl font-display font-bold text-zenit-accent">{score}</p>
         </div>
-        <div className="w-[1px] h-8 bg-white/10" />
+        <div className="w-[1px] h-8 bg-zenit-border-primary" />
         <div className="text-center">
-          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Nível</p>
-          <p className="text-2xl font-display font-bold text-white">{sequence.length}</p>
+          <p className="text-[10px] font-bold text-zenit-text-tertiary uppercase tracking-widest">Nível</p>
+          <p className="text-2xl font-display font-bold text-zenit-text-primary">{sequence.length}</p>
         </div>
       </div>
 
       {gameState === 'start' ? (
         <div className="py-10 space-y-6">
           <Brain size={60} className="mx-auto text-zenit-accent/40" />
-          <p className="text-sm text-white/60 max-w-[200px] mx-auto">Memorize a sequência de cores e repita sem errar.</p>
+          <p className="text-sm text-zenit-text-tertiary max-w-[200px] mx-auto">Memorize a sequência de cores e repita sem errar.</p>
           <button 
             onClick={startNextLevel}
             className="w-full py-4 bg-zenit-accent text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest"
@@ -579,7 +579,7 @@ const MathGame: React.FC<{ onClose: () => void; onScoreUpdate: (score: number) =
                   else if (btn === 'OK') {} // Auto-check on input
                   else handleInput(btn.toString());
                 }}
-                className="py-3 bg-white/5 rounded-xl border border-white/10 text-lg font-bold text-white hover:bg-white/10 transition-all active:scale-90"
+                className="py-3 bg-zenit-surface-2 rounded-xl border border-zenit-border-primary text-lg font-bold text-zenit-text-primary hover:bg-zenit-surface-3 transition-all active:scale-90"
               >
                 {btn}
               </button>
@@ -590,19 +590,19 @@ const MathGame: React.FC<{ onClose: () => void; onScoreUpdate: (score: number) =
         <div className="text-center space-y-6 py-4">
           <div className="space-y-2">
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-accent">Treino Finalizado</p>
-            <p className="text-sm text-white/60">Você resolveu {score} equações neurais.</p>
+            <p className="text-sm text-zenit-text-tertiary">Você resolveu {score} equações neurais.</p>
           </div>
           <div className="flex space-x-3">
             <button 
               onClick={() => { setTimeLeft(30); setScore(0); setIsPlaying(true); generateProblem(); }}
-              className="flex-1 py-4 bg-white/5 rounded-2xl text-[9px] font-bold uppercase tracking-widest border border-white/10 flex items-center justify-center space-x-2"
+              className="flex-1 py-4 bg-zenit-surface-2 rounded-2xl text-[9px] font-bold uppercase tracking-widest border border-zenit-border-primary flex items-center justify-center space-x-2 shadow-sm"
             >
               <RotateCcw size={14} />
               <span>Reiniciar</span>
             </button>
             <button 
               onClick={onClose}
-              className="flex-1 py-4 bg-zenit-accent rounded-2xl text-[9px] font-bold uppercase tracking-widest text-white flex items-center justify-center space-x-2"
+              className="flex-1 py-4 bg-zenit-accent rounded-2xl text-[9px] font-bold uppercase tracking-widest text-white flex items-center justify-center space-x-2 shadow-lg shadow-zenit-accent/20"
             >
               <X size={14} />
               <span>Fechar</span>

@@ -100,7 +100,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
         .from('stories')
         .select(`
           *,
-          user:users (
+          user:profiles (
             display_name,
             username,
             avatar_url
@@ -136,7 +136,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
         .from('posts')
         .select(`
           *,
-          user:users (
+          user:profiles (
             display_name,
             username,
             avatar_url,
@@ -177,7 +177,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('id, display_name, username, avatar_url, level')
         .ilike('username', `%${searchQuery}%`)
         .limit(5);
@@ -394,30 +394,41 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
   );
 
   const renderDiscover = () => (
-    <div className="space-y-8 pb-24">
-      {/* Trending Tags */}
-      <div className="flex flex-wrap gap-3 px-2">
-        {trendingTags.map((tag) => (
-          <button 
-            key={tag}
-            className="px-6 py-3 bg-zenit-surface-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-zenit-text-tertiary hover:text-zenit-accent hover:border-zenit-accent/50 transition-all shadow-inner"
-          >
-            {tag}
-          </button>
-        ))}
+    <div className="space-y-12 pb-32">
+      {/* Neural Signal Anchors (Tags) */}
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4 px-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-zenit-accent shadow-[0_0_10px_var(--accent-glow)]" />
+          <h3 className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary italic">Signal Anchors</h3>
+        </div>
+        <div className="flex flex-wrap gap-4 px-2">
+          {trendingTags.map((tag) => (
+            <button 
+              key={tag}
+              className="px-8 py-4 bg-zenit-glass border border-zenit-glass-border rounded-[2rem] text-[9px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-1 hover:border-zenit-accent/20 transition-all shadow-xl italic"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Suggested Users */}
-      <div className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary px-2">Usuários em Ascensão</h3>
+      {/* Rising Protocol Agents (Users) */}
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4 px-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-zenit-accent shadow-[0_0_10px_var(--accent-glow)]" />
+          <h3 className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary italic">Rising Protocol Agents</h3>
+        </div>
         <div className="grid grid-cols-1 gap-4">
           {searchResults.length > 0 ? searchResults.map((user) => (
-            <div key={user.id} className="glass-card p-6 flex items-center justify-between bg-zenit-surface-1/50 rounded-[2.5rem]">
-              <div className="flex items-center space-x-4">
-                <img src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} className="w-12 h-12 rounded-full" />
-                <div>
-                  <p className="text-sm font-bold text-zenit-text-primary">@{user.username}</p>
-                  <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest">Nível {user.level}</p>
+            <div key={user.id} className="p-8 flex items-center justify-between bg-zenit-glass border border-zenit-glass-border rounded-[3rem] shadow-2xl group transition-all hover:bg-zenit-surface-1">
+              <div className="flex items-center space-x-6">
+                <div className="w-14 h-14 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary p-0.5 overflow-hidden">
+                  <img src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} className="w-full h-full object-cover transition-all duration-700" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-base font-black text-zenit-text-primary italic tracking-tighter uppercase leading-none">@{user.username}</p>
+                  <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic leading-none">Protocol Strength: {user.level * 120}pt</p>
                 </div>
               </div>
               <button 
@@ -425,35 +436,38 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                   setSelectedUserId(user.id);
                   setActiveTab('profile');
                 }}
-                className="px-6 py-3 bg-zenit-accent text-white rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-zenit-accent/20"
+                className="w-12 h-12 flex items-center justify-center bg-zenit-text-primary text-zenit-black rounded-full hover:bg-zenit-accent hover:text-white transition-all active:scale-90"
               >
-                Ver Perfil
+                <ChevronRight size={20} />
               </button>
             </div>
           )) : (
-            <div className="text-center py-10 opacity-30">
-              <p className="text-[10px] font-bold uppercase tracking-widest">Pesquise para descobrir novos usuários</p>
+            <div className="text-center py-20 bg-zenit-glass border border-dashed border-zenit-glass-border rounded-[3rem]">
+              <p className="text-[8px] font-black uppercase tracking-[0.6em] text-zenit-text-tertiary italic">Intercepte novas conexões neurais através do sinal de busca</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Popular Posts Grid */}
-      <div className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary px-2">Explorar Nexus</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {posts.filter(p => p.image_url).slice(0, 6).map((post) => (
+      {/* Visual Stream Archive (Popular Posts) */}
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4 px-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-zenit-accent shadow-[0_0_10px_var(--accent-glow)]" />
+          <h3 className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary italic">Visual Stream Archive</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-6">
+          {posts.filter(p => p.image_url).slice(0, 4).map((post) => (
             <motion.div 
               key={post.id}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ y: -5 }}
               onClick={() => setSelectedPost(post)}
-              className="aspect-square rounded-[2rem] overflow-hidden border border-zenit-border-secondary relative group cursor-pointer"
+              className="aspect-[4/5] rounded-[3rem] overflow-hidden border border-zenit-glass-border relative group cursor-pointer shadow-2xl"
             >
-              <img src={post.image_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-zenit-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                <div className="flex items-center space-x-2 text-white">
-                  <Heart size={12} fill="currentColor" />
-                  <span className="text-[10px] font-bold">{post.likes_count}</span>
+              <img src={post.image_url} className="w-full h-full object-cover transition-all duration-1000" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
+                <div className="flex items-center space-x-3 text-white">
+                  <Heart size={16} fill="currentColor" />
+                  <span className="text-xs font-mono font-black italic tracking-tighter">{post.likes_count.toString().padStart(2, '0')}</span>
                 </div>
               </div>
             </motion.div>
@@ -470,41 +484,41 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
       <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-zenit-surface-1/80 backdrop-blur-3xl px-6 h-20 flex items-center justify-between border-b border-zenit-border-primary">
-        <div className="flex items-center space-x-4">
+      <header className="sticky top-0 z-50 bg-zenit-nav backdrop-blur-3xl px-8 h-24 flex items-center justify-between border-b border-zenit-border-primary">
+        <div className="flex items-center space-x-6">
           {selectedUserId && activeTab === 'profile' ? (
             <button 
               onClick={() => {
                 setSelectedUserId(null);
                 setActiveTab('feed');
               }}
-              className="w-12 h-12 flex items-center justify-center bg-zenit-surface-1 hover:bg-zenit-surface-2 rounded-2xl transition-all active:scale-90"
+              className="w-12 h-12 flex items-center justify-center bg-zenit-glass hover:bg-zenit-surface-2 rounded-full transition-all active:scale-90 border border-zenit-glass-border shadow-2xl"
             >
               <ArrowLeft size={20} className="text-zenit-text-primary" />
             </button>
           ) : (
             <div className="flex flex-col">
-              <h1 className="text-2xl font-display font-medium tracking-tight text-zenit-text-primary italic leading-none">
+              <h1 className="text-2xl font-display font-black tracking-tighter text-zenit-text-primary italic leading-none uppercase">
                 NEXUS
               </h1>
-              <div className="flex items-center space-x-2 mt-1.5">
-                <div className="w-1 h-1 rounded-full bg-zenit-scarlet animate-pulse" />
-                <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary opacity-60">Neural Network v2.5</span>
+              <div className="flex items-center space-x-3 mt-2 opacity-30">
+                <div className="w-1 h-1 rounded-full bg-zenit-accent animate-ping" />
+                <span className="text-[7.5px] font-black uppercase tracking-[0.5em] text-zenit-text-primary">Neural Net v5.1</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Search Bar - Fixed Width */}
-        <div className="flex-1 max-w-[200px] sm:max-w-sm mx-6 relative" ref={searchRef}>
+        <div className="flex-1 max-w-[200px] sm:max-w-md mx-6 relative" ref={searchRef}>
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-all" />
             <input 
               type="text"
-              placeholder={t.social.search}
+              placeholder="Explorar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zenit-surface-1/50 rounded-2xl py-3 pl-11 pr-4 text-xs focus:outline-none focus:border-zenit-accent/30 focus:bg-zenit-surface-2 transition-all placeholder:text-zenit-text-tertiary font-medium text-zenit-text-primary border border-transparent focus:border-zenit-accent/20"
+              className="w-full bg-zenit-glass border border-zenit-glass-border rounded-[2rem] py-3.5 pl-12 pr-6 text-[10px] uppercase font-black tracking-widest focus:outline-none focus:border-zenit-accent/20 focus:bg-zenit-surface-2 transition-all placeholder:text-zenit-text-tertiary/40 text-zenit-text-primary shadow-2xl"
             />
           </div>
 
@@ -515,7 +529,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-zenit-surface-1 rounded-2xl overflow-hidden z-50 border border-zenit-border-primary shadow-2xl"
+                className="absolute top-full left-0 right-0 mt-3 bg-zenit-surface-1 rounded-3xl overflow-hidden z-50 border border-zenit-border-primary shadow-2xl p-2"
               >
                 {searchResults.map((user) => (
                   <button
@@ -526,15 +540,15 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                       setIsSearching(false);
                       setSearchQuery('');
                     }}
-                    className="w-full p-3 flex items-center space-x-3 hover:bg-zenit-surface-2 transition-colors last:border-0"
+                    className="w-full p-3 flex items-center space-x-3 hover:bg-zenit-surface-2 rounded-2xl transition-colors"
                   >
                     <img 
                       src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-9 h-9 rounded-full object-cover border border-zenit-border-primary"
                     />
                     <div className="text-left">
-                      <p className="text-xs font-bold text-zenit-text-primary">{user.display_name}</p>
-                      <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest">@{user.username}</p>
+                      <p className="text-xs font-black text-white">@{user.username}</p>
+                      <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest opacity-40">Nível {user.level}</p>
                     </div>
                   </button>
                 ))}
@@ -543,12 +557,12 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
           </AnimatePresence>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 sm:space-x-2">
           <button 
             onClick={() => setIsFabOpen(!isFabOpen)}
-            className="text-zenit-text-primary p-2 hover:bg-zenit-surface-1 rounded-xl transition-all relative group"
+            className="w-10 h-10 flex items-center justify-center bg-zenit-surface-2 hover:bg-zenit-surface-3 rounded-full text-zenit-text-primary transition-all relative border border-zenit-border-primary shadow-sm"
           >
-            <Plus size={22} strokeWidth={2.5} className={`transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`} />
+            <Plus size={20} strokeWidth={2.5} className={`transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`} />
             
             {/* FAB Dropdown Menu */}
             <AnimatePresence>
@@ -557,19 +571,19 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-4 w-48 bg-zenit-surface-1/95 backdrop-blur-2xl border border-zenit-border-primary rounded-3xl shadow-2xl overflow-hidden p-2 z-[60]"
+                  className="absolute top-full right-0 mt-4 w-44 bg-zenit-surface-1/95 backdrop-blur-2xl border border-zenit-border-primary rounded-[2rem] shadow-2xl overflow-hidden p-2 z-[60]"
                 >
                   <button
                     onClick={() => {
                       setIsNexusModalOpen(true);
                       setIsFabOpen(false);
                     }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-2xl transition-all group"
+                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-xl transition-all group"
                   >
                     <div className="w-8 h-8 rounded-lg bg-zenit-crimson flex items-center justify-center">
                       <Camera size={14} className="text-white" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-secondary group-hover:text-zenit-text-primary">Nexus</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary group-hover:text-zenit-text-primary">Nexus</span>
                   </button>
                   
                   <button
@@ -577,57 +591,58 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                       setIsCreateModalOpen(true);
                       setIsFabOpen(false);
                     }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-2xl transition-all group"
+                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-xl transition-all group"
                   >
                     <div className="w-8 h-8 rounded-lg bg-zenit-accent flex items-center justify-center">
                       <ImageIcon size={14} className="text-white" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-secondary group-hover:text-zenit-text-primary">{t.social.post}</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary group-hover:text-zenit-text-primary">Post</span>
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </button>
-          <button className="text-zenit-text-primary p-2 hover:bg-zenit-surface-1 rounded-xl transition-all">
-            <Heart size={20} strokeWidth={2.5} />
-          </button>
         </div>
       </header>
 
-      {/* Nexus Section (Stories) - Horizontal Scrollable */}
+      {/* Nexus Section (Stories) - Minimalist & Futuristic */}
       {activeTab === 'feed' && (
-        <div className="bg-zenit-black/20 py-8 overflow-x-auto scrollbar-hide relative z-10 border-b border-zenit-border-primary/50">
-          <div className="flex px-6 space-x-8">
-            {/* Create Nexus Button */}
+        <div className="bg-zenit-surface-1 py-8 border-b border-zenit-border-secondary relative z-10 overflow-hidden">
+          {/* Futuristic Grid Line */}
+          <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-zenit-accent/20 to-transparent" />
+          
+          <div className="flex px-6 space-x-6 items-center overflow-x-auto scrollbar-hide">
+            {/* Create Nexus - Discrete Action */}
             <div className="flex flex-col items-center space-y-3 flex-shrink-0">
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsNexusModalOpen(true)}
-                className="w-16 h-16 rounded-full p-0.5 bg-zenit-border-primary relative group flex items-center justify-center bg-zenit-surface-1"
+                className="w-16 h-16 rounded-full flex items-center justify-center bg-zenit-surface-2 border border-zenit-border-primary hover:border-zenit-accent/40 transition-colors group shadow-sm"
               >
-                 <div className="w-14 h-14 rounded-full bg-zenit-surface-2 flex items-center justify-center border border-dashed border-zenit-border-primary">
-                    <Plus size={20} className="text-zenit-text-tertiary" />
-                 </div>
+                <Plus size={24} className="text-zenit-text-tertiary group-hover:text-zenit-accent transition-colors" />
               </motion.button>
-              <span className="text-[9px] font-black text-zenit-text-tertiary uppercase tracking-[0.2em] italic">Capturar</span>
+              <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.4em] italic">Capturar</span>
             </div>
             
-            {/* Real Story Items */}
+            {/* Nexus Stream Items */}
             {storyItems.map((item) => (
               <motion.button 
                 key={item.id}
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ y: -3 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedStory(item)}
-                className="flex flex-col items-center space-y-3 flex-shrink-0"
+                className="flex flex-col items-center space-y-3 flex-shrink-0 group"
               >
-                <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-zenit-scarlet to-zenit-crimson ring-2 ring-transparent group-active:ring-zenit-accent transition-all">
-                  <div className="w-full h-full rounded-full bg-zenit-black flex items-center justify-center border-2 border-zenit-black overflow-hidden">
-                    <img src={item.user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.user?.username}`} className="w-full h-full object-cover" />
+                <div className="relative p-0.5 rounded-full ring-2 ring-zenit-accent/20 group-hover:ring-zenit-accent transition-all duration-500">
+                  <div className="w-[60px] h-[60px] rounded-full overflow-hidden bg-zenit-black p-0.5">
+                    <img 
+                      src={item.user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.user?.username}`} 
+                      className="w-full h-full rounded-full object-cover transition-all duration-700" 
+                    />
                   </div>
                 </div>
-                <span className="text-[9px] font-black text-zenit-text-primary uppercase tracking-[0.2em] italic truncate max-w-[70px]">
+                <span className="text-[8px] font-black text-zenit-text-tertiary uppercase tracking-[0.2em] italic truncate max-w-[64px]">
                   {item.user?.display_name.split(' ')[0]}
                 </span>
               </motion.button>
@@ -638,17 +653,17 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
 
       {/* Fluxo Tab */}
       {(activeTab === 'feed' || activeTab === 'discover') && (
-        <div className="flex justify-center p-6 sticky top-20 z-40">
-          <div className="flex bg-zenit-surface-1/60 backdrop-blur-2xl rounded-full p-1.5">
+        <div className="flex justify-center p-4">
+          <div className="flex bg-zenit-surface-2 border border-zenit-border-primary rounded-full p-1 shadow-inner">
             <button 
               onClick={() => setActiveTab('feed')}
-              className={`px-10 py-3 rounded-full text-[10px] font-bold uppercase tracking-[0.4em] italic transition-all relative ${activeTab === 'feed' ? 'bg-zenit-accent text-white' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+              className={`px-8 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.3em] italic transition-all relative ${activeTab === 'feed' ? 'bg-zenit-text-primary text-zenit-black shadow-xl' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
             >
               Fluxo
             </button>
             <button 
               onClick={() => setActiveTab('discover')}
-              className={`px-10 py-3 rounded-full text-[10px] font-bold uppercase tracking-[0.4em] italic transition-all relative ${activeTab === 'discover' ? 'bg-zenit-accent text-white' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+              className={`px-8 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.3em] italic transition-all relative ${activeTab === 'discover' ? 'bg-zenit-text-primary text-zenit-black shadow-xl' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
             >
               Descobrir
             </button>
@@ -657,7 +672,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto flex flex-col gap-4 p-4">
+      <main className="max-w-3xl mx-auto px-6 pb-44 space-y-12">
         {activeTab === 'feed' ? renderFeed() : activeTab === 'discover' ? renderDiscover() : renderProfile()}
       </main>
 
@@ -799,7 +814,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
         )}
       </AnimatePresence>
 
-      {/* Create Nexus Modal */}
+      {/* Nexus Creation Modal (The Capture) */}
       <AnimatePresence>
         {isNexusModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -808,45 +823,47 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsNexusModalOpen(false)}
-              className="absolute inset-0 bg-black/95 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/95 backdrop-blur-xl"
             />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-zenit-surface-1 rounded-[3rem] overflow-hidden flex flex-col max-h-[85vh]"
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              className="relative w-full max-w-sm bg-zenit-surface-1 border border-zenit-border-primary rounded-[4rem] overflow-hidden flex flex-col p-2 shadow-2xl"
             >
-              <div className="p-8 space-y-8 flex-1 overflow-y-auto scrollbar-hide">
+              <div className="p-8 space-y-8">
                 <div className="flex justify-between items-center">
                   <div className="space-y-1">
-                    <h3 className="text-2xl font-display font-bold text-zenit-text-primary uppercase italic tracking-tight">Novo <span className="text-zenit-accent">Nexus</span></h3>
-                    <p className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em]">Momento Efêmero</p>
+                    <h3 className="text-2xl font-display font-black text-zenit-text-primary uppercase italic tracking-tighter leading-none">NEXUS CAPTURE</h3>
+                    <div className="flex items-center space-x-2">
+                       <div className="w-1 h-1 rounded-full bg-zenit-accent animate-pulse" />
+                       <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em]">Neural Stream v5.0</p>
+                    </div>
                   </div>
-                  <button onClick={() => setIsNexusModalOpen(false)} className="w-12 h-12 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all">
+                  <button onClick={() => setIsNexusModalOpen(false)} className="w-12 h-12 rounded-full bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all border border-zenit-border-primary shadow-sm">
                     <X size={20} />
                   </button>
                 </div>
 
                 <div className="space-y-6">
                   {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-[10px] uppercase tracking-widest font-bold flex flex-col space-y-3">
-                      <span>{error}</span>
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-[10px] uppercase tracking-widest font-black text-center">
+                      {error}
                     </div>
                   )}
 
                   <div 
                     onClick={() => !imagePreview && document.getElementById('nexus-image')?.click()}
-                    className="aspect-[9/16] w-full bg-zenit-surface-2 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer hover:border-zenit-accent/50 transition-all overflow-hidden group relative"
+                    className="aspect-[3/4] w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[3rem] flex flex-col items-center justify-center cursor-pointer hover:bg-zenit-surface-3 transition-all overflow-hidden group relative shadow-inner"
                   >
                     {imagePreview ? (
                       <>
                         <img src={imagePreview} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-zenit-black/20 group-hover:bg-zenit-black/40 transition-all" />
+                        <div className="absolute inset-0 bg-black/40" />
                         
-                        {/* Text Overlay Preview */}
                         {newNexusText && (
                           <div className="absolute inset-0 flex items-center justify-center px-10 text-center pointer-events-none">
-                            <p className="text-2xl font-display italic text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                            <p className="text-3xl font-display font-black italic text-white drop-shadow-2xl uppercase tracking-tighter">
                               {newNexusText}
                             </p>
                           </div>
@@ -858,30 +875,30 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                             setNewPostImage(null);
                             setImagePreview(null);
                           }}
-                          className="absolute top-4 right-4 p-3 bg-zenit-black/60 backdrop-blur-md rounded-full text-zenit-text-primary hover:bg-zenit-black/80 transition-all shadow-lg"
+                          className="absolute top-6 right-6 p-3 bg-black/80 rounded-full text-white shadow-2xl"
                         >
-                          <X size={18} />
+                          <X size={20} />
                         </button>
                       </>
                     ) : (
-                      <div className="flex flex-col items-center space-y-4">
-                        <div className="w-20 h-20 rounded-full bg-zenit-accent/10 flex items-center justify-center">
-                          <Camera size={36} className="text-zenit-accent" />
+                      <div className="flex flex-col items-center space-y-4 group-hover:scale-110 transition-transform duration-500">
+                        <div className="w-20 h-20 rounded-[2rem] bg-zenit-surface-3 flex items-center justify-center border border-zenit-border-primary group-hover:bg-zenit-text-primary group-hover:text-zenit-black transition-all shadow-md">
+                          <Camera size={32} />
                         </div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-tertiary">{t.social.captureMoment}</p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary group-hover:text-zenit-text-primary">Abrir Sinal Visual</p>
                       </div>
                     )}
                     <input id="nexus-image" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-tertiary ml-2">Texto no Nexus</label>
-                    <textarea
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary ml-2 italic">Mensagem Neural</label>
+                    <input
                       value={newNexusText}
                       onChange={(e) => setNewNexusText(e.target.value)}
-                      placeholder="Escreva algo para aparecer na imagem..."
-                      className="w-full bg-zenit-surface-2 rounded-2xl p-5 text-sm text-zenit-text-primary placeholder:text-zenit-text-tertiary/40 focus:outline-none focus:border-zenit-accent/30 transition-all resize-none"
-                      rows={3}
+                      placeholder="ESCREVA SEU PROTOCOLO..."
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl p-5 text-xs font-black text-zenit-text-primary italic placeholder:text-zenit-text-tertiary/10 focus:outline-none focus:border-zenit-accent/30 transition-all uppercase tracking-widest shadow-inner"
+                      maxLength={60}
                     />
                   </div>
                 </div>
@@ -889,14 +906,14 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                 <button
                   onClick={handleCreateNexus}
                   disabled={isPublishing || !newPostImage}
-                  className="w-full py-6 bg-zenit-text-primary text-zenit-black rounded-[2rem] text-[11px] font-bold uppercase tracking-[0.4em] flex items-center justify-center space-x-3 disabled:opacity-50 hover:opacity-90 transition-all"
+                  className="w-full py-6 bg-zenit-text-primary text-zenit-black rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.5em] flex items-center justify-center space-x-3 disabled:opacity-20 hover:brightness-90 transition-all italic shadow-2xl"
                 >
                   {isPublishing ? (
                     <Loader2 size={18} className="animate-spin" />
                   ) : (
                     <>
-                      <Zap size={18} />
-                      <span>Ativar Nexus</span>
+                      <Send size={18} />
+                      <span>Transmitir Nexus</span>
                     </>
                   )}
                 </button>
@@ -927,58 +944,70 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-zenit-black">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black">
       <motion.div 
         initial={{ opacity: 0, scale: 1.1 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 1.1 }}
-        className="relative w-full h-full max-w-sm overflow-hidden sm:rounded-[3rem] sm:h-[80vh]"
+        className="relative w-full h-full max-w-sm overflow-hidden sm:rounded-[4rem] sm:h-[85vh] border border-zenit-border-primary bg-zenit-surface-1 shadow-2xl"
       >
-        {/* Progress Bars */}
-        <div className="absolute top-0 left-0 right-0 p-6 z-30 flex space-x-1.5">
-          <div className="h-1 flex-1 bg-zenit-text-primary/10 rounded-full overflow-hidden backdrop-blur-md">
+        {/* Cinematic Scanline Overlay */}
+        <div className="absolute inset-x-0 top-0 h-1 z-30 bg-zenit-accent/20 blur-sm animate-scanline" />
+
+        {/* Neural Sync Progress */}
+        <div className="absolute top-0 left-0 right-0 p-8 z-30 space-y-4">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.5em] italic">Neural Sync In-Progress...</span>
+            <span className="text-[7.5px] font-mono text-zenit-text-tertiary">{Math.floor(progress)}%</span>
+          </div>
+          <div className="h-[2px] w-full bg-zenit-surface-2 rounded-full overflow-hidden backdrop-blur-md">
             <motion.div 
-              className="h-full bg-zenit-text-primary shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+              className="h-full bg-zenit-accent shadow-[0_0_15px_var(--accent-glow)]"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        {/* Header */}
-        <div className="absolute top-10 left-0 right-0 px-6 z-30 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-zenit-accent to-zenit-crimson shadow-lg">
+        {/* Neural Context Header */}
+        <div className="absolute top-16 left-0 right-0 px-8 z-30 flex items-center justify-between">
+          <div className="flex items-center space-x-5">
+            <div className="w-12 h-12 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary p-0.5 backdrop-blur-xl shadow-lg">
               <img 
                 src={story.user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${story.user?.username}`} 
-                className="w-full h-full rounded-full object-cover border-2 border-zenit-black"
+                className="w-full h-full rounded-[14px] object-cover"
                 referrerPolicy="no-referrer"
               />
             </div>
-            <div className="text-left">
-              <p className="text-sm font-bold text-zenit-text-primary uppercase tracking-widest drop-shadow-md">{story.user?.display_name}</p>
-              <p className="text-[9px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] drop-shadow-md">Protocolo Ativo</p>
+            <div className="text-left space-y-1">
+              <p className="text-xs font-black text-zenit-text-primary uppercase tracking-[0.2em] italic leading-none">{story.user?.display_name}</p>
+              <div className="flex items-center space-x-2">
+                 <div className="w-1 h-1 rounded-full bg-zenit-accent animate-pulse" />
+                 <p className="text-[7.5px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic">Transmissão Ativa</p>
+              </div>
             </div>
           </div>
-          <button onClick={onClose} className="w-10 h-10 flex items-center justify-center bg-zenit-black/40 backdrop-blur-xl rounded-full text-zenit-text-secondary hover:text-zenit-text-primary transition-all">
+          <button onClick={onClose} className="w-12 h-12 flex items-center justify-center bg-zenit-surface-2 border border-zenit-border-primary backdrop-blur-xl rounded-full text-zenit-text-tertiary hover:text-zenit-text-primary transition-all shadow-sm">
             <X size={20} />
           </button>
         </div>
 
-        {/* Content */}
+        {/* Visual Stream Area */}
         <div className="w-full h-full relative">
           <img 
             src={story.image_url} 
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-zenit-black via-transparent to-zenit-black/60" />
+          {/* Digital Distortion Overlays */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] [background-size:20px_20px]" />
           
           {story.content && (
-            <div className="absolute inset-0 flex items-center justify-center px-10 text-center">
+            <div className="absolute inset-x-0 bottom-32 flex items-center justify-center px-12 text-center">
               <motion.p 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-2xl font-display italic text-zenit-text-primary leading-relaxed drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-3xl font-display font-black italic text-white uppercase leading-none tracking-tighter drop-shadow-2xl"
               >
                 {story.content}
               </motion.p>
@@ -986,10 +1015,15 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
           )}
         </div>
 
-        {/* Zenit Branding Overlay */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-2 opacity-40">
-          <p className="text-[8px] font-bold uppercase tracking-[0.8em] text-zenit-text-tertiary">ZENIT NEXUS SYSTEM</p>
-          <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-zenit-text-tertiary to-transparent" />
+        {/* Technical Footer Metadata */}
+        <div className="absolute bottom-12 inset-x-0 px-8 flex items-center justify-between opacity-30 z-30">
+          <div className="flex flex-col space-y-1">
+            <span className="text-[7px] font-black text-white uppercase tracking-[0.5em]">Bit-Stream Alpha v5.1</span>
+            <span className="text-[6px] font-mono text-white/50">HASH_{story.id.slice(0, 12).toUpperCase()}</span>
+          </div>
+          <div className="w-10 h-10 border border-white/20 rounded-lg flex items-center justify-center">
+             <Zap size={12} className="text-white" />
+          </div>
         </div>
       </motion.div>
     </div>
@@ -1026,58 +1060,60 @@ const PostCard: React.FC<{ post: Post; onLike: () => void; onViewProfile: () => 
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-zenit-surface-1/40 backdrop-blur-3xl rounded-[3rem] overflow-hidden mb-10 group/card transition-all duration-700 relative"
+      className="bg-zenit-glass border border-zenit-glass-border rounded-[3rem] overflow-hidden mb-12 group/card transition-all duration-700 relative shadow-2xl"
     >
-      {/* Subtle Glow Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zenit-accent/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      {/* Subtle Neural Grid Background */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(var(--text-primary)_1px,transparent_1px)] [background-size:20px_20px] opacity-10" />
+      </div>
 
-      {/* Post Header */}
-      <div className="p-6 flex items-center justify-between relative z-10">
-        <button onClick={onViewProfile} className="flex items-center space-x-5 group">
+      {/* Header - Technical Context */}
+      <div className="p-8 flex items-center justify-between relative z-10 border-b border-zenit-glass-border">
+        <button onClick={onViewProfile} className="flex items-center space-x-6 group">
           <div className="relative">
-            <div className="w-14 h-14 rounded-[1.8rem] p-0.5 bg-gradient-to-tr from-zenit-accent to-zenit-crimson group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-              <div className="w-full h-full rounded-[1.6rem] bg-zenit-black p-0.5">
-                <img 
-                  src={post.user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user.username}`} 
-                  className="w-full h-full rounded-[1.4rem] object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+            <div className="w-14 h-14 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary group-hover:border-zenit-accent/40 transition-all duration-500 overflow-hidden flex items-center justify-center">
+              <img 
+                src={post.user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user.username}`} 
+                className="w-full h-full object-cover transition-all duration-700"
+                referrerPolicy="no-referrer"
+              />
             </div>
             {post.user.role === 'admin' && (
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-zenit-accent rounded-full border-2 border-zenit-black flex items-center justify-center">
-                <ShieldCheck size={12} className="text-white" />
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-zenit-accent flex items-center justify-center rounded-lg border border-zenit-black shadow-lg">
+                <ShieldCheck size={10} className="text-white" />
               </div>
             )}
           </div>
-          <div className="text-left">
-            <div className="flex items-center space-x-2">
-              <p className="text-base font-display font-black italic uppercase tracking-tighter text-zenit-text-primary group-hover:text-zenit-accent transition-colors">
-                {post.user.display_name}
-              </p>
-              {post.user.role === 'admin' && (
-                <span className="text-[8px] bg-zenit-accent/20 text-zenit-accent px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em]">Staff</span>
-              )}
+          <div className="text-left space-y-1">
+            <h4 className="text-sm font-black uppercase tracking-[0.2em] text-zenit-text-primary italic leading-none">
+              {post.user.display_name}
+            </h4>
+            <div className="flex items-center space-x-3">
+              <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic leading-none">@{post.user.username}</p>
+              <div className="w-1 h-3 bg-zenit-border-primary rounded-full" />
+              <p className="text-[8px] text-zenit-accent font-black uppercase tracking-[0.2em] italic leading-none">LVL {post.user.level}</p>
             </div>
-            <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-bold italic opacity-60">@{post.user.username}</p>
           </div>
         </button>
-        <button className="w-12 h-12 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-white/5 rounded-2xl transition-all">
-          <MoreHorizontal size={20} />
-        </button>
+        <div className="flex items-center space-x-2">
+           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20 group/status animate-pulse">
+             <div className="w-full h-full rounded-full bg-emerald-500 scale-50" />
+           </div>
+           <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.4em] italic">Transmissão Ativa</span>
+        </div>
       </div>
 
-      {/* Post Content */}
-      <div className="relative px-4" onDoubleClick={handleDoubleTap}>
+      {/* Main Content Area */}
+      <div className="relative" onDoubleClick={handleDoubleTap}>
         {post.image_url ? (
-          <div className="aspect-[4/5] bg-zenit-black rounded-[2.5rem] overflow-hidden relative transition-all duration-700">
-            <img src={post.image_url} className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-[2s]" referrerPolicy="no-referrer" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-zenit-black/60" />
+          <div className="aspect-[4/5] bg-zenit-black relative transition-all duration-700 overflow-hidden">
+            <img src={post.image_url} className="w-full h-full object-cover group-hover/card:scale-105 transition-all duration-[2s]" referrerPolicy="no-referrer" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
             
-            {/* Text Overlay for Posts */}
+            {/* Minimal Typography Overlay */}
             {post.content && (
-              <div className="absolute inset-0 flex items-center justify-center px-12 text-center pointer-events-none">
-                <p className="text-3xl font-display font-black italic text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)] leading-tight tracking-tighter">
+              <div className="absolute inset-x-0 bottom-0 p-12 text-center pointer-events-none">
+                <p className="text-2xl sm:text-3xl font-display font-black italic text-white leading-tight tracking-tighter uppercase drop-shadow-2xl">
                   {post.content}
                 </p>
               </div>
@@ -1086,74 +1122,70 @@ const PostCard: React.FC<{ post: Post; onLike: () => void; onViewProfile: () => 
             <AnimatePresence>
               {showHeartAnim && (
                 <motion.div 
-                  initial={{ scale: 0, opacity: 0, rotate: -30 }}
-                  animate={{ scale: 1.8, opacity: 1, rotate: 0 }}
-                  exit={{ scale: 2.5, opacity: 0, rotate: 30 }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1.5, opacity: 1 }}
+                  exit={{ scale: 2, opacity: 0 }}
                   className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
                 >
-                  <Heart size={120} fill="#FF0000" className="text-zenit-accent" />
+                  <div className="w-24 h-24 rounded-full bg-zenit-accent flex items-center justify-center border border-white/20 shadow-2xl shadow-zenit-accent/40">
+                    <Heart size={48} fill="#FFF" className="text-white" />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         ) : (
-          <div className="p-16 bg-gradient-to-br from-zenit-surface-2/40 to-transparent min-h-[300px] flex items-center justify-center text-center relative overflow-hidden group-hover/card:bg-zenit-surface-2/60 transition-all duration-700 rounded-[2.5rem]">
-            <div className="absolute top-0 left-0 w-full h-full opacity-[0.05] pointer-events-none">
-              <div className="absolute top-10 left-10 w-32 h-32 border-2 border-zenit-text-primary rounded-full blur-sm" />
-              <div className="absolute bottom-10 right-10 w-48 h-48 border-2 border-zenit-accent rounded-full blur-sm" />
-            </div>
-            <p className="text-3xl font-display font-black italic text-zenit-text-secondary leading-tight relative z-10 tracking-tighter drop-shadow-2xl">
-              "{post.content}"
+          <div className="p-20 bg-zenit-glass min-h-[400px] flex items-center justify-center text-center relative overflow-hidden group-hover/card:bg-zenit-surface-2 transition-all duration-700">
+            <div className="absolute inset-0 bg-[linear-gradient(var(--text-primary)_1px,transparent_1px),linear-gradient(90deg,var(--text-primary)_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.03]" />
+            <p className="text-3xl sm:text-4xl font-display font-black italic text-zenit-text-primary leading-tight relative z-10 tracking-tighter uppercase max-w-sm drop-shadow-2xl">
+              {post.content}
             </p>
           </div>
         )}
       </div>
 
-      {/* Post Actions */}
-      <div className="p-8 space-y-8 relative z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-10">
+      {/* Action Suite - Control Panel Style */}
+      <div className="p-10 bg-zenit-glass relative z-10 border-t border-zenit-glass-border">
+        <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center space-x-12">
             <button 
               onClick={toggleLike}
               className={`flex items-center space-x-3 transition-all active:scale-75 ${isLiked ? 'text-zenit-accent' : 'text-zenit-text-tertiary hover:text-zenit-text-primary'}`}
             >
-              <Heart size={28} fill={isLiked ? "currentColor" : "none"} strokeWidth={2.5} className={isLiked ? 'animate-pulse' : ''} />
-              <span className="text-base font-black italic tracking-tighter">{likesCount}</span>
+              <Heart size={24} fill={isLiked ? "currentColor" : "none"} strokeWidth={2.5} className={isLiked ? 'shadow-xl' : ''} />
+              <span className="text-sm font-mono font-black italic tracking-tighter">{likesCount.toString().padStart(3, '0')}</span>
             </button>
             <button 
               onClick={onViewComments}
               className="flex items-center space-x-3 text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-75"
             >
-              <MessageSquare size={28} strokeWidth={2.5} />
-              <span className="text-base font-black italic tracking-tighter">{post.comments_count}</span>
+              <MessageSquare size={24} strokeWidth={2.5} />
+              <span className="text-sm font-mono font-black italic tracking-tighter">{post.comments_count.toString().padStart(3, '0')}</span>
             </button>
             <button className="text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-75">
-              <Share2 size={28} strokeWidth={2.5} />
+              <Share2 size={24} strokeWidth={2.5} />
             </button>
           </div>
           <button className="text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-75">
-            <Bookmark size={28} strokeWidth={2.5} />
+            <Bookmark size={24} strokeWidth={2.5} />
           </button>
         </div>
 
-        {post.image_url && post.content && (
-          <div className="space-y-3">
-            <p className="text-sm text-zenit-text-secondary leading-relaxed font-medium">
-              <span className="font-black italic uppercase tracking-tighter text-zenit-accent mr-2">@{post.user.username}</span>
-              {post.content}
-            </p>
+        {/* Technical Footer */}
+        <div className="flex items-center justify-between pt-8 border-t border-zenit-glass-border">
+          <div className="flex items-center space-x-4">
+             <div className="px-5 py-1.5 bg-zenit-surface-2 rounded-full border border-zenit-border-primary">
+               <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.4em] italic">
+                 CATEGORIA: {post.type === 'thought' ? 'PENSAMENTO' : post.type === 'achievement' ? 'CONQUISTA' : post.type === 'routine' ? 'ROTINA' : 'REFLEXÃO'}
+               </span>
+             </div>
+             <div className="w-1 h-3 bg-zenit-border-primary rounded-full" />
+             <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.4em] italic opacity-40">
+                SINAL VERIFICADO
+             </span>
           </div>
-        )}
-        
-        <div className="flex items-center justify-between pt-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 rounded-full bg-zenit-accent animate-pulse" />
-            <span className="px-4 py-1.5 bg-zenit-surface-2/50 rounded-full text-[9px] font-black text-zenit-text-tertiary uppercase tracking-[0.3em] italic">
-              {post.type === 'thought' ? 'Pensamento' : post.type === 'achievement' ? 'Conquista' : post.type === 'routine' ? 'Rotina' : 'Reflexão'}
-            </span>
-          </div>
-          <span className="text-[9px] font-black text-zenit-text-tertiary uppercase tracking-[0.3em] italic opacity-40">
-            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
+          <span className="text-[8px] font-mono font-black text-zenit-text-tertiary uppercase tracking-widest italic opacity-40">
+            ID_{post.id.slice(0, 8).toUpperCase()} // {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR }).toUpperCase()}
           </span>
         </div>
       </div>
@@ -1179,7 +1211,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any 
         .from('post_comments')
         .select(`
           *,
-          user:users (
+          user:profiles (
             display_name,
             username,
             avatar_url
@@ -1217,7 +1249,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any 
         }])
         .select(`
           *,
-          user:users (
+          user:profiles (
             display_name,
             username,
             avatar_url

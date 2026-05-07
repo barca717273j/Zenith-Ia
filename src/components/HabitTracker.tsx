@@ -322,48 +322,49 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
   ];
 
   return (
-    <div className="flex flex-col gap-4 p-4 pb-32 max-w-2xl mx-auto min-h-screen">
-      <header className="flex justify-between items-end mb-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary italic">
-            Sincronia <span className="text-zenit-accent">Neural</span>
+    <div className="flex flex-col gap-8 p-6 pb-40 max-w-2xl mx-auto min-h-screen">
+      <header className="flex justify-between items-start mb-4">
+        <div className="space-y-3">
+          <h1 className="text-4xl sm:text-5xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary italic">
+            Neural <span className="text-zenit-accent font-black">Sync</span>
           </h1>
-          <div className="flex items-center space-x-3">
-            <div className="h-1 w-16 bg-gradient-to-r from-zenit-accent to-transparent rounded-full shadow-[0_0_10px_var(--accent-glow)]" />
-            <p className="text-zenit-text-tertiary text-[11px] font-bold uppercase tracking-[0.3em]">
-              {activeView === 'habits' ? `${habits.length}/${habitLimit} Protocolos Ativos` : activeView === 'tasks' ? `${tasks.length} Diretrizes Pendentes` : 'Análise de Performance'}
+          <div className="flex items-center space-x-4">
+            <div className="h-1 w-12 bg-zenit-accent/40 rounded-full" />
+            <p className="text-zenit-text-tertiary text-[9px] font-black uppercase tracking-[0.4em] italic opacity-60">
+              {activeView === 'habits' ? `${habits.length}/${habitLimit} PROTOCOLS` : activeView === 'tasks' ? `${tasks.length} DIRECTIVES` : 'NEURAL ANALYSIS'}
             </p>
           </div>
         </div>
         <motion.button 
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsAdding(true)}
           disabled={activeView === 'habits' && habits.length >= habitLimit}
-          className="neon-button w-16 h-16 !p-0"
+          className="w-16 h-16 rounded-[2rem] bg-zenit-text-primary text-zenit-black flex items-center justify-center shadow-2xl hover:bg-zenit-accent hover:text-white transition-all group border border-zenit-border-primary"
         >
-          <Plus size={32} />
+          <Plus size={32} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-500" />
         </motion.button>
       </header>
 
       {/* View Switcher */}
-      <div className="flex glass-nav p-1.5 rounded-[2rem] border border-zenit-border-primary">
+      <div className="flex bg-zenit-surface-1 p-1.5 rounded-[2.5rem] border border-zenit-border-primary shadow-inner">
         {(['habits', 'tasks', 'stats'] as const).map((view) => (
           <button
             key={view}
             onClick={() => setActiveView(view)}
-            className={`flex-1 py-4 text-[11px] uppercase tracking-[0.2em] font-black rounded-[1.5rem] transition-all duration-500 relative overflow-hidden ${
+            className={`flex-1 py-4 text-[9px] uppercase tracking-[0.4em] font-black rounded-[2.2rem] transition-all duration-500 relative overflow-hidden italic ${
               activeView === view 
-                ? 'text-white' 
-                : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'
+                ? 'text-white dark:text-black' 
+                : 'text-zenit-text-tertiary hover:text-zenit-text-primary'
             }`}
           >
             {activeView === view && (
               <motion.div 
                 layoutId="active-view-bg"
-                className="absolute inset-0 bg-gradient-to-br from-zenit-accent to-zenit-crimson shadow-lg"
+                className="absolute inset-0 bg-zenit-text-primary"
               />
             )}
-            <span className="relative z-10">{view === 'habits' ? 'Hábitos' : view === 'tasks' ? 'Tarefas' : 'Análise'}</span>
+            <span className="relative z-10">{view === 'habits' ? 'Hábitos' : view === 'tasks' ? 'Tarefas' : 'Stats'}</span>
           </button>
         ))}
       </div>
@@ -411,17 +412,17 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                   layout
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className={`glass-card p-4 sm:p-5 rounded-[2rem] flex items-center transition-all duration-500 border border-zenit-border-primary/50 relative overflow-hidden group ${
-                    habit.completed_today ? 'bg-zenit-surface-1/30 grayscale-[0.8] opacity-60' : 'bg-zenit-surface-1 active:scale-[0.98]'
+                  className={`p-6 rounded-[2.5rem] flex items-center transition-all duration-500 border border-zenit-border-primary relative overflow-hidden group ${
+                    habit.completed_today ? 'bg-zenit-surface-1 opacity-40' : 'bg-zenit-surface-1 hover:bg-zenit-surface-2 active:scale-[0.98] shadow-xl'
                   }`}
                 >
-                  <div className="flex items-center space-x-5 flex-1 relative z-10 min-w-0">
+                  <div className="flex items-center space-x-6 flex-1 relative z-10 min-w-0">
                     <button
                       onClick={() => toggleHabit(habit)}
-                      className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 relative border min-h-[44px] min-w-[44px] flex-shrink-0 ${
+                      className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 relative border-2 min-h-[44px] min-w-[44px] flex-shrink-0 ${
                         habit.completed_today 
-                          ? 'bg-zenit-scarlet border-zenit-scarlet text-white shadow-[0_0_25px_rgba(255,0,0,0.4)]' 
-                          : 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary'
+                          ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_20px_rgba(255,36,0,0.3)]' 
+                          : 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary group-hover:border-zenit-accent/50 group-hover:text-zenit-text-primary'
                       }`}
                     >
                       {habit.completed_today ? (
@@ -431,40 +432,31 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                       )}
                     </button>
 
-                    <div className="flex-1 min-w-0 space-y-1.5">
+                    <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-center justify-between gap-3">
-                        <p className={`text-base font-bold tracking-tight truncate transition-all duration-500 ${habit.completed_today ? 'text-zenit-text-tertiary font-medium italic' : 'text-zenit-text-primary'}`}>
+                        <p className={`text-lg font-bold tracking-tight truncate transition-all duration-500 ${habit.completed_today ? 'text-zenit-text-tertiary font-medium italic' : 'text-zenit-text-primary'}`}>
                           {habit.title}
                         </p>
-                        <div className="flex items-center px-2 py-1 bg-zenit-surface-2 rounded-lg border border-zenit-border-primary/50 flex-shrink-0">
-                          <Flame size={12} className={habit.streak > 0 ? 'text-zenit-scarlet' : 'text-zenit-text-tertiary opacity-40'} />
-                          <span className="text-[10px] font-bold font-mono ml-1">{habit.streak}</span>
+                        <div className="flex items-center px-3 py-1 bg-zenit-surface-2 rounded-xl border border-zenit-border-primary flex-shrink-0">
+                          <Flame size={12} className={habit.streak > 0 ? 'text-zenit-accent animate-pulse' : 'text-zenit-text-tertiary opacity-20'} />
+                          <span className="text-[10px] font-black font-mono ml-2 text-zenit-text-tertiary">{habit.streak}</span>
                         </div>
                       </div>
                       
-                      <div className="flex items-center space-x-3 text-[8px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-60">
-                        <span className="flex items-center gap-1.5">
-                          <Star size={10} />
+                      <div className="flex items-center space-x-4 text-[7px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary italic">
+                        <span className="flex items-center gap-2">
+                          <Star size={10} className="text-zenit-accent/40" />
                           {habit.frequency}
                         </span>
-                        <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
+                        <div className="w-1 h-1 bg-zenit-border-primary/50 rounded-full" />
                         <span className="truncate">Ciclo: {habit.target_value || 1} {habit.target_unit || 'un'}</span>
-                      </div>
-
-                      {/* Micro Progress Bar */}
-                      <div className="h-1 w-full bg-zenit-surface-2 rounded-full overflow-hidden mt-1 opacity-40 group-hover:opacity-100 transition-opacity">
-                         <motion.div 
-                           initial={{ width: 0 }}
-                           animate={{ width: `${Math.min((habit.streak / 30) * 100, 100)}%` }}
-                           className="h-full bg-zenit-scarlet"
-                         />
                       </div>
                     </div>
                   </div>
                   
                   <button 
                     onClick={() => deleteHabit(habit.id)}
-                    className="ml-4 p-3 text-zenit-text-tertiary hover:text-zenit-scarlet opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="ml-4 p-2 text-zenit-text-tertiary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -488,27 +480,27 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
-                className={`glass-card p-4 rounded-2xl flex items-center justify-between border border-zenit-border-primary/50 relative overflow-hidden group ${
-                  task.completed ? 'opacity-40 grayscale' : 'bg-zenit-surface-1'
+                className={`p-6 rounded-[2rem] flex items-center justify-between border border-zenit-border-primary relative overflow-hidden group ${
+                  task.completed ? 'opacity-30' : 'bg-zenit-surface-1 shadow-xl'
                 }`}
               >
-                <div className="flex items-center space-x-4 flex-1 relative z-10">
+                <div className="flex items-center space-x-5 flex-1 relative z-10">
                   <button
                     onClick={() => toggleTask(task)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border-2 ${
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 border-2 ${
                       task.completed 
-                        ? 'bg-zenit-scarlet border-zenit-scarlet text-white' 
-                        : 'bg-zenit-surface-2 border-zenit-border-primary'
+                        ? 'bg-zenit-accent border-zenit-accent text-white shadow-lg' 
+                        : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary group-hover:text-zenit-text-primary'
                     }`}
                   >
-                    {task.completed ? <Check size={18} strokeWidth={4} /> : <div className="w-1.5 h-1.5 rounded-full bg-zenit-border-primary" />}
+                    {task.completed ? <Check size={18} strokeWidth={4} /> : <div className="w-1.5 h-1.5 rounded-full bg-zenit-text-tertiary" />}
                   </button>
-                  <div className="space-y-0.5 min-w-0">
-                    <p className={`text-sm font-bold tracking-tight truncate ${task.completed ? 'text-zenit-text-tertiary line-through italic' : 'text-zenit-text-primary'}`}>
+                  <div className="space-y-1 min-w-0">
+                    <p className={`text-base font-bold tracking-tight truncate ${task.completed ? 'text-zenit-text-tertiary line-through italic' : 'text-zenit-text-primary'}`}>
                       {task.title}
                     </p>
-                    <div className="flex items-center space-x-2 text-[8px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-60">
-                      <div className={`w-1.5 h-1.5 rounded-full ${task.priority === 'high' ? 'bg-zenit-scarlet' : task.priority === 'medium' ? 'bg-emerald-500' : 'bg-zenit-text-tertiary'}`} />
+                    <div className="flex items-center space-x-3 text-[7.5px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary italic">
+                      <div className={`w-1.5 h-1.5 rounded-full ${task.priority === 'high' ? 'bg-zenit-accent shadow-[0_0_8px_rgba(255,36,0,0.5)]' : task.priority === 'medium' ? 'bg-emerald-500' : 'bg-zenit-text-tertiary opacity-30'}`} />
                       <span>{task.priority || 'Normal'}</span>
                       {task.due_date && <span>• {task.due_date}</span>}
                     </div>
@@ -516,7 +508,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                 </div>
                 <button 
                   onClick={() => deleteTask(task.id)}
-                  className="p-2 text-zenit-text-tertiary hover:text-zenit-scarlet opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="p-2 text-zenit-text-tertiary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -677,7 +669,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-lg glass-nav rounded-t-[2.5rem] border-t border-zenit-border-primary p-8 pb-12 shadow-2xl overflow-hidden"
+              className="relative w-full max-w-lg bg-zenit-surface-1 rounded-t-[2.5rem] border-t border-zenit-border-primary p-8 pb-12 shadow-2xl overflow-hidden"
             >
               {/* Drag Handle */}
               <div className="flex justify-center mb-6">
@@ -687,7 +679,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
               <div className="flex justify-between items-center mb-8">
                 <div className="space-y-1">
                   <h3 className="text-2xl font-display font-bold uppercase tracking-tight text-zenit-text-primary italic">
-                    Novo <span className="text-zenit-accent">{activeView === 'habits' ? 'Hábito' : 'Protocolo'}</span>
+                    Novo <span className="text-zenit-scarlet">{activeView === 'habits' ? 'Hábito' : 'Protocolo'}</span>
                   </h3>
                   <p className="text-[11px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold">Defina sua próxima diretriz</p>
                 </div>
@@ -706,7 +698,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                     value={newHabitName}
                     onChange={(e) => setNewHabitName(e.target.value)}
                     placeholder={activeView === 'habits' ? "Nome do Hábito..." : "O que precisa ser feito?"}
-                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl px-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent transition-all placeholder:text-zenit-text-tertiary"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl px-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all placeholder:text-zenit-text-tertiary/30"
                   />
                   <Zap size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-zenit-text-tertiary opacity-20" />
                 </div>
@@ -719,7 +711,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                         <select
                           value={newFrequency}
                           onChange={(e) => setNewFrequency(e.target.value as any)}
-                          className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-xl px-4 py-3 text-xs text-zenit-text-primary focus:outline-none focus:border-zenit-accent transition-all appearance-none"
+                          className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-xl px-4 py-3 text-xs text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all appearance-none"
                         >
                           <option value="daily" className="bg-zenit-surface-1">Diário</option>
                           <option value="weekly" className="bg-zenit-surface-1">Semanal</option>
@@ -733,7 +725,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                           min="1"
                           value={newTarget}
                           onChange={(e) => setNewTarget(parseInt(e.target.value) || 1)}
-                          className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-xl px-4 py-3 text-xs text-zenit-text-primary focus:outline-none focus:border-zenit-accent transition-all"
+                          className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-xl px-4 py-3 text-xs text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all"
                         />
                       </div>
                     </div>
@@ -743,7 +735,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
                         type="time"
                         value={newReminderTime}
                         onChange={(e) => setNewReminderTime(e.target.value)}
-                        className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-xl px-4 py-3 text-xs text-zenit-text-primary focus:outline-none focus:border-zenit-accent transition-all"
+                        className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-xl px-4 py-3 text-xs text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all"
                       />
                     </div>
                   </>
@@ -751,7 +743,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
 
                 <button 
                   onClick={addHabit}
-                  className="neon-button w-full py-5 rounded-2xl text-[11px] uppercase tracking-[0.3em]"
+                  className="w-full py-5 rounded-2xl bg-zenit-scarlet text-white text-[11px] font-bold uppercase tracking-[0.3em] shadow-xl shadow-zenit-scarlet/20 hover:shadow-zenit-scarlet/40 transition-all active:scale-95"
                 >
                   {activeView === 'habits' ? 'Inicializar Hábito' : 'Criar Tarefa'}
                 </button>

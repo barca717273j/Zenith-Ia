@@ -87,7 +87,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
     }
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', currentProfileId)
         .single();
@@ -108,7 +108,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
         .from('posts')
         .select(`
           *,
-          user:users (
+          user:profiles (
             display_name,
             username,
             avatar_url
@@ -163,7 +163,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
   const fetchFollowers = async () => {
     const { data } = await supabase
       .from('followers')
-      .select('follower:users!followers_follower_id_fkey(*)')
+      .select('follower:profiles!followers_follower_id_fkey(*)')
       .eq('following_id', currentProfileId);
     if (data) setFollowList(data.map((f: any) => f.follower));
     setView('followers');
@@ -172,7 +172,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
   const fetchFollowing = async () => {
     const { data } = await supabase
       .from('followers')
-      .select('following:users!followers_following_id_fkey(*)')
+      .select('following:profiles!followers_following_id_fkey(*)')
       .eq('follower_id', currentProfileId);
     if (data) setFollowList(data.map((f: any) => f.following));
     setView('following');
@@ -221,7 +221,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
     // Secret password for admin access
     if (adminPassword === 'zenit2024') {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ is_admin: true })
         .eq('id', userData?.id);
       
@@ -282,7 +282,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
         .getPublicUrl(filePath);
 
       const { error: updateError } = await supabase
-        .from("users")
+        .from("profiles")
         .update({
           avatar_url: urlData.publicUrl,
           photo_url: urlData.publicUrl,
@@ -308,7 +308,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
     setMessage(null);
     try {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({
           full_name: editName,
           display_name: editName,
@@ -693,7 +693,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                           onClick={async () => {
                             if (!userData?.id) return;
                             const { error } = await supabase
-                              .from('users')
+                              .from('profiles')
                               .update({ language: lang })
                               .eq('id', userData.id);
                             if (!error) await refreshUserData();
@@ -879,140 +879,138 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
               )}
             </AnimatePresence>
 
+            {/* Top Bar Actions */}
+            <div className="absolute top-8 right-8 z-20 flex space-x-3">
+              <button 
+                onClick={() => setView('preferences')}
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-zenit-glass text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-[0.98] border border-zenit-glass-border backdrop-blur-xl"
+              >
+                <Settings size={20} />
+              </button>
+            </div>
+
             {/* Premium Profile Header */}
-            <div className="p-8 space-y-8 relative z-10">
-              <div className="flex flex-col items-center text-center space-y-6">
-                {/* Large Profile Pic */}
-                <div className="relative group cursor-pointer" onClick={handlePhotoClick}>
+            <div className="pt-20 pb-10 px-8 relative z-10">
+              <div className="flex flex-col items-center">
+                {/* Profile Pic with Neural Glow */}
+                <div className="relative group cursor-pointer mb-10" onClick={handlePhotoClick}>
                   <motion.div 
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     whileTap={{ scale: 0.95 }}
-                    className="w-32 h-32 sm:w-40 sm:h-40 rounded-full relative"
+                    className="w-32 h-32 relative"
                   >
-                    {/* Rotating Border Effect */}
-                    <motion.div 
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 rounded-full"
-                    />
-                    
-                    <div className="w-full h-full rounded-full bg-zenit-black relative z-10">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-zenit-accent via-zenit-crimson to-transparent animate-spin-slow duration-[10s] opacity-20" />
+                    <div className="w-full h-full rounded-full bg-zenit-black relative z-10 p-[2px]">
                       <img 
                         src={targetUser?.avatar_url || targetUser?.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetUser?.id}`} 
                         alt="Profile" 
-                        className="w-full h-full rounded-full object-cover"
+                        className="w-full h-full rounded-full object-cover group-hover:scale-105 transition-all duration-700 shadow-2xl"
                         referrerPolicy="no-referrer"
                       />
                     </div>
-                    
-                    {/* Glow Effect */}
-                    <div className="absolute inset-0 bg-zenit-accent/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                   </motion.div>
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-zenit-surface-2 rounded-full z-20 border border-zenit-border-primary shadow-lg">
-                    <span className="text-[10px] font-bold text-zenit-accent uppercase tracking-[0.2em]">LVL {level}</span>
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-3 py-1 bg-zenit-accent rounded-full z-20 shadow-xl shadow-zenit-accent/40">
+                    <span className="text-[8px] font-black text-white uppercase tracking-[0.2em] italic">ZENIT AGENT</span>
                   </div>
                 </div>
 
-                {/* User Info */}
-                <div className="space-y-3">
-                  <h1 className="text-3xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary">
-                    {targetUser?.full_name || targetUser?.display_name || 'Usuário Zenit'}
+                {/* Info Hierarchy */}
+                <div className="text-center space-y-2 mb-10">
+                  <h1 className="text-3xl font-display font-black uppercase tracking-tighter text-zenit-text-primary italic">
+                    {targetUser?.full_name || targetUser?.display_name || 'Agente Zenit'}
                   </h1>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-zenit-accent animate-pulse" />
-                    <p className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em]">@{targetUser?.username || 'zenit_user'}</p>
+                  <div className="flex items-center justify-center space-x-3">
+                    <p className="text-[9px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic leading-none">
+                      @{targetUser?.username || 'zenit_user'}
+                    </p>
+                    <div className="w-1 h-3 bg-zenit-border-primary rounded-full" />
+                    <p className="text-[9px] text-zenit-accent font-black uppercase tracking-[0.2em] italic leading-none">
+                      RANK {Math.floor(level/10) + 1}
+                    </p>
                   </div>
                   {targetUser?.bio && (
-                    <p className="text-sm text-zenit-text-secondary leading-relaxed max-w-md mx-auto mt-4 font-light italic opacity-80">
-                      "{targetUser.bio}"
+                    <p className="text-[11px] text-zenit-text-tertiary leading-relaxed max-w-[280px] mx-auto font-black uppercase tracking-[0.1em] italic pt-4">
+                      {targetUser.bio}
                     </p>
                   )}
                 </div>
 
-                {/* Stats Grid */}
-                <div className="flex items-center justify-center space-x-8 sm:space-x-12 pt-6">
-                  <div className="text-center group cursor-default">
-                    <p className="text-xl sm:text-2xl font-display font-bold text-zenit-text-primary tracking-tighter group-hover:text-zenit-accent transition-colors">{socialStats.posts}</p>
-                    <p className="text-[8px] sm:text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.flow}</p>
+                {/* Integration Stats */}
+                <div className="w-full max-w-sm flex items-center justify-between px-8 py-8 bg-zenit-glass border-y border-zenit-glass-border">
+                  <div className="text-center">
+                    <p className="text-xl font-display font-black text-zenit-text-primary italic leading-none">{socialStats.posts}</p>
+                    <p className="text-[7.5px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black mt-2 italic">Posts</p>
                   </div>
-                  <button onClick={fetchFollowers} className="text-center group transition-transform active:scale-95">
-                    <p className="text-xl sm:text-2xl font-display font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors tracking-tighter">{socialStats.followers}</p>
-                    <p className="text-[8px] sm:text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.followers}</p>
+                  <div className="w-[1px] h-6 bg-zenit-border-primary" />
+                  <button onClick={fetchFollowers} className="text-center group transition-all active:scale-95">
+                    <p className="text-xl font-display font-black text-zenit-text-primary italic leading-none group-hover:text-zenit-accent">{socialStats.followers}</p>
+                    <p className="text-[7.5px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black mt-2 italic group-hover:text-zenit-text-primary">Seguidores</p>
                   </button>
-                  <button onClick={fetchFollowing} className="text-center group transition-transform active:scale-95">
-                    <p className="text-xl sm:text-2xl font-display font-bold text-zenit-text-primary group-hover:text-zenit-accent transition-colors tracking-tighter">{socialStats.following}</p>
-                    <p className="text-[8px] sm:text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold mt-1">{t.profile.following}</p>
+                  <div className="w-[1px] h-6 bg-zenit-border-primary" />
+                  <button onClick={fetchFollowing} className="text-center group transition-all active:scale-95">
+                    <p className="text-xl font-display font-black text-zenit-text-primary italic leading-none group-hover:text-zenit-accent">{socialStats.following}</p>
+                    <p className="text-[7.5px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black mt-2 italic group-hover:text-zenit-text-primary">Seguindo</p>
                   </button>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center space-x-4 w-full max-w-sm pt-6">
+                {/* Primary Actions */}
+                <div className="w-full max-w-[320px] pt-10 flex gap-4">
                   {isOwnProfile ? (
                     <>
                       <button 
                         onClick={() => setView('edit-profile')}
-                        className="flex-1 py-4 rounded-2xl bg-zenit-accent text-white text-[10px] font-bold uppercase tracking-[0.3em] hover:brightness-110 transition-all active:scale-[0.98] shadow-lg shadow-zenit-accent/20"
+                        className="flex-1 py-5 rounded-[2rem] bg-zenit-text-primary text-zenit-black text-[9px] font-black uppercase tracking-[0.4em] hover:brightness-90 transition-all active:scale-[0.98] shadow-2xl flex items-center justify-center space-x-2"
                       >
-                        {t.profile.editProfile}
-                      </button>
-                      <button 
-                        onClick={() => setView('preferences')}
-                        className="p-4 rounded-2xl bg-zenit-surface-2 text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-[0.98] border border-zenit-border-primary"
-                      >
-                        <Settings size={20} />
+                        <User size={14} />
+                        <span>Editar Protocolo</span>
                       </button>
                     </>
                   ) : (
                     <button 
                       onClick={toggleFollow}
-                      className={`flex-1 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.3em] transition-all active:scale-[0.98] ${
+                      className={`flex-1 py-5 rounded-[2rem] text-[9px] font-black uppercase tracking-[0.4em] transition-all active:scale-[0.98] flex items-center justify-center space-x-2 ${
                         isFollowing 
-                          ? 'bg-zenit-surface-2 text-zenit-text-tertiary' 
-                          : 'bg-zenit-accent text-white hover:brightness-110'
+                          ? 'bg-zenit-glass text-zenit-text-tertiary border border-zenit-glass-border' 
+                          : 'bg-zenit-accent text-white shadow-xl shadow-zenit-accent/20'
                       }`}
                     >
-                      {isFollowing ? t.profile.following : t.profile.follow}
+                      <span>{isFollowing ? 'Seguindo Protocolo' : 'Iniciar Conexão'}</span>
                     </button>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Post Grid */}
-            <div className="mt-12 bg-zenit-surface-2/20">
-              <div className="flex justify-center py-8">
-                <div className="flex items-center space-x-4 text-zenit-accent">
-                  <div className="w-1 h-1 rounded-full bg-zenit-accent animate-ping" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.5em]">{t.profile.personalFlow}</span>
-                  <div className="w-1 h-1 rounded-full bg-zenit-accent animate-ping" />
+            {/* Content Feed Section */}
+            <div className="mt-4">
+              <div className="flex justify-start px-8 py-5 border-y border-zenit-glass-border bg-zenit-glass">
+                <div className="flex items-center space-x-3">
+                  <div className="w-4 h-[1px] bg-zenit-accent" />
+                  <span className="text-[7.5px] font-black tracking-[0.6em] text-zenit-text-tertiary uppercase italic">Registro de Transmissões</span>
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-1 px-1">
+              <div className="grid grid-cols-3 gap-0.5 mt-1">
                 {posts.map((post) => (
                   <motion.div 
                     key={post.id}
-                    whileHover={{ opacity: 0.9, scale: 0.98 }}
+                    whileHover={{ opacity: 0.9 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSelectedPost(post)}
-                    className="aspect-square bg-zenit-surface-2 relative group cursor-pointer overflow-hidden"
+                    className="aspect-square bg-zenit-surface-1 relative group cursor-pointer overflow-hidden"
                   >
                     {post.image_url ? (
-                      <img src={post.image_url} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={post.image_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" referrerPolicy="no-referrer" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center p-6 bg-gradient-to-br from-zenit-surface-1 to-zenit-black">
-                        <p className="text-[10px] text-zenit-text-tertiary text-center line-clamp-4 italic font-medium leading-relaxed opacity-60">"{post.caption || post.content}"</p>
+                      <div className="w-full h-full flex items-center justify-center p-3 sm:p-6 bg-zenit-glass">
+                        <p className="text-[8px] sm:text-[10px] text-zenit-text-tertiary text-center line-clamp-3 italic font-medium leading-relaxed opacity-40 uppercase">"{post.caption || post.content}"</p>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-zenit-accent/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center space-x-6 backdrop-blur-[4px]">
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center space-x-4 backdrop-blur-[2px]">
                       <div className="flex flex-col items-center space-y-1 text-white">
-                        <Heart size={20} fill="currentColor" />
-                        <span className="text-[11px] font-bold">{post.likes_count || 0}</span>
-                      </div>
-                      <div className="flex flex-col items-center space-y-1 text-white">
-                        <MessageSquare size={20} fill="currentColor" className="opacity-80" />
-                        <span className="text-[11px] font-bold">{post.comments_count || 0}</span>
+                        <Heart size={14} fill="currentColor" />
+                        <span className="text-[10px] font-black">{post.likes_count || 0}</span>
                       </div>
                     </div>
                   </motion.div>
@@ -1045,35 +1043,45 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
             </AnimatePresence>
 
             {isOwnProfile && (
-              <div className="p-8 space-y-4 mt-12">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary ml-2 mb-6">{t.profile.zenitSystems}</h3>
-                <MenuButton 
-                  icon={<Brain size={24} />} 
-                  label={t.profile.mentalGym} 
-                  sublabel={t.profile.cognitiveOptimization} 
-                  onClick={() => setView('gym')} 
-                />
-                <MenuButton 
-                  icon={<Book size={24} />} 
-                  label={t.profile.neuralJournal} 
-                  sublabel={t.profile.consciousnessRecord} 
-                  onClick={() => setView('journal')} 
-                />
-                {userData?.is_admin && (
+              <div className="p-8 space-y-6 mt-12 bg-zenit-glass border-t border-zenit-glass-border rounded-t-[3rem]">
+                <h3 className="text-[8px] font-black uppercase tracking-[0.6em] text-zenit-text-tertiary/40 ml-2 mb-8">Zenith Ecosystem</h3>
+                
+                <div className="grid grid-cols-1 gap-4">
                   <MenuButton 
-                    icon={<Shield size={24} />} 
-                    label={t.admin.adminPanel} 
-                    sublabel={t.admin.systemManagement} 
-                    onClick={() => setActiveTab?.('admin')} 
+                    icon={<Brain size={20} />} 
+                    label={t.profile.mentalGym} 
+                    sublabel={t.profile.cognitiveOptimization} 
+                    onClick={() => setView('gym')} 
                   />
-                )}
-                <MenuButton 
-                  icon={<LogOut size={24} />} 
-                  label={t.profile.disconnect} 
-                  sublabel={t.profile.terminateInterface} 
-                  onClick={handleLogout} 
-                  danger
-                />
+                  <MenuButton 
+                    icon={<Book size={20} />} 
+                    label={t.profile.neuralJournal} 
+                    sublabel={t.profile.consciousnessRecord} 
+                    onClick={() => setView('journal')} 
+                  />
+                  {userData?.is_admin && (
+                    <MenuButton 
+                      icon={<Shield size={20} />} 
+                      label={t.admin.adminPanel} 
+                      sublabel={t.admin.systemManagement} 
+                      onClick={() => setActiveTab?.('admin')} 
+                    />
+                  )}
+                  <MenuButton 
+                    icon={<LogOut size={20} />} 
+                    label={t.profile.disconnect} 
+                    sublabel={t.profile.terminateInterface} 
+                    onClick={handleLogout} 
+                    danger
+                  />
+                </div>
+
+                {/* System Footer Info */}
+                <div className="pt-12 pb-8 flex flex-col items-center space-y-3 opacity-20 text-zenit-text-tertiary">
+                  <p className="text-[7.5px] font-black uppercase tracking-[1em]">Project Zenith</p>
+                  <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-zenit-text-tertiary to-transparent" />
+                  <p className="text-[6px] font-black uppercase tracking-[0.4em] italic">v5.0.2 - Protocol Verified</p>
+                </div>
               </div>
             )}
           </div>
@@ -1167,7 +1175,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
         .from('post_comments')
         .select(`
           *,
-          user:users (
+          user:profiles (
             display_name,
             username,
             avatar_url
@@ -1198,7 +1206,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
         }])
         .select(`
           *,
-          user:users (
+          user:profiles (
             display_name,
             username,
             avatar_url
@@ -1263,7 +1271,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
                 <span className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold mt-1">@{post.user?.username}</span>
               </div>
             </div>
-            <button onClick={onClose} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-90">
+            <button onClick={onClose} className="w-10 h-10 rounded-xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-90 border border-zenit-border-primary shadow-sm">
               <X size={18} />
             </button>
           </div>
@@ -1273,7 +1281,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex space-x-4 p-4 rounded-2xl bg-white/5"
+                className="flex space-x-4 p-4 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary shadow-inner"
               >
                 <img 
                   src={post.user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user?.username}`} 
@@ -1323,7 +1331,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
                       </p>
                       <p className="text-[8px] text-zenit-text-tertiary uppercase font-bold tracking-[0.2em] flex items-center space-x-3">
                         <span>{new Date(comment.created_at).toLocaleDateString()}</span>
-                        <span className="w-1 h-1 rounded-full bg-white/10" />
+                        <span className="w-1 h-1 rounded-full bg-zenit-border-primary" />
                         <button className="hover:text-zenit-accent transition-colors uppercase tracking-[0.2em]">{t.profile.reply}</button>
                       </p>
                     </div>
@@ -1332,7 +1340,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any;
               </div>
             ) : (
               <div className="text-center py-16 space-y-6">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto bg-white/5">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto bg-zenit-surface-2 border border-zenit-border-primary shadow-inner">
                   <MessageSquare size={24} className="text-zenit-text-tertiary/20" />
                 </div>
                 <div className="space-y-2">

@@ -68,7 +68,7 @@ export const Subscription: React.FC<SubscriptionProps> = ({ t }) => {
       // In a real production app, this would call a Stripe checkout session
       // For this implementation, we'll simulate the success and update Supabase directly
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ subscription_tier: planId })
         .eq('id', userData.id);
 

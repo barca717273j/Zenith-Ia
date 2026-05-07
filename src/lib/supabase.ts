@@ -39,7 +39,7 @@ export const testSupabaseConnection = async (retryCount = 0): Promise<{ connecte
 
     // Try a very simple query
     const { error } = await supabase
-      .from('users')
+      .from('profiles')
       .select('id')
       .limit(1)
       .abortSignal(controller.signal);
@@ -48,8 +48,8 @@ export const testSupabaseConnection = async (retryCount = 0): Promise<{ connecte
 
     if (error) {
       // If it's a "table not found" error, the connection is actually working!
-      if (error.code === 'PGRST116' || error.message.includes('relation "users" does not exist') || error.code === '42P01') {
-        console.log('Supabase connected, but "users" table not found. Please run the SQL schema.');
+      if (error.code === 'PGRST116' || error.message.includes('relation "profiles" does not exist') || error.code === '42P01') {
+        console.log('Supabase connected, but "profiles" table not found. Please run the SQL schema.');
         return { connected: true };
       }
       

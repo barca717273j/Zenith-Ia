@@ -115,9 +115,9 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="bg-zenit-surface-1 w-full max-w-lg rounded-t-[3rem] sm:rounded-[3.5rem] border-t sm:border border-zenit-border-primary space-y-6 relative overflow-hidden shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-10 flex flex-col max-h-[92vh] sm:max-h-[85vh]"
+            className="bg-zenit-surface-1 w-full max-w-lg rounded-t-[3rem] sm:rounded-[3.5rem] border-t sm:border border-zenit-border-primary space-y-6 relative overflow-hidden shadow-[0_-20px_50px_rgba(0,0,0,0.1)] z-10 flex flex-col max-h-[92vh] sm:max-h-[85vh]"
           >
-            <div className="w-12 h-1.5 bg-zenit-border-primary rounded-full mx-auto mt-4 mb-2 opacity-20 flex-shrink-0" />
+            <div className="w-12 h-1.5 bg-zenit-border-primary rounded-full mx-auto mt-4 mb-2 opacity-10 flex-shrink-0" />
             
             <div className="px-8 flex justify-between items-center flex-shrink-0 pt-4">
               <div className="space-y-1">
@@ -126,7 +126,7 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
               </div>
               <button 
                 onClick={onClose} 
-                className="w-12 h-12 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all border border-white/5 shadow-xl active:scale-90 group"
+                className="w-12 h-12 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all border border-zenit-border-primary shadow-sm hover:shadow-md active:scale-90 group"
               >
                 <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
               </button>
@@ -143,7 +143,7 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
                   placeholder="Ex: Meditação Alpha..."
-                  className="w-full bg-zenit-surface-2 border border-white/5 rounded-full px-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all placeholder:text-zenit-text-tertiary/20 shadow-inner"
+                  className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full px-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all placeholder:text-zenit-text-tertiary/30 shadow-inner"
                 />
               </div>
 
@@ -156,7 +156,7 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                       type="time"
                       value={newTime}
                       onChange={(e) => setNewTime(e.target.value)}
-                      className="w-full bg-zenit-surface-2 border border-white/5 rounded-full pl-14 pr-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full pl-14 pr-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all shadow-inner"
                     />
                   </div>
                 </div>
@@ -167,7 +167,7 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                     <select
                       value={newDuration}
                       onChange={(e) => setNewDuration(e.target.value)}
-                      className="w-full bg-zenit-surface-2 border border-white/5 rounded-full pl-14 pr-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all appearance-none shadow-inner cursor-pointer"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full pl-14 pr-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all appearance-none shadow-inner cursor-pointer"
                     >
                       <option value="15min">15 min</option>
                       <option value="30min">30 min</option>
@@ -182,12 +182,12 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
                 <div className="space-y-3">
                   <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em] ml-4">Prioridade</label>
-                  <div className="flex gap-1.5 p-1.5 bg-zenit-surface-2 rounded-full border border-white/5 shadow-inner">
+                  <div className="flex gap-1.5 p-1.5 bg-zenit-surface-2 rounded-full border border-zenit-border-primary shadow-inner">
                     {priorities.map(p => (
                       <button
                         key={p.id}
                         onClick={() => setNewPriority(p.id as any)}
-                        className={`flex-1 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${newPriority === p.id ? p.color.replace('zenit', 'zenit') : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+                        className={`flex-1 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${newPriority === p.id ? p.color : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
                       >
                         {p.label}
                       </button>
@@ -200,7 +200,7 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                     <select
                       value={newFrequency}
                       onChange={(e) => setNewFrequency(e.target.value as any)}
-                      className="w-full bg-zenit-surface-2 border border-white/5 rounded-full px-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all appearance-none shadow-inner cursor-pointer"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full px-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all appearance-none shadow-inner cursor-pointer"
                     >
                       <option value="daily">Diária</option>
                       <option value="weekly">Semanal</option>
@@ -221,9 +221,9 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {categories.map(cat => (
                     <button
-                      key={cat.id}
-                      onClick={() => setNewCategory(cat.id)}
-                      className={`flex flex-col items-center justify-center p-5 rounded-3xl border transition-all active:scale-95 group ${newCategory === cat.id ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_20px_var(--accent-glow)]' : 'bg-zenit-surface-2 border-white/5 text-zenit-text-tertiary hover:bg-white/5 shadow-inner'}`}
+                        key={cat.id}
+                        onClick={() => setNewCategory(cat.id)}
+                        className={`flex flex-col items-center justify-center p-5 rounded-3xl border transition-all active:scale-95 group ${newCategory === cat.id ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_10px_20px_var(--accent-glow)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-3 shadow-sm hover:shadow-md'}`}
                     >
                       <div className={`transition-transform duration-300 ${newCategory === cat.id ? 'scale-125' : 'group-hover:scale-110'}`}>{cat.icon}</div>
                       <span className="text-[9px] mt-3 font-bold uppercase tracking-widest">{cat.label}</span>
@@ -255,7 +255,7 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                           setSelectedDays([...selectedDays, day.id]);
                         }
                       }}
-                      className={`h-12 rounded-2xl text-[10px] font-bold transition-all active:scale-90 border flex items-center justify-center ${selectedDays.includes(day.id) ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_15px_var(--accent-glow)]' : 'bg-zenit-surface-2 border-white/5 text-zenit-text-tertiary hover:bg-white/5 shadow-inner'}`}
+                      className={`h-12 rounded-2xl text-[10px] font-bold transition-all active:scale-90 border flex items-center justify-center ${selectedDays.includes(day.id) ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_10px_15px_var(--accent-glow)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-3 shadow-inner'}`}
                     >
                       {day.label}
                     </button>

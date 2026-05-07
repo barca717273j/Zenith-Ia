@@ -2,37 +2,41 @@
 @import "tailwindcss";
 
 :root {
-  --bg-color: #F5F5F5;
-  --text-primary: #111111;
-  --text-secondary: #666666;
-  --text-tertiary: #888888;
+  --bg-color: #F8F9FA;
+  --text-primary: #1C1C1E;
+  --text-secondary: #3A3A3C;
+  --text-tertiary: #8E8E93;
   --surface-1: #FFFFFF;
-  --surface-2: #EAEAEA;
-  --surface-3: #DFDFDF;
-  --border-primary: rgba(0, 0, 0, 0.1);
-  --border-secondary: rgba(0, 0, 0, 0.05);
-  --nav-bg: rgba(245, 245, 245, 0.95);
-  --scrollbar-thumb: #CCCCCC;
-  --accent-color: #FF0000;
-  --accent-glow: rgba(255, 0, 0, 0.25);
-  --secondary-glow: rgba(255, 0, 0, 0.1);
+  --surface-2: #F2F2F7;
+  --surface-3: #E5E5EA;
+  --border-primary: rgba(0, 0, 0, 0.06);
+  --border-secondary: rgba(0, 0, 0, 0.03);
+  --nav-bg: rgba(255, 255, 255, 0.85);
+  --scrollbar-thumb: #D1D1D6;
+  --accent-color: #E31C25;
+  --accent-glow: rgba(227, 28, 37, 0.05);
+  --secondary-glow: rgba(0, 0, 0, 0.01);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.04);
 }
 
 .dark {
   --bg-color: #020202;
   --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-secondary: rgba(255, 255, 255, 0.85);
   --text-tertiary: rgba(255, 255, 255, 0.5);
   --surface-1: #0A0A0A;
   --surface-2: #121212;
   --surface-3: #181818;
-  --border-primary: rgba(255, 255, 255, 0.12);
-  --border-secondary: rgba(255, 255, 255, 0.06);
-  --nav-bg: rgba(2, 2, 2, 0.9);
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --nav-bg: rgba(2, 2, 2, 0.95);
   --scrollbar-thumb: rgba(255, 255, 255, 0.2);
-  --accent-color: #FF0000;
-  --accent-glow: rgba(255, 0, 0, 0.5);
-  --secondary-glow: rgba(255, 0, 0, 0.15);
+  --accent-color: #E31C25;
+  --accent-glow: rgba(227, 28, 37, 0.5);
+  --secondary-glow: rgba(227, 28, 37, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.05);
 }
 
 @theme {
@@ -52,6 +56,8 @@
   --color-zenit-border-secondary: var(--border-secondary);
   --color-zenit-nav: var(--nav-bg);
   --color-zenit-accent: var(--accent-color);
+  --color-zenit-glass: var(--glass-bg);
+  --color-zenit-glass-border: var(--glass-border);
   --color-zenit-scarlet: #FF0000;
   --color-zenit-crimson: #D00000;
   --color-zenit-cyan: #00F5FF;

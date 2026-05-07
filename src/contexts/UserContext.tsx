@@ -188,6 +188,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .select()
           .single();
 
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          // Adicionando um alerta temporário para que o usuário saiba que precisa rodar o SQL
+          if (insertError.code === '42P01') {
+            alert('ERRO: Tabela "profiles" não encontrada. Por favor, execute o comando SQL do Passo 2 no Dashboard do Supabase.');
+          } else {
+            alert('Erro ao criar perfil de usuário: ' + insertError.message);
+          }
+          return;
+        }
+
         if (newUser) {
           setUserData({ ...newUser, subscription_tier: 'free' } as any);
         }
@@ -302,7 +313,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     if (Object.keys(updates).length > 0) {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update(updates)
         .eq('id', userData.id);
       

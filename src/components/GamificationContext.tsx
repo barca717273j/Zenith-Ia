@@ -27,7 +27,7 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const user = userDataAuth?.user || authUser;
     if (user) {
       const { data: userData } = await supabase
-        .from('users')
+        .from('profiles')
         .select('xp, streak, life_score, last_action_date')
         .eq('id', user.id)
         .single();
@@ -53,7 +53,7 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           } else {
             // Streak broken
             setStreak(0);
-            await supabase.from('users').update({ streak: 0 }).eq('id', user.id);
+            await supabase.from('profiles').update({ streak: 0 }).eq('id', user.id);
           }
         }
       }
@@ -99,7 +99,7 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // Get current XP first to avoid stale state issues
     const { data: currentData } = await supabase
-      .from('users')
+      .from('profiles')
       .select('xp, life_score, streak, last_action_date')
       .eq('id', user.id)
       .single();
@@ -119,7 +119,7 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setStreak(newStreak);
     
     await supabase
-      .from('users')
+      .from('profiles')
       .update({ 
         xp: newXP,
         life_score: (currentData.life_score || 0) + Math.floor(amount / 10),

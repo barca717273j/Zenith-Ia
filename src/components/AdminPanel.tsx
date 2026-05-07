@@ -69,16 +69,16 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
 
   const fetchUsers = async () => {
     const { data, error } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .order('created_at', { ascending: false });
     if (!error) setUsers(data || []);
   };
 
   const fetchSystemStats = async () => {
-    const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
+    const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
     const { count: exCount } = await supabase.from('exercises').select('*', { count: 'exact', head: true });
-    const { count: premCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).neq('subscription_tier', 'basic');
+    const { count: premCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).neq('subscription_tier', 'basic');
     const { count: postCount } = await supabase.from('posts').select('*', { count: 'exact', head: true });
     const { count: habitCount } = await supabase.from('habits').select('*', { count: 'exact', head: true });
     
@@ -95,7 +95,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
   const handleUpdateTier = async () => {
     if (!selectedUser || !newTier) return;
     const { error } = await supabase
-      .from('users')
+      .from('profiles')
       .update({ subscription_tier: newTier })
       .eq('id', selectedUser.id);
     
@@ -270,21 +270,21 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
         <div className="flex bg-zenit-surface-1 p-1 rounded-2xl border border-zenit-border-primary w-full sm:w-auto">
           <button 
             onClick={() => setActiveTab('exercises')}
-            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'exercises' ? 'bg-zenit-scarlet text-white shadow-lg' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'exercises' ? 'bg-zenit-scarlet text-white shadow-lg' : 'text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-2'}`}
           >
             <Database size={14} />
             <span>Conteúdo</span>
           </button>
           <button 
             onClick={() => setActiveTab('users')}
-            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'users' ? 'bg-zenit-scarlet text-white shadow-lg' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'users' ? 'bg-zenit-scarlet text-white shadow-lg' : 'text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-2'}`}
           >
             <Users size={14} />
             <span>Usuários</span>
           </button>
           <button 
             onClick={() => setActiveTab('system')}
-            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'system' ? 'bg-zenit-scarlet text-white shadow-lg' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+            className={`flex-1 sm:flex-none px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${activeTab === 'system' ? 'bg-zenit-scarlet text-white shadow-lg' : 'text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-2'}`}
           >
             <Activity size={14} />
             <span>Sistema</span>
@@ -421,18 +421,18 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
       {/* User Management Modal */}
       <AnimatePresence>
         {selectedUser && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-zenit-black/90 backdrop-blur-xl">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="glass-card w-full max-w-md p-10 space-y-8 bg-zenit-black border-zenit-border-primary"
+              className="glass-card w-full max-w-md p-10 space-y-8 bg-zenit-surface-1 border-zenit-border-primary rounded-[3rem] shadow-2xl relative z-10"
             >
               <div className="flex justify-between items-center">
                 <div className="space-y-1">
                   <h2 className="text-2xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary">Gerenciar Usuário</h2>
                   <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest">{selectedUser.display_name || selectedUser.email}</p>
                 </div>
-                <button onClick={() => setSelectedUser(null)} className="w-12 h-12 rounded-2xl bg-zenit-surface-1 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-colors">
+                <button onClick={() => setSelectedUser(null)} className="w-12 h-12 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-colors">
                   <X size={24} />
                 </button>
               </div>
@@ -443,7 +443,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                   <select 
                     value={newTier}
                     onChange={(e) => setNewTier(e.target.value)}
-                    className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all appearance-none text-sm"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all appearance-none text-sm"
                   >
                     <option value="basic">Básico</option>
                     <option value="pro">Pro</option>
@@ -453,7 +453,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                   </select>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-zenit-surface-1 rounded-2xl border border-zenit-border-primary">
+                <div className="flex items-center justify-between p-4 bg-zenit-surface-2 rounded-2xl border border-zenit-border-primary">
                   <div className="flex items-center space-x-3">
                     <Shield size={18} className="text-zenit-scarlet" />
                     <label className="text-[10px] text-zenit-text-secondary uppercase tracking-widest font-bold">Privilégios Admin</label>
@@ -463,7 +463,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                     checked={selectedUser.is_admin}
                     onChange={async (e) => {
                       const { error } = await supabase
-                        .from('users')
+                        .from('profiles')
                         .update({ is_admin: e.target.checked })
                         .eq('id', selectedUser.id);
                       if (!error) {
@@ -471,7 +471,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                         setSelectedUser({ ...selectedUser, is_admin: e.target.checked });
                       }
                     }}
-                    className="w-6 h-6 rounded-lg border-zenit-border-primary bg-zenit-surface-2 text-zenit-scarlet focus:ring-zenit-scarlet"
+                    className="w-6 h-6 rounded-lg border-zenit-border-primary bg-zenit-surface-3 text-zenit-scarlet focus:ring-zenit-scarlet"
                   />
                 </div>
 
@@ -490,18 +490,18 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
       {/* Add Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-zenit-black/90 backdrop-blur-xl">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="glass-card w-full max-w-lg p-10 space-y-8 bg-zenit-black border-zenit-border-primary overflow-y-auto max-h-[90vh]"
+              className="glass-card w-full max-w-lg p-10 space-y-8 bg-zenit-surface-1 border-zenit-border-primary overflow-y-auto max-h-[90vh] rounded-[3rem] shadow-2xl relative z-10"
             >
               <div className="flex justify-between items-center">
                 <div className="space-y-1">
                   <h2 className="text-2xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary">Novo Exercício</h2>
                   <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-widest">Expanda o catálogo neural</p>
                 </div>
-                <button onClick={() => setShowAddModal(false)} className="w-12 h-12 rounded-2xl bg-zenit-surface-1 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-colors">
+                <button onClick={() => setShowAddModal(false)} className="w-12 h-12 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-colors">
                   <X size={24} />
                 </button>
               </div>
@@ -513,7 +513,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                     type="text" 
                     value={newExercise.title}
                     onChange={(e) => setNewExercise({ ...newExercise, title: e.target.value })}
-                    className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all placeholder:text-zenit-text-tertiary/20"
                     placeholder="Nome do exercício..."
                   />
                 </div>
@@ -524,7 +524,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                     type="text" 
                     value={newExercise.video_url}
                     onChange={(e) => setNewExercise({ ...newExercise, video_url: e.target.value })}
-                    className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all placeholder:text-zenit-text-tertiary/20"
                     placeholder="https://www.youtube.com/embed/..."
                   />
                 </div>
@@ -536,7 +536,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                       type="text" 
                       value={newExercise.duration}
                       onChange={(e) => setNewExercise({ ...newExercise, duration: e.target.value })}
-                      className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all text-sm"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all text-sm"
                       placeholder="Ex: 15 min"
                     />
                   </div>
@@ -546,7 +546,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                       type="number" 
                       value={newExercise.xp_reward}
                       onChange={(e) => setNewExercise({ ...newExercise, xp_reward: parseInt(e.target.value) })}
-                      className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all text-sm"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all text-sm"
                     />
                   </div>
                 </div>
@@ -557,7 +557,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                     <select 
                       value={newExercise.category}
                       onChange={(e) => setNewExercise({ ...newExercise, category: e.target.value })}
-                      className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all appearance-none text-sm"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all appearance-none text-sm"
                     >
                       <option value="training">Treino</option>
                       <option value="body">Corpo</option>
@@ -573,7 +573,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                     <select 
                       value={newExercise.difficulty}
                       onChange={(e) => setNewExercise({ ...newExercise, difficulty: e.target.value })}
-                      className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all appearance-none text-sm"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all appearance-none text-sm"
                     >
                       <option value="beginner">Iniciante</option>
                       <option value="intermediate">Intermediário</option>
@@ -587,12 +587,12 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                   <textarea 
                     value={newExercise.description}
                     onChange={(e) => setNewExercise({ ...newExercise, description: e.target.value })}
-                    className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all h-32 resize-none text-sm"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-6 text-zenit-text-primary focus:outline-none focus:border-zenit-scarlet transition-all h-32 resize-none text-sm"
                     placeholder="Instruções de execução..."
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-zenit-surface-1 rounded-2xl border border-zenit-border-primary">
+                <div className="flex items-center justify-between p-4 bg-zenit-surface-2 rounded-2xl border border-zenit-border-primary">
                   <div className="flex items-center space-x-3">
                     <Shield size={18} className="text-yellow-500" />
                     <label className="text-[10px] text-zenit-text-secondary uppercase tracking-widest font-bold">Conteúdo Premium</label>
@@ -601,7 +601,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
                     type="checkbox" 
                     checked={newExercise.is_premium}
                     onChange={(e) => setNewExercise({ ...newExercise, is_premium: e.target.checked })}
-                    className="w-6 h-6 rounded-lg border-zenit-border-primary bg-zenit-surface-2 text-zenit-scarlet focus:ring-zenit-scarlet"
+                    className="w-6 h-6 rounded-lg border-zenit-border-primary bg-zenit-surface-3 text-zenit-scarlet focus:ring-zenit-scarlet"
                   />
                 </div>
 
@@ -620,12 +620,12 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
       {/* Confirmation Modal */}
       <AnimatePresence>
         {confirmAction && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-zenit-black/90 backdrop-blur-xl">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="glass-card w-full max-w-sm p-10 space-y-8 bg-zenit-black border-zenit-border-primary"
+              className="glass-card w-full max-w-sm p-10 space-y-8 bg-zenit-surface-1 border-zenit-border-primary rounded-[3rem] shadow-2xl relative z-10"
             >
               <div className="space-y-2 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-zenit-scarlet/10 flex items-center justify-center mx-auto mb-6 border border-zenit-scarlet/20">
@@ -638,7 +638,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
               <div className="flex space-x-4">
                 <button 
                   onClick={() => setConfirmAction(null)}
-                  className="flex-1 py-4 rounded-2xl bg-zenit-surface-1 text-zenit-text-tertiary text-[10px] font-bold uppercase tracking-widest hover:bg-zenit-surface-2 transition-all"
+                  className="flex-1 py-4 rounded-2xl bg-zenit-surface-2 text-zenit-text-tertiary text-[10px] font-bold uppercase tracking-widest hover:bg-zenit-surface-3 transition-all"
                 >
                   Cancelar
                 </button>
@@ -680,10 +680,10 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
 };
 
 const StatCard: React.FC<{ label: string; value: number | string; icon: React.ReactNode }> = ({ label, value, icon }) => (
-  <div className="glass-card p-6 space-y-4 border-zenit-border-secondary bg-zenit-surface-1/50 relative overflow-hidden group">
+  <div className="glass-card p-6 space-y-4 border border-zenit-border-primary bg-zenit-surface-1 group rounded-[2.5rem] relative overflow-hidden transition-all hover:bg-zenit-surface-2">
     <div className="absolute top-0 left-0 w-full h-1 bg-zenit-scarlet/10 group-hover:bg-zenit-scarlet/30 transition-all" />
     <div className="flex justify-between items-start">
-      <div className="w-10 h-10 rounded-xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary group-hover:text-zenit-scarlet transition-all">
+      <div className="w-10 h-10 rounded-xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary group-hover:text-zenit-scarlet transition-all border border-zenit-border-primary">
         {icon}
       </div>
       <p className="text-3xl font-display font-bold text-zenit-text-primary tracking-tighter">{value}</p>

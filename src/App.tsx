@@ -138,7 +138,7 @@ function AppContent() {
     
     try {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({
           onboarding_completed: true,
           updated_at: new Date().toISOString()
@@ -267,7 +267,7 @@ function AppContent() {
               opacity: [0.1, 0.3, 0.1]
             }}
             transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-            className="marble-blob w-[500px] h-[500px] bg-white/5 bottom-20 right-20"
+            className="marble-blob w-[500px] h-[500px] bg-zenit-text-primary/5 bottom-20 right-20"
           />
           <motion.div 
             animate={{ 

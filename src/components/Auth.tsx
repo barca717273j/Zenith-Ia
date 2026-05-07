@@ -58,7 +58,7 @@ export const Auth: React.FC = () => {
       // If it doesn't look like an email, try to find the email by username
       if (!identifier.includes('@')) {
         const { data: userData, error: userError } = await supabase
-          .from('users')
+          .from('profiles')
           .select('email')
           .eq('username', identifier.toLowerCase())
           .single();

@@ -361,7 +361,7 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
           )}
           <button 
             onClick={() => setIsAdding(true)}
-            className="w-14 h-14 rounded-[1.5rem] bg-gradient-to-br from-zenit-scarlet to-zenit-crimson text-white shadow-[0_10px_30px_rgba(255,0,0,0.3)] flex items-center justify-center transition-all active:scale-95 border border-white/20"
+            className="w-14 h-14 rounded-[1.5rem] bg-gradient-to-br from-zenit-scarlet to-zenit-crimson text-white shadow-[0_10px_30px_rgba(255,0,0,0.3)] flex items-center justify-center transition-all active:scale-95 border border-zenit-border-primary/20"
           >
             <Plus size={28} />
           </button>
@@ -408,7 +408,7 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
               <button
                 onClick={() => generateAiRoutine()}
                 disabled={isAiGenerating || !aiPrompt.trim()}
-                className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-br from-zenit-scarlet to-zenit-crimson text-white text-[10px] font-black uppercase tracking-widest shadow-[0_10px_30px_rgba(255,0,0,0.3)] hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-3 border border-white/20 disabled:opacity-50"
+                className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-br from-zenit-scarlet to-zenit-crimson text-white text-[10px] font-black uppercase tracking-widest shadow-[0_10px_30px_rgba(255,0,0,0.3)] hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-3 border border-zenit-border-primary/20 disabled:opacity-50"
               >
                 {isAiGenerating ? (
                   <Loader2 size={18} className="animate-spin" />
@@ -450,25 +450,25 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
         </div>
       </div>
 
-      {/* Period Selector */}
-      <div className="flex space-x-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-        <button
-          onClick={() => setActivePeriod('all')}
-          className={`px-6 py-3 text-[10px] uppercase tracking-[0.3em] font-bold rounded-2xl border transition-all whitespace-nowrap active:scale-95 shadow-lg ${activePeriod === 'all' ? 'bg-zenit-text-primary text-zenit-black border-zenit-text-primary shadow-[0_0_20px_rgba(255,255,255,0.1)]' : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:text-zenit-text-secondary hover:border-zenit-border-primary/50'}`}
-        >
-          {t.routine.all}
-        </button>
-        {periods.map(p => (
-          <button
-            key={p.id}
-            onClick={() => setActivePeriod(p.id as any)}
-            className={`px-6 py-3 text-[10px] uppercase tracking-[0.3em] font-bold rounded-2xl border transition-all whitespace-nowrap flex items-center space-x-2 active:scale-95 shadow-lg ${activePeriod === p.id ? 'bg-zenit-text-primary text-zenit-black border-zenit-text-primary shadow-[0_0_20px_rgba(255,255,255,0.1)]' : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:text-zenit-text-secondary hover:border-zenit-border-primary/50'}`}
-          >
-            {p.icon}
-            <span>{p.label}</span>
-          </button>
-        ))}
-      </div>
+            {/* Period Selector */}
+            <div className="flex space-x-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
+              <button
+                onClick={() => setActivePeriod('all')}
+                className={`px-6 py-3 text-[10px] uppercase tracking-[0.3em] font-bold rounded-2xl border transition-all whitespace-nowrap active:scale-95 shadow-lg ${activePeriod === 'all' ? 'bg-zenit-text-primary text-zenit-black border-zenit-text-primary' : 'bg-zenit-glass border-zenit-glass-border text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-1'}`}
+              >
+                {t.routine.all}
+              </button>
+              {periods.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => setActivePeriod(p.id as any)}
+                  className={`px-6 py-3 text-[10px] uppercase tracking-[0.3em] font-bold rounded-2xl border transition-all whitespace-nowrap flex items-center space-x-2 active:scale-95 shadow-lg ${activePeriod === p.id ? 'bg-zenit-text-primary text-zenit-black border-zenit-text-primary' : 'bg-zenit-glass border-zenit-glass-border text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-1'}`}
+                >
+                  {p.icon}
+                  <span>{p.label}</span>
+                </button>
+              ))}
+            </div>
 
       {/* Timeline View */}
       <div className="relative space-y-12 pl-8">
@@ -529,7 +529,7 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
                   <div className="flex flex-col items-center space-y-4">
                     <button 
                       onClick={() => toggleRoutine(r.id, r.completed)}
-                      className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all active:scale-90 border shadow-2xl ${r.completed ? 'bg-gradient-to-br from-zenit-scarlet to-zenit-crimson border-white/20 text-white shadow-[0_5px_20px_rgba(255,0,0,0.3)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:border-zenit-scarlet hover:text-zenit-scarlet'}`}
+                      className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all active:scale-90 border shadow-2xl ${r.completed ? 'bg-gradient-to-br from-zenit-scarlet to-zenit-crimson border-zenit-accent/20 text-white shadow-[0_5px_20px_rgba(255,0,0,0.3)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:border-zenit-scarlet hover:text-zenit-scarlet'}`}
                     >
                       <CheckCircle2 size={28} strokeWidth={r.completed ? 3 : 2} />
                     </button>
@@ -556,25 +556,25 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsAdding(false)}
-              className="absolute inset-0 bg-zenit-black/90 backdrop-blur-md"
+              className="absolute inset-0 bg-black/80 backdrop-blur-xl"
             />
             <motion.div 
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-[3.5rem] border-t sm:border border-zenit-border-secondary space-y-6 relative overflow-hidden shadow-[0_-20px_50px_rgba(255,0,0,0.1)] z-10 mb-0 sm:mb-0 flex flex-col max-h-[92vh] sm:max-h-[85vh]"
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="bg-zenit-glass w-full max-w-lg rounded-t-[3rem] sm:rounded-[3rem] border-t border-zenit-glass-border space-y-6 relative overflow-hidden shadow-2xl z-10 flex flex-col max-h-[90vh] backdrop-blur-2xl"
             >
-              <div className="w-12 h-1.5 bg-zenit-accent/20 rounded-full mx-auto mt-4 mb-2 flex-shrink-0" />
+              <div className="w-12 h-1 bg-zenit-border-primary rounded-full mx-auto mt-4 mb-2 flex-shrink-0" />
               
               <div className="px-8 flex justify-between items-center flex-shrink-0">
                 <div className="space-y-1">
-                  <h3 className="text-2xl font-display font-bold text-zenit-black tracking-tight uppercase italic">{t.routine.newProtocol.split(' ')[0]} <span className="text-zenit-accent">{t.routine.newProtocol.split(' ')[1]}</span></h3>
-                  <p className="text-[10px] text-zenit-accent font-bold uppercase tracking-[0.3em] opacity-80">{t.routine.performanceConfig}</p>
+                  <h3 className="text-xl font-display font-black text-zenit-text-primary tracking-tighter uppercase italic">Novo <span className="text-zenit-accent">Protocolo</span></h3>
+                  <p className="text-[9px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] opacity-40">Configuração de Alta Performance</p>
                 </div>
                 <button 
                   onClick={() => setIsAdding(false)} 
-                  className="w-12 h-12 rounded-2xl bg-zenit-surface-1 flex items-center justify-center text-zenit-accent hover:bg-zenit-accent hover:text-white transition-all border border-zenit-border-secondary shadow-sm active:scale-90"
+                  className="w-10 h-10 rounded-full bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-3 transition-all active:scale-90"
                 >
                   <X size={20} />
                 </button>
@@ -582,88 +582,74 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
 
               <div className="px-8 pb-10 space-y-8 overflow-y-auto scrollbar-hide flex-1">
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-accent font-bold uppercase tracking-[0.3em] ml-1">{t.routine.taskName}</label>
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Identificador do Protocolo</label>
                   <input
                     type="text"
                     value={newTask}
                     onChange={(e) => setNewTask(e.target.value)}
-                    placeholder={t.routine.aiPlaceholder.split('...')[0]}
-                    className="w-full bg-white border-2 border-zenit-border-secondary rounded-[2rem] px-6 py-5 text-sm text-zenit-black focus:outline-none focus:border-zenit-accent transition-all placeholder:text-zenit-text-tertiary/30 shadow-inner"
+                    placeholder="Ex: Foco Profundo"
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl px-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/50 transition-all placeholder:text-zenit-text-tertiary/20 shadow-inner"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <label className="text-[10px] text-zenit-accent font-bold uppercase tracking-[0.3em] ml-1">{t.routine.time}</label>
+                    <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Horário</label>
                     <div className="relative">
-                      <Clock size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zenit-accent pointer-events-none" />
+                      <Clock size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zenit-accent/50 pointer-events-none" />
                       <input
                         type="time"
                         value={newTime}
                         onChange={(e) => setNewTime(e.target.value)}
-                        className="w-full bg-white border-2 border-zenit-border-secondary rounded-2xl pl-12 pr-6 py-4 text-sm text-zenit-black focus:outline-none focus:border-zenit-accent transition-all shadow-inner"
+                        className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl pl-12 pr-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/50 transition-all shadow-inner"
                       />
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] text-zenit-accent font-bold uppercase tracking-[0.3em] ml-1">{t.routine.duration}</label>
+                    <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Janela</label>
                     <div className="relative">
-                      <Activity size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zenit-accent pointer-events-none" />
+                      <Activity size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zenit-accent/50 pointer-events-none" />
                       <select
                         value={newDuration}
                         onChange={(e) => setNewDuration(e.target.value)}
-                        className="w-full bg-white border-2 border-zenit-border-secondary rounded-2xl pl-12 pr-6 py-4 text-sm text-zenit-black focus:outline-none focus:border-zenit-accent transition-all appearance-none shadow-inner"
+                        className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl pl-12 pr-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/50 transition-all appearance-none shadow-inner"
                       >
-                        <option value="15min" className="bg-white">15 min</option>
-                        <option value="30min" className="bg-white">30 min</option>
-                        <option value="45min" className="bg-white">45 min</option>
-                        <option value="1h" className="bg-white">1 hora</option>
-                        <option value="2h" className="bg-white">2 horas</option>
+                        <option value="15min">15 min</option>
+                        <option value="30min">30 min</option>
+                        <option value="45min">45 min</option>
+                        <option value="1h">1 hora</option>
+                        <option value="2h">2 horas</option>
                       </select>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.routine.priority}</label>
-                    <div className="flex gap-1.5 p-1.5 bg-zenit-surface-2 rounded-2xl border border-zenit-border-primary shadow-inner">
-                      {priorities.map(p => (
-                        <button
-                          key={p.id}
-                          onClick={() => setNewPriority(p.id as any)}
-                          className={`flex-1 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-tighter transition-all ${newPriority === p.id ? p.color : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
-                        >
-                          {p.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.routine.frequency}</label>
-                    <select
-                      value={newFrequency}
-                      onChange={(e) => setNewFrequency(e.target.value as any)}
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl px-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 transition-all appearance-none shadow-inner"
-                    >
-                      <option value="daily" className="bg-zenit-surface-2">Diária</option>
-                      <option value="weekly" className="bg-zenit-surface-2">Semanal</option>
-                      <option value="custom" className="bg-zenit-surface-2">Personalizada</option>
-                    </select>
+                <div className="space-y-3">
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Prioridade Neural</label>
+                  <div className="flex gap-2 p-1.5 bg-zenit-glass rounded-2xl border border-zenit-glass-border shadow-inner">
+                    {priorities.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => setNewPriority(p.id as any)}
+                        className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${newPriority === p.id ? p.color : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.routine.category}</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Domínio</label>
+                  <div className="grid grid-cols-4 gap-3">
                     {categories.map(cat => (
                       <button
                         key={cat.id}
                         onClick={() => setNewCategory(cat.id)}
-                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all active:scale-95 ${newCategory === cat.id ? 'bg-zenit-text-primary border-zenit-text-primary text-zenit-black shadow-[0_0_20px_rgba(255,255,255,0.1)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-3 shadow-inner'}`}
+                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all active:scale-95 ${newCategory === cat.id ? 'bg-zenit-text-primary text-zenit-black border-zenit-text-primary shadow-xl' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary shadow-inner hover:bg-zenit-surface-3'}`}
                       >
                         <div className="scale-110">{cat.icon}</div>
-                        <span className="text-[9px] mt-2 font-bold uppercase tracking-tighter">{cat.label}</span>
+                        <span className="text-[8px] mt-2 font-black uppercase tracking-tighter">{cat.label}</span>
                       </button>
                     ))}
                   </div>
@@ -675,44 +661,23 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
                     max={100}
                     value={newEnergy}
                     onChange={setNewEnergy}
-                    label={t.routine.expectedEnergy}
+                    label="Nível de Energia Requerido"
                   />
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.3em] ml-1">{t.routine.weeklyRepetition}</label>
-                  <div className="grid grid-cols-7 gap-2">
-                    {weekDays.map(day => (
-                      <button
-                        key={day.id}
-                        onClick={() => {
-                          if (selectedDays.includes(day.id)) {
-                            setSelectedDays(selectedDays.filter(d => d !== day.id));
-                          } else {
-                            setSelectedDays([...selectedDays, day.id]);
-                          }
-                        }}
-                        className={`h-12 rounded-xl text-[10px] font-bold transition-all active:scale-90 border flex items-center justify-center ${selectedDays.includes(day.id) ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_15px_var(--accent-glow)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-3 shadow-inner'}`}
-                      >
-                        {day.label}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 <div className="flex gap-4 pt-4">
                   <button
                     onClick={() => setIsAdding(false)}
-                    className="flex-1 py-5 rounded-2xl bg-zenit-surface-1 border-2 border-zenit-border-secondary text-zenit-accent text-[11px] font-bold uppercase tracking-[0.3em] transition-all hover:bg-zenit-accent hover:text-white active:scale-95"
+                    className="flex-1 py-5 rounded-2xl bg-zenit-surface-2 text-zenit-text-tertiary text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:bg-zenit-surface-3 active:scale-95"
                   >
-                    {t.routine.cancel}
+                    Abortar
                   </button>
                   <button
                     onClick={addRoutine}
                     disabled={!newTask.trim()}
-                    className="flex-[2] py-5 rounded-2xl bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white text-[11px] font-bold uppercase tracking-[0.3em] shadow-xl shadow-zenit-accent/20 hover:scale-[1.02] transition-all active:scale-95 border border-white/20 disabled:opacity-50 disabled:scale-100"
+                    className="flex-[2] py-5 rounded-2xl bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white text-[10px] font-black uppercase tracking-[0.3em] shadow-xl shadow-zenit-accent/20 hover:scale-[1.02] transition-all active:scale-95 border border-zenit-border-primary/20 disabled:opacity-50"
                   >
-                    {t.routine.createProtocol}
+                    Ativar Protocolo
                   </button>
                 </div>
               </div>

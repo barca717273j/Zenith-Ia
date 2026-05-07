@@ -81,94 +81,89 @@ export const DailyMissions: React.FC<{ t: any; userData: any }> = ({ t, userData
   }, [userData]);
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center px-2">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <div className="w-1.5 h-1.5 bg-zenit-cyan rounded-full animate-pulse" />
-            <h3 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-zenit-text-primary">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-primary italic">
               Objetivos Táticos
             </h3>
           </div>
-          <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold">Recompensas de XP Ativas</p>
+          <p className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-black leading-none">Recompensas de Atributos</p>
         </div>
         <motion.div 
           whileHover={{ scale: 1.05 }}
-          className="flex items-center space-x-3 bg-zenit-surface-1 px-5 py-2.5 rounded-2xl border border-zenit-border-primary shadow-lg"
+          className="flex items-center space-x-3 bg-zenit-surface-2 px-5 py-2.5 rounded-2xl border border-zenit-border-primary shadow-sm"
         >
-          <Trophy size={16} className="text-zenit-electric-blue drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-primary">Nível {level}</span>
+          <Trophy size={14} className="text-zenit-text-tertiary" />
+          <span className="text-[9px] font-black uppercase tracking-widest text-zenit-text-primary">Nível {level}</span>
         </motion.div>
       </div>
 
-      <div className="glass-card p-8 space-y-10 relative overflow-hidden border-zenit-border-primary bg-zenit-surface-1">
+      <div className="glass-card p-8 space-y-10 relative overflow-hidden border border-white/5 bg-white/[0.02] rounded-[2.5rem]">
         {/* Background Glow */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-zenit-electric-blue/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 blur-[100px] rounded-full pointer-events-none" />
         
         {/* Progress Section */}
-        <div className="space-y-4 relative z-10">
-          <div className="flex justify-between items-end">
+        <div className="space-y-5 relative z-10">
+          <div className="flex justify-between items-end px-1">
             <div className="space-y-1.5">
               <div className="flex items-center space-x-2">
-                <Award size={12} className="text-zenit-electric-blue" />
-                <span className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold">Patente Atual</span>
+                <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black italic">Rank Neural</span>
               </div>
-              <p className="text-xl font-display font-bold text-zenit-text-primary uppercase tracking-tight">{levelName}</p>
+              <p className="text-2xl font-display font-black text-zenit-text-primary italic uppercase tracking-tighter leading-none">{levelName}</p>
             </div>
-            <div className="text-right space-y-1">
-              <span className="text-zenit-electric-blue text-xs font-mono font-bold drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">
-                {xp % 100} / 100 XP
+            <div className="text-right space-y-1.5">
+              <span className="text-zenit-text-primary text-xs font-black italic">
+                {xp % 100}<span className="text-zenit-text-tertiary/20"> / 100 XP</span>
               </span>
-              <div className="text-[8px] text-zenit-text-tertiary uppercase tracking-widest font-bold">Próximo Nível</div>
             </div>
           </div>
-          <div className="h-3 w-full bg-zenit-surface-2 rounded-full overflow-hidden border border-zenit-border-secondary p-[2px]">
+          <div className="h-2 w-full bg-zenit-surface-2 rounded-full overflow-hidden p-[2px] border border-zenit-border-primary">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${xp % 100}%` }}
-              className="h-full bg-gradient-to-r from-zenit-electric-blue via-zenit-cyan to-zenit-electric-blue rounded-full relative"
+              className="h-full bg-zenit-accent rounded-full relative shadow-[0_0_15px_var(--accent-glow)]"
             >
-              <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/10 to-transparent" />
             </motion.div>
           </div>
         </div>
 
-        <div className="space-y-5 relative z-10">
+        <div className="space-y-3 relative z-10">
           {loading ? (
             <div className="flex justify-center py-10">
-              <div className="w-6 h-6 border-2 border-zenit-electric-blue border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-zenit-border-primary border-t-zenit-accent rounded-full animate-spin" />
             </div>
           ) : missions.map((m) => (
             <motion.div 
               key={m.id} 
               whileHover={{ x: 4 }}
-              className="group flex items-center space-x-5 p-5 rounded-[28px] bg-zenit-surface-2 border border-zenit-border-secondary hover:border-zenit-border-primary hover:bg-zenit-surface-1 transition-all cursor-pointer"
+              className="group flex items-center space-x-5 p-4 rounded-3xl bg-zenit-surface-2 border border-zenit-border-primary hover:bg-zenit-surface-3 transition-all cursor-pointer shadow-sm"
             >
-              <div className="w-12 h-12 rounded-2xl bg-zenit-surface-1 flex items-center justify-center shrink-0 border border-zenit-border-primary group-hover:border-zenit-electric-blue/30 transition-all shadow-inner">
-                <div className="text-zenit-text-tertiary group-hover:text-zenit-electric-blue transition-colors">
+              <div className="w-11 h-11 rounded-2xl bg-zenit-surface-3 flex items-center justify-center shrink-0 border border-zenit-border-primary group-hover:bg-zenit-text-primary group-hover:text-zenit-black transition-all shadow-inner">
+                <div className="text-zenit-text-tertiary group-hover:text-inherit">
                   {m.icon}
                 </div>
               </div>
               <div className="flex-1 space-y-3">
                 <div className="flex justify-between items-center">
-                  <div className="space-y-0.5">
-                    <p className="text-sm font-bold text-zenit-text-secondary group-hover:text-zenit-text-primary transition-colors tracking-tight">{m.title}</p>
-                    <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest font-bold">{m.progress} de {m.total} Concluídos</p>
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-black text-zenit-text-primary group-hover:text-zenit-text-primary transition-colors tracking-tight uppercase italic">{m.title}</p>
+                    <p className="text-[8px] text-zenit-text-tertiary uppercase tracking-widest font-black">{m.progress} de {m.total} CICLOS</p>
                   </div>
-                  <div className="flex items-center space-x-1.5 text-zenit-electric-blue bg-zenit-electric-blue/10 px-3 py-1 rounded-xl border border-zenit-electric-blue/10">
-                    <Sparkles size={10} />
-                    <span className="text-[10px] font-bold font-mono">+{m.xp} XP</span>
+                  <div className="flex items-center space-x-1.5 text-zenit-text-tertiary">
+                    <span className="text-[9px] font-black italic">+{m.xp} XP</span>
                   </div>
                 </div>
-                <div className="h-1.5 w-full bg-zenit-surface-1 rounded-full overflow-hidden p-[1px]">
+                <div className="h-1 w-full bg-zenit-surface-3 rounded-full overflow-hidden shadow-inner">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, (m.progress / m.total) * 100)}%` }}
-                    className={`h-full transition-all rounded-full ${m.progress >= m.total ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-zenit-surface-2 group-hover:bg-zenit-electric-blue/40'}`} 
+                    className={`h-full transition-all rounded-full ${m.progress >= m.total ? 'bg-zenit-accent shadow-[0_0_10px_var(--accent-glow)]' : 'bg-zenit-accent/20 group-hover:bg-zenit-accent/30'}`} 
                   />
                 </div>
               </div>
-              <ChevronRight size={16} className="text-zenit-text-tertiary opacity-20 group-hover:opacity-100 transition-opacity" />
             </motion.div>
           ))}
         </div>

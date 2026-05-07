@@ -103,7 +103,7 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
       <div className="min-h-screen p-6 pb-32">
         <button 
           onClick={() => setMode('menu')}
-          className="flex items-center space-x-2 text-white/40 hover:text-white transition-colors mb-8"
+          className="flex items-center space-x-2 text-zenit-text-tertiary hover:text-zenit-text-primary transition-colors mb-8"
         >
           <ArrowLeft size={16} />
           <span className="text-[10px] font-bold uppercase tracking-widest">{t.gym.back}</span>
@@ -210,7 +210,7 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-display font-bold text-zenit-text-tertiary uppercase tracking-[0.4em]">Histórico de Performance</h3>
-          <div className="h-[1px] flex-1 bg-white/5 mx-4" />
+          <div className="h-[1px] flex-1 bg-zenit-border-primary mx-4" />
         </div>
         
         <div className="grid gap-4">
@@ -221,7 +221,7 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="premium-card p-4 flex items-center justify-between border-white/5 bg-white/[0.01]"
+                className="premium-card p-4 flex items-center justify-between border-zenit-border-primary bg-zenit-surface-1 shadow-sm"
               >
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 rounded-xl bg-zenit-accent/10 flex items-center justify-center text-zenit-accent">
@@ -245,9 +245,9 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
               </motion.div>
             ))
           ) : (
-            <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-[2rem] opacity-20">
-              <Trophy size={32} className="mx-auto mb-4" />
-              <p className="text-[10px] font-bold uppercase tracking-widest">Nenhum recorde registrado</p>
+            <div className="text-center py-12 border-2 border-dashed border-zenit-border-primary rounded-[2rem] opacity-40">
+              <Trophy size={32} className="mx-auto mb-4 text-zenit-text-tertiary/20" />
+              <p className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-tertiary">Nenhum recorde registrado</p>
             </div>
           )}
         </div>

@@ -8,12 +8,14 @@ import { useUser } from '../contexts/UserContext';
 export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFullPage = false }) => {
   const { userData } = useUser();
   const [mode, setMode] = useState<'focus' | 'break'>('focus');
-  const [focusDuration, setFocusDuration] = useState(25 * 60);
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [focusDuration, setFocusDuration] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [sessions, setSessions] = useState(0);
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [customMinutes, setCustomMinutes] = useState('25');
+  const [customHours, setCustomHours] = useState('0');
+  const [customMinutes, setCustomMinutes] = useState('0');
+  const [customSeconds, setCustomSeconds] = useState('0');
   const { addXP } = useGamification();
 
   const saveFocusSession = async (duration: number) => {
@@ -31,9 +33,23 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
     }
   };
 
-  const BREAK_TIME = 5 * 60;
+  const handleCustomSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const h = parseInt(customHours) || 0;
+    const m = parseInt(customMinutes) || 0;
+    const s = parseInt(customSeconds) || 0;
+    const totalSecs = h * 3600 + m * 60 + s;
+    
+    if (totalSecs > 0) {
+      setIsActive(false);
+      setFocusDuration(totalSecs);
+      setTimeLeft(totalSecs);
+      setMode('focus');
+      setShowCustomInput(false);
+    }
+  };
 
-  const presets = [25, 45, 55, 90, 100];
+  const BREAK_TIME = 5 * 60;
 
   useEffect(() => {
     let interval: any = null;
@@ -70,25 +86,14 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
     setTimeLeft(focusDuration);
   };
 
-  const handlePresetClick = (secs: number) => {
-    setIsActive(false);
-    setFocusDuration(secs);
-    setTimeLeft(secs);
-    setMode('focus');
-    setShowCustomInput(false);
-  };
-
-  const handleCustomSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const secs = parseInt(customMinutes);
-    if (!isNaN(secs) && secs > 0) {
-      handlePresetClick(secs);
-    }
-  };
-
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
+    
+    if (hrs > 0) {
+      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -119,48 +124,73 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
         </div>
       </div>
 
-      {/* Time Presets */}
+      {/* Custom Timer Input */}
       {!isActive && mode === 'focus' && (
-        <div className="flex flex-wrap justify-center gap-3 relative z-10">
-          {presets.map((mins) => (
+        <div className="flex flex-col items-center space-y-6 relative z-10">
+          {!showCustomInput ? (
             <button
-              key={mins}
-              onClick={() => handlePresetClick(mins)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${
-                focusDuration === mins 
-                  ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_15px_var(--accent-glow)] scale-105' 
-                  : 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary hover:border-zenit-accent/30 hover:text-zenit-text-primary'
-              }`}
+              onClick={() => setShowCustomInput(true)}
+              className="px-10 py-4 rounded-2xl bg-zenit-text-primary text-zenit-black text-[10px] font-black uppercase tracking-[0.3em] hover:brightness-90 transition-all shadow-xl italic"
             >
-              {mins}s
+              Customizar Protocolo
             </button>
-          ))}
-          <button
-            onClick={() => setShowCustomInput(!showCustomInput)}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${
-              showCustomInput 
-                ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_15px_var(--accent-glow)]' 
-                : 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary hover:border-zenit-accent/30'
-            }`}
-          >
-            Custom
-          </button>
+          ) : (
+            <form onSubmit={handleCustomSubmit} className="flex flex-col items-center space-y-6 bg-zenit-surface-2 p-8 rounded-[2rem] border border-zenit-border-primary backdrop-blur-xl shadow-inner">
+              <div className="flex items-center space-x-4">
+                <div className="flex flex-col items-center space-y-2">
+                  <span className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest">Horas</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="23"
+                    value={customHours}
+                    onChange={(e) => setCustomHours(e.target.value)}
+                    className="w-16 bg-zenit-surface-3 border border-zenit-border-primary rounded-xl px-2 py-3 text-center text-zenit-text-primary font-black focus:outline-none focus:border-zenit-accent transition-all"
+                  />
+                </div>
+                <span className="text-xl font-black text-zenit-text-tertiary/20 mt-4">:</span>
+                <div className="flex flex-col items-center space-y-2">
+                  <span className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest">Minutos</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={customMinutes}
+                    onChange={(e) => setCustomMinutes(e.target.value)}
+                    className="w-16 bg-zenit-surface-3 border border-zenit-border-primary rounded-xl px-2 py-3 text-center text-zenit-text-primary font-black focus:outline-none focus:border-zenit-accent transition-all"
+                  />
+                </div>
+                <span className="text-xl font-black text-zenit-text-tertiary/20 mt-4">:</span>
+                <div className="flex flex-col items-center space-y-2">
+                  <span className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest">Segundos</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={customSeconds}
+                    onChange={(e) => setCustomSeconds(e.target.value)}
+                    className="w-16 bg-zenit-surface-3 border border-zenit-border-primary rounded-xl px-2 py-3 text-center text-zenit-text-primary font-black focus:outline-none focus:border-zenit-accent transition-all"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 w-full">
+                <button 
+                  type="button"
+                  onClick={() => setShowCustomInput(false)}
+                  className="flex-1 bg-zenit-surface-3 text-zenit-text-tertiary py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] italic border border-zenit-border-primary"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-[2] bg-zenit-accent text-white py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.3em] shadow-xl shadow-zenit-accent/20 italic"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </form>
+          )}
         </div>
-      )}
-
-      {showCustomInput && !isActive && mode === 'focus' && (
-        <form onSubmit={handleCustomSubmit} className="flex items-center space-x-3 relative z-10 justify-center">
-          <input
-            type="number"
-            value={customMinutes}
-            onChange={(e) => setCustomMinutes(e.target.value)}
-            className="w-24 bg-zenit-surface-2 border border-zenit-border-primary rounded-xl px-4 py-2 text-center text-zenit-text-primary font-bold focus:outline-none focus:border-zenit-accent transition-all"
-            placeholder="Mins"
-          />
-          <button type="submit" className="bg-zenit-accent text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_var(--accent-glow)] hover:brightness-110 transition-all">
-            Set
-          </button>
-        </form>
       )}
 
       <div className="relative flex items-center justify-center py-6">

@@ -397,106 +397,91 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   };
 
   return (
-    <div className="p-4 space-y-8 pb-32 max-w-2xl mx-auto min-h-screen">
-      <header className="flex justify-between items-end">
-        <div className="space-y-1.5">
-          <h1 className="text-3xl font-bold font-display tracking-tight text-zenit-text-primary">
-            Fluxo <span className="text-zenit-scarlet italic">Capital</span>
+    <div className="p-4 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
+      <header className="flex justify-between items-center px-2">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-display font-black uppercase tracking-tighter text-white italic">
+            Fluxo <span className="text-zenit-accent font-black">Capital</span>
           </h1>
-          <div className="flex items-center space-x-2 opacity-80">
-            <div className="h-0.5 w-10 bg-zenit-scarlet rounded-full" />
-            <p className="text-zenit-text-tertiary text-[9px] font-black uppercase tracking-[0.2em]">
-              Sistema de Liquidez Neural
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-px bg-white/20 rounded-full" />
+            <p className="text-[9px] text-white/40 font-black uppercase tracking-[0.4em]">
+              Central de Liquidez
             </p>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowAIChat(true)}
-            className="w-12 h-12 rounded-2xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center text-zenit-scarlet shadow-lg shadow-zenit-scarlet/5 active:bg-zenit-surface-2 transition-all min-h-[44px] min-w-[44px]"
-          >
-            <Zap size={22} className="drop-shadow-[0_0_8px_var(--accent-glow)]" />
-          </motion.button>
-        </div>
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowAIChat(true)}
+          className="w-11 h-11 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center text-zenit-accent transition-all shadow-sm"
+        >
+          <Zap size={20} className="animate-pulse" />
+        </motion.button>
       </header>
 
-      {/* Main Balance Card - Instagram/Notion Hybrid Style */}
-      <div className="relative group perspective-1000">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-8 rounded-[2.5rem] border-zenit-border-primary bg-zenit-surface-1 relative overflow-hidden shadow-2xl shadow-black/20"
-        >
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 p-8 opacity-5 text-zenit-text-primary translate-x-4 -translate-y-4">
-            <PiggyBank size={140} />
+      {/* Main Balance Card */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative p-10 rounded-[2.5rem] bg-zenit-text-primary text-zenit-bg overflow-hidden shadow-2xl"
+      >
+        <div className="absolute top-0 right-0 p-10 opacity-5 -translate-x-4 -translate-y-4">
+          <Wallet size={120} />
+        </div>
+        
+        <div className="relative z-10 flex flex-col items-center text-center space-y-8">
+          <div className="space-y-1">
+            <span className="text-[9px] opacity-40 uppercase tracking-[0.4em] font-black italic">Balanço Consolidado</span>
+            <h2 className="text-5xl font-display font-black tracking-tighter truncate max-w-full italic">
+              {formatCurrency(balance)}
+            </h2>
           </div>
-          <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-zenit-scarlet/10 blur-[80px] rounded-full pointer-events-none" />
           
-          <div className="relative z-10 flex flex-col items-center text-center space-y-6">
-            <div className="space-y-1">
-              <span className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black">{t.finance.balance}</span>
-              <h2 className="text-5xl font-display font-medium tracking-tight text-zenit-text-primary truncate max-w-full">
-                {formatCurrency(balance)}
-              </h2>
+          <div className="flex w-full divide-x divide-zenit-bg/5 pt-6 border-t border-zenit-bg/5">
+            <div className="flex-1 flex flex-col items-center space-y-1">
+              <span className="text-[8px] opacity-40 uppercase tracking-[0.3em] font-black leading-none">Entradas</span>
+              <span className="text-sm font-black italic opacity-80">{formatCurrency(totalIncome)}</span>
             </div>
-            
-            <div className="flex w-full divide-x divide-zenit-border-secondary pt-4 border-t border-zenit-border-secondary/50">
-              <div className="flex-1 flex flex-col items-center">
-                <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold mb-1">Entradas</span>
-                <div className="flex items-center text-emerald-500 space-x-1">
-                  <TrendingUp size={12} />
-                  <span className="text-sm font-bold font-mono">{formatCurrency(totalIncome)}</span>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col items-center">
-                <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-bold mb-1">Saídas</span>
-                <div className="flex items-center text-zenit-scarlet space-x-1">
-                  <TrendingDown size={12} />
-                  <span className="text-sm font-bold font-mono">{formatCurrency(totalExpense)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions Integration */}
-            <div className="flex w-full gap-3 pt-2">
-              <button 
-                onClick={() => { setType('income'); setShowAddModal(true); }}
-                className="flex-1 bg-zenit-surface-2 border border-zenit-border-primary text-zenit-text-primary py-3.5 rounded-2xl text-[9px] font-bold uppercase tracking-widest hover:bg-zenit-surface-3 transition-all flex items-center justify-center space-x-2 active:scale-95"
-              >
-                <Plus size={14} className="text-emerald-500" />
-                <span>Provimento</span>
-              </button>
-              <button 
-                onClick={() => { setType('expense'); setShowAddModal(true); }}
-                className="flex-1 bg-zenit-text-primary text-zenit-black py-3.5 rounded-2xl text-[9px] font-bold uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center space-x-2 active:scale-95"
-              >
-                <Plus size={14} className="text-zenit-scarlet" />
-                <span>Alocação</span>
-              </button>
+            <div className="flex-1 flex flex-col items-center space-y-1">
+              <span className="text-[8px] opacity-40 uppercase tracking-[0.3em] font-black leading-none">Saídas</span>
+              <span className="text-sm font-black italic opacity-80">{formatCurrency(totalExpense)}</span>
             </div>
           </div>
-        </motion.div>
-      </div>
 
-      {/* Tab Switcher - More Subtle & App-like */}
-      <div className="flex bg-zenit-surface-1/50 p-1 rounded-2xl border border-zenit-border-primary/50 backdrop-blur-xl mx-2">
+          <div className="flex w-full gap-3">
+            <button 
+              onClick={() => { setType('income'); setShowAddModal(true); }}
+              className="flex-1 bg-zenit-bg/5 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-zenit-bg/10 transition-all border border-zenit-bg/5 italic"
+            >
+              Provimento
+            </button>
+            <button 
+              onClick={() => { setType('expense'); setShowAddModal(true); }}
+              className="flex-1 bg-zenit-bg text-zenit-text-primary py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-all italic shadow-lg"
+            >
+              Alocação
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Tab Switcher */}
+      <div className="flex bg-zenit-surface-2 p-1 rounded-2xl border border-zenit-border-primary backdrop-blur-xl shadow-inner">
         {(['flow', 'budget', 'goals'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 text-[9px] uppercase tracking-[0.2em] font-bold rounded-xl transition-all duration-300 relative ${
+            className={`flex-1 py-3 text-[9px] uppercase tracking-[0.3em] font-black rounded-xl transition-all relative italic ${
               activeTab === tab 
-                ? 'text-white' 
-                : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'
+                ? 'text-zenit-bg' 
+                : 'text-zenit-text-tertiary hover:text-zenit-text-primary'
             }`}
           >
             {activeTab === tab && (
               <motion.div 
                 layoutId="finance-tab-active"
-                className="absolute inset-0 bg-zenit-scarlet shadow-lg shadow-zenit-scarlet/10"
+                className="absolute inset-0 bg-zenit-text-primary"
                 style={{ borderRadius: 'inherit' }}
               />
             )}
@@ -1251,20 +1236,20 @@ const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; cu
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: idx * 0.1 }}
       whileHover={{ y: -4 }}
-      className="glass-card p-8 space-y-6 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-500 rounded-[32px] relative overflow-hidden group"
+      className="glass-card p-8 space-y-6 border border-zenit-border-primary bg-zenit-surface-1/40 hover:bg-zenit-surface-1 transition-all duration-500 rounded-[32px] relative overflow-hidden group shadow-lg"
     >
-      <div className="absolute -right-4 -top-4 w-32 h-32 bg-white/[0.02] rounded-full blur-3xl group-hover:bg-zenit-scarlet/5 transition-colors" />
+      <div className="absolute -right-4 -top-4 w-32 h-32 bg-zenit-accent/5 rounded-full blur-3xl group-hover:bg-zenit-accent/10 transition-colors" />
       
       <div className="flex justify-between items-start relative z-10">
-        <div className={`w-14 h-14 rounded-[20px] bg-white/5 flex items-center justify-center ${accentColor} border border-white/10 group-hover:scale-110 transition-transform duration-500`}>
+        <div className={`w-14 h-14 rounded-[20px] bg-zenit-surface-2 flex items-center justify-center ${accentColor} border border-zenit-border-primary group-hover:scale-110 transition-transform duration-500 shadow-inner`}>
           {icon}
         </div>
         <div className="text-right flex flex-col items-end space-y-2">
-          <span className={`text-3xl font-display font-bold text-white`}>{Math.round(progress)}%</span>
-          <p className="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1">{t.finance.completed}</p>
+          <span className={`text-3xl font-display font-bold text-zenit-text-primary`}>{Math.round(progress)}%</span>
+          <p className="text-[9px] text-zenit-text-tertiary font-black uppercase tracking-widest mt-1">{t.finance.completed}</p>
           <button 
             onClick={onDelete}
-            className="text-[9px] text-white/10 hover:text-zenit-scarlet uppercase tracking-widest font-bold transition-colors opacity-0 group-hover:opacity-100"
+            className="text-[9px] text-zenit-text-tertiary/40 hover:text-zenit-scarlet uppercase tracking-widest font-black transition-colors opacity-0 group-hover:opacity-100"
           >
             Excluir
           </button>
@@ -1274,17 +1259,17 @@ const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; cu
       <div className="space-y-4 relative z-10">
         <div className="flex justify-between items-end">
           <div>
-            <h4 className="text-xl font-bold text-white tracking-tight">{label}</h4>
-            <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em] mt-1">
+            <h4 className="text-xl font-bold text-zenit-text-primary tracking-tight">{label}</h4>
+            <p className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.2em] mt-1">
               {t.finance.remaining} {formatCurrency(remaining)}
             </p>
           </div>
-          <p className="text-sm font-bold text-white/40">
+          <p className="text-sm font-bold text-zenit-text-tertiary">
             {formatCurrency(target)}
           </p>
         </div>
         
-        <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
+        <div className="relative h-2 w-full bg-zenit-surface-2 rounded-full overflow-hidden shadow-inner">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(100, progress)}%` }}

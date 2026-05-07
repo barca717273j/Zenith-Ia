@@ -39,7 +39,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
         
         if (!lastDate || lastDate.toDateString() !== today.toDateString()) {
           const { error } = await supabase
-            .from('users')
+            .from('profiles')
             .update({ ai_messages_count: 0 })
             .eq('id', userData.id);
           
@@ -152,26 +152,23 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
                 animate={{ opacity: 1, y: 0 }}
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} relative z-10`}
               >
-                <div className={`max-w-[85%] flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-2`}>
+                <div className={`max-w-[90%] flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-3`}>
                   <div className={`flex items-center space-x-3 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                    <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg border ${
+                    <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg border backdrop-blur-md ${
                       msg.role === 'user' 
                         ? 'bg-zenit-surface-2 text-zenit-text-tertiary border-zenit-border-primary' 
-                        : 'bg-zenit-accent/10 border-zenit-accent/20 text-zenit-accent'
+                        : 'bg-gradient-to-br from-zenit-accent to-zenit-crimson border-white/20 text-white shadow-zenit-accent/20'
                     }`}>
                       {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-zenit-text-tertiary opacity-50">
-                      {msg.role === 'user' ? 'Você' : 'Infinity Core'}
-                    </span>
                   </div>
                   
-                  <div className={`p-6 rounded-[2rem] text-sm leading-relaxed font-medium shadow-2xl transition-all ${
+                  <div className={`p-6 rounded-[2rem] text-sm leading-relaxed font-medium transition-all ${
                     msg.role === 'user' 
-                      ? 'bg-zenit-accent text-white rounded-tr-none shadow-[0_10px_30px_rgba(255,0,0,0.15)]' 
-                      : 'bg-zenit-surface-1 text-zenit-text-primary rounded-tl-none border border-zenit-border-primary'
+                      ? 'bg-zenit-text-primary text-zenit-black rounded-tr-none shadow-2xl' 
+                      : 'bg-zenit-surface-2 text-zenit-text-primary rounded-tl-none border border-zenit-border-primary backdrop-blur-xl'
                   }`}>
-                    <div className={`max-w-none prose prose-sm prose-p:leading-relaxed ${msg.role === 'user' ? 'prose-invert prose-strong:text-white' : 'prose-invert prose-strong:text-zenit-accent'}`}>
+                    <div className={`max-w-none prose prose-sm prose-p:leading-relaxed ${msg.role === 'user' ? 'dark:prose-invert prose-strong:text-zenit-accent font-bold' : 'dark:prose-invert prose-strong:text-zenit-accent font-medium'}`}>
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   </div>
@@ -180,7 +177,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
             ))}
             {isTyping && (
               <div className="flex justify-start relative z-10">
-                <div className="bg-zenit-surface-1 p-6 rounded-[2rem] rounded-tl-none flex space-x-2 border border-zenit-border-primary shadow-xl">
+                <div className="bg-zenit-surface-2 p-6 rounded-[2rem] rounded-tl-none flex space-x-2 border border-zenit-border-primary shadow-xl">
                   <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 bg-zenit-accent rounded-full" />
                   <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 bg-zenit-accent rounded-full" />
                   <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 bg-zenit-accent rounded-full" />
@@ -207,7 +204,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
             </div>
 
             <div className="relative flex items-center w-full group">
-              <div className="absolute left-6 text-zenit-accent/40 group-focus-within:text-zenit-accent transition-colors">
+              <div className="absolute left-6 text-zenit-text-tertiary/40 group-focus-within:text-zenit-accent transition-colors">
                 <Terminal size={18} />
               </div>
               <input
@@ -217,14 +214,14 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose, t }) 
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                 disabled={isLimitReached}
                 placeholder={isLimitReached ? "LIMITE DIÁRIO ATINGIDO" : "Transmita sua consulta ao núcleo..."}
-                className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[2rem] py-6 pl-16 pr-24 focus:outline-none focus:border-zenit-accent/50 transition-all font-medium text-zenit-text-primary placeholder:text-zenit-text-tertiary/20 disabled:opacity-50 shadow-inner"
+                className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[2rem] py-6 pl-16 pr-24 focus:outline-none focus:border-zenit-accent/30 transition-all font-medium text-zenit-text-primary placeholder:text-zenit-text-tertiary/20 disabled:opacity-50 shadow-inner backdrop-blur-xl"
               />
               <motion.button
                 whileHover={{ scale: 1.05, x: -5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSend}
                 disabled={!input.trim() || isTyping || isLimitReached}
-                className="absolute right-3 w-14 h-14 bg-gradient-to-br from-zenit-accent to-zenit-crimson text-white rounded-2xl disabled:opacity-50 hover:brightness-110 transition-all shadow-[0_0_20px_var(--accent-glow)] flex items-center justify-center border border-white/10"
+                className="absolute right-3 w-14 h-14 bg-zenit-text-primary text-zenit-black rounded-2xl disabled:opacity-50 hover:brightness-90 transition-all shadow-2xl flex items-center justify-center"
               >
                 {isLimitReached ? <Lock size={20} /> : <Send size={20} />}
               </motion.button>
