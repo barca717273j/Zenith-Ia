@@ -429,13 +429,14 @@ export const Auth: React.FC = () => {
                     </div>
                     <input
                       type="text"
-                      name="email"
+                      name="username"
+                      id="login-email"
                       autoComplete="username"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-14 pr-5 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
-                      placeholder="seu@email.com ou username"
+                      placeholder="E-mail ou Usuário"
                     />
                   </div>
                 </div>
@@ -458,6 +459,7 @@ export const Auth: React.FC = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
+                      id="login-password"
                       autoComplete="current-password"
                       required
                       value={password}
@@ -529,12 +531,13 @@ export const Auth: React.FC = () => {
                   <input
                     type="text"
                     name="name"
+                    id="reg-name"
                     autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
-                    placeholder={t.common.fullNamePlaceholder}
+                    placeholder="Seu nome completo"
                   />
                 </div>
 
@@ -543,12 +546,13 @@ export const Auth: React.FC = () => {
                   <input
                     type="text"
                     name="username"
+                    id="reg-username"
                     autoComplete="username"
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
-                    placeholder="username_neural"
+                    placeholder="Nome de Usuário"
                   />
                 </div>
 
@@ -557,6 +561,7 @@ export const Auth: React.FC = () => {
                   <input
                     type="email"
                     name="email"
+                    id="reg-email"
                     autoComplete="email"
                     required
                     value={email}
@@ -572,6 +577,7 @@ export const Auth: React.FC = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       name="new-password"
+                      id="reg-password"
                       autoComplete="new-password"
                       required
                       value={password}
@@ -608,6 +614,7 @@ export const Auth: React.FC = () => {
                   <input
                     type="password"
                     name="confirm-password"
+                    id="reg-confirm-password"
                     autoComplete="new-password"
                     required
                     value={confirmPassword}
@@ -636,7 +643,7 @@ export const Auth: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !isFormValid()}
                   className="w-full neon-button py-5 text-[11px] font-black uppercase tracking-[0.4em] disabled:opacity-50 disabled:grayscale"
                 >
                   {loading ? (
@@ -645,7 +652,7 @@ export const Auth: React.FC = () => {
                       <span>{t.common.creatingAccount}</span>
                     </div>
                   ) : (
-                    <span>Iniciar Jornada</span>
+                    <span>Criar Conta</span>
                   )}
                 </button>
               </form>

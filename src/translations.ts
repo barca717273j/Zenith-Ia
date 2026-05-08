@@ -688,7 +688,7 @@ export const translations = {
       basic: {
         name: 'Básico',
         price: 'Grátis',
-        features: ['1 função/área a cada 2 dias', 'IA Mentor Básico', 'Rotina Essencial', 'Acesso ao Nexus'],
+        features: ['5 mensagens IA/dia', 'Protocolo Financeiro Livre', 'Rotina Essencial', 'Acesso Total ao Nexus'],
       },
       pro: {
         name: 'Pro',
@@ -842,7 +842,7 @@ export const translations = {
       disconnect: 'Desconectar',
       terminateInterface: 'Encerrar interface',
       fullName: 'Nome Completo',
-      username: 'Identificador Neural',
+      username: 'Nome de Usuário',
       bio: 'Biografia Neural',
       imageUrl: 'Link da Imagem',
       saveProtocol: 'Salvar Protocolo',

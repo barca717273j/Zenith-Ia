@@ -45,7 +45,6 @@ interface FinanceTrackerProps {
 export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, setAppTab }) => {
   const { userData } = useUser();
   const tier = userData?.subscription_tier || 'basic';
-  const hasAccess = TIER_LIMITS[tier as SubscriptionTier]?.hasFinanceTracking || false;
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
@@ -85,35 +84,19 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [category, setCategory] = useState('');
 
+  // Remove access check as requested to make it free
   useEffect(() => {
-    if (userData?.id && hasAccess) {
+    if (userData?.id) {
       fetchTransactions();
       fetchBudgets();
       fetchGoals();
     }
-  }, [userData, hasAccess]);
+  }, [userData]);
 
-  if (!hasAccess) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center space-y-6">
-        <div className="w-20 h-20 rounded-3xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center shadow-2xl shadow-zenit-scarlet/10">
-          <Lock size={40} className="text-zenit-scarlet" />
-        </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-zenit-text-primary tracking-tight">{t.finance.premiumTitle}</h2>
-          <p className="text-sm text-zenit-text-tertiary max-w-xs mx-auto leading-relaxed">
-            {t.finance.premiumDesc}
-          </p>
-        </div>
-        <button 
-          onClick={() => setAppTab('profile')}
-          className="bg-zenit-text-primary text-zenit-black px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:opacity-90 transition-all active:scale-95 shadow-xl shadow-zenit-text-primary/5"
-        >
-          {t.finance.upgradeNow}
-        </button>
-      </div>
-    );
-  }
+  /* 
+    The premium lock screen block has been removed to make all finance 
+    functionalities free for all users as requested.
+  */
 
   const totalIncome = transactions
     .filter(t => t.type === 'income')

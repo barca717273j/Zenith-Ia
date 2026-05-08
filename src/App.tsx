@@ -156,17 +156,70 @@ function AppContent() {
   };
 
   if (loading) {
-    const loadingText = t?.common?.loading || 'Carregando ZENITH...';
     return (
-      <div className="min-h-screen flex items-center justify-center transition-colors duration-500 bg-zenit-black">
-        <div className="text-center space-y-4">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-            className="w-12 h-12 border-4 border-zenit-scarlet border-t-transparent rounded-full shadow-[0_0_20px_rgba(255,36,0,0.3)] mx-auto"
+      <div className="min-h-screen flex items-center justify-center bg-zenit-black relative overflow-hidden">
+        {/* Background Animation */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-fluid-marble opacity-30" />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.2, 0.1]
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-zenit-scarlet/20 rounded-full blur-[120px]"
           />
-          <p className="text-zenit-text-tertiary text-xs font-display uppercase tracking-widest">{loadingText}</p>
         </div>
+
+        <div className="relative z-10 text-center space-y-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="relative"
+          >
+            <div className="relative z-10 w-24 h-24 mx-auto bg-gradient-to-br from-zenit-scarlet to-zenit-crimson rounded-[2rem] flex items-center justify-center shadow-[0_0_50px_rgba(255,36,0,0.4)]">
+              <span className="text-4xl font-display font-black text-white italic tracking-tighter">Z</span>
+            </div>
+            {/* Animated Ring */}
+            <motion.div 
+              animate={{ 
+                scale: [1, 1.5],
+                opacity: [0.5, 0]
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+              className="absolute inset-0 border-2 border-zenit-scarlet rounded-[2rem]"
+            />
+          </motion.div>
+
+          <div className="space-y-4">
+            <motion.h1 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-4xl font-display font-black text-white tracking-tighter italic uppercase"
+            >
+              ZENITH <span className="text-zenit-accent">IA</span>
+            </motion.h1>
+            
+            <div className="flex flex-col items-center space-y-2">
+              <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className="h-full bg-zenit-accent shadow-[0_0_10px_var(--accent-glow)]"
+                />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary animate-pulse italic">
+                Sincronizando Sistema Neural...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Scanline Effect */}
+        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] z-50 bg-[length:100%_4px,3px_100%]" />
       </div>
     );
   }

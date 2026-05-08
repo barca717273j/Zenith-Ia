@@ -64,6 +64,8 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
   const [newNexusText, setNewNexusText] = useState('');
+  const [nexusTextPos, setNexusTextPos] = useState({ x: 0, y: 0 });
+  const [nexusTextScale, setNexusTextScale] = useState(1);
   const [newPostType, setNewPostType] = useState<Post['type']>('thought');
   const [newPostImage, setNewPostImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -282,7 +284,12 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
           {
             user_id: userData.id,
             image_url: publicUrl,
-            content: newNexusText,
+            content: JSON.stringify({
+              text: newNexusText,
+              x: nexusTextPos.x,
+              y: nexusTextPos.y,
+              scale: nexusTextScale
+            }),
           }
         ]);
 
@@ -290,6 +297,8 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
 
       await incrementUsage('stories');
       setNewNexusText('');
+      setNexusTextPos({ x: 0, y: 0 });
+      setNexusTextScale(1);
       setNewPostImage(null);
       setImagePreview(null);
       setIsNexusModalOpen(false);
@@ -862,10 +871,27 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                         <div className="absolute inset-0 bg-black/40" />
                         
                         {newNexusText && (
-                          <div className="absolute inset-0 flex items-center justify-center px-10 text-center pointer-events-none">
-                            <p className="text-3xl font-display font-black italic text-white drop-shadow-2xl uppercase tracking-tighter">
-                              {newNexusText}
-                            </p>
+                          <div className="absolute inset-0 flex items-center justify-center p-4">
+                            <motion.div 
+                              drag
+                              dragMomentum={false}
+                              onDragEnd={(_, info) => {
+                                setNexusTextPos(prev => ({ 
+                                  x: prev.x + info.offset.x, 
+                                  y: prev.y + info.offset.y 
+                                }));
+                              }}
+                              animate={{ x: nexusTextPos.x, y: nexusTextPos.y, scale: nexusTextScale }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                document.getElementById('nexus-text-input')?.focus();
+                              }}
+                              className="cursor-move p-4 active:scale-95 transition-transform"
+                            >
+                              <p className="text-3xl font-display font-black italic text-white drop-shadow-2xl uppercase tracking-tighter text-center pointer-events-none">
+                                {newNexusText}
+                              </p>
+                            </motion.div>
                           </div>
                         )}
 
@@ -892,8 +918,25 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                   </div>
 
                   <div className="space-y-3">
+                    <div className="flex justify-between items-center px-2">
+                      <label className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary italic">Tamanho do Ajuste</label>
+                      <span className="text-[8px] font-mono text-zenit-accent font-bold">{Math.round(nexusTextScale * 100)}%</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="0.5" 
+                      max="2.5" 
+                      step="0.1"
+                      value={nexusTextScale}
+                      onChange={(e) => setNexusTextScale(parseFloat(e.target.value))}
+                      className="w-full h-1.5 bg-zenit-surface-2 rounded-full appearance-none cursor-pointer accent-zenit-accent"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
                     <label className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary ml-2 italic">Mensagem Neural</label>
                     <input
+                      id="nexus-text-input"
                       value={newNexusText}
                       onChange={(e) => setNewNexusText(e.target.value)}
                       placeholder="ESCREVA SEU PROTOCOLO..."
@@ -928,6 +971,17 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
 
 const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onClose }) => {
   const [progress, setProgress] = useState(0);
+
+  const storyData = (() => {
+    try {
+      if (story.content?.startsWith('{')) {
+        return JSON.parse(story.content);
+      }
+      return { text: story.content, x: 0, y: 0, scale: 1 };
+    } catch (e) {
+      return { text: story.content, x: 0, y: 0, scale: 1 };
+    }
+  })();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1002,14 +1056,18 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] [background-size:20px_20px]" />
           
-          {story.content && (
-            <div className="absolute inset-x-0 bottom-32 flex items-center justify-center px-12 text-center">
+          {storyData.text && (
+            <div className="absolute inset-0 flex items-center justify-center p-4">
               <motion.p 
                 initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-3xl font-display font-black italic text-white uppercase leading-none tracking-tighter drop-shadow-2xl"
+                animate={{ opacity: 1, scale: storyData.scale || 1 }}
+                style={{ 
+                  x: storyData.x || 0, 
+                  y: storyData.y || 0 
+                }}
+                className="text-3xl font-display font-black italic text-white uppercase leading-none tracking-tighter drop-shadow-2xl text-center"
               >
-                {story.content}
+                {storyData.text}
               </motion.p>
             </div>
           )}

@@ -1,0 +1,37 @@
+{
+  "name": "Zenith",
+  "short_name": "Zenith",
+  "description": "Seu Protocolo de Evolução Humana. Alta Performance, Biohacking e Foco Absoluto.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F9FA",
+  "theme_color": "#E31C25",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Zenith&backgroundColor=E31C25&shape1Color=ffffff",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Zenith&backgroundColor=E31C25&shape1Color=ffffff",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "health", "fitness"],
+  "shortcuts": [
+    {
+      "name": "Foco",
+      "url": "/focus",
+      "description": "Iniciar Protocolo de Foco"
+    },
+    {
+      "name": "Nexus",
+      "url": "/social",
+      "description": "Acessar Nexus Social"
+    }
+  ]
+}
