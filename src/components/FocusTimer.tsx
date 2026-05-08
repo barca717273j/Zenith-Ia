@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Play, Pause, RotateCcw, Zap, Sparkles, Timer, Brain } from 'lucide-react';
+import { Play, Pause, RotateCcw, Zap, Sparkles, Timer, Brain, ArrowLeft } from 'lucide-react';
 import { useGamification } from './GamificationContext';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 
-export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFullPage = false }) => {
+export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean; onBack?: () => void }> = ({ t, isFullPage = false, onBack }) => {
   const { userData } = useUser();
   const [mode, setMode] = useState<'focus' | 'break'>('focus');
   const [focusDuration, setFocusDuration] = useState(0);
@@ -14,6 +14,7 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
   const [sessions, setSessions] = useState(0);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customHours, setCustomHours] = useState('0');
+  const [customDays, setCustomDays] = useState('0');
   const [customMinutes, setCustomMinutes] = useState('0');
   const [customSeconds, setCustomSeconds] = useState('0');
   const { addXP } = useGamification();
@@ -35,10 +36,11 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
 
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const d = parseInt(customDays) || 0;
     const h = parseInt(customHours) || 0;
     const m = parseInt(customMinutes) || 0;
     const s = parseInt(customSeconds) || 0;
-    const totalSecs = h * 3600 + m * 60 + s;
+    const totalSecs = d * 86400 + h * 3600 + m * 60 + s;
     
     if (totalSecs > 0) {
       setIsActive(false);
@@ -87,10 +89,14 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
   };
 
   const formatTime = (seconds: number) => {
-    const hrs = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+    const hrs = Math.floor((seconds % 86400) / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     
+    if (days > 0) {
+      return `${days}d ${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
     if (hrs > 0) {
       return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
@@ -101,181 +107,90 @@ export const FocusTimer: React.FC<{ t: any; isFullPage?: boolean }> = ({ t, isFu
   const progress = ((totalTime - timeLeft) / totalTime) * 100;
 
   return (
-    <div className={`${isFullPage ? 'min-h-screen p-8 flex flex-col items-center justify-center' : 'premium-card p-10 space-y-10'} relative overflow-hidden group border-zenit-border-primary bg-zenit-surface-1`}>
-      {/* Background Glows */}
-      <div className={`absolute top-0 right-0 w-64 h-64 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none transition-colors duration-1000 ${mode === 'focus' ? 'bg-zenit-accent/10' : 'bg-emerald-500/10'}`} />
-      <div className={`absolute bottom-0 left-0 w-64 h-64 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none transition-colors duration-1000 ${mode === 'focus' ? 'bg-purple-500/10' : 'bg-zenit-accent/10'}`} />
+    <div className={`${isFullPage ? 'min-h-screen p-8 flex flex-col items-center justify-center' : 'p-6 flex items-center justify-between space-x-6'} relative overflow-hidden group border-zenit-border-primary bg-zenit-surface-1 rounded-[2.5rem]`}>
       
-      <div className="flex justify-between items-center w-full relative z-10 max-w-md">
-        <div className="space-y-1.5">
-          <div className="flex items-center space-x-3">
-            <div className={`w-2.5 h-2.5 rounded-full animate-pulse shadow-[0_0_10px_currentColor] ${mode === 'focus' ? 'text-zenit-accent bg-zenit-accent' : 'text-emerald-400 bg-emerald-400'}`} />
-            <h3 className="text-sm font-display font-bold uppercase tracking-[0.3em] text-zenit-text-primary italic">
-              {mode === 'focus' ? 'Protocolo de Foco' : 'Fase de Recuperação'}
-            </h3>
-          </div>
-          <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-black">Sessão #{sessions + 1}</p>
-        </div>
-        <div className="bg-zenit-surface-2 px-4 py-2 rounded-2xl border border-zenit-border-primary flex items-center space-x-2 shadow-sm">
-          <Brain size={14} className={mode === 'focus' ? 'text-zenit-accent' : 'text-emerald-400'} />
-          <span className="text-[10px] text-zenit-text-secondary font-black uppercase tracking-widest">
-            {mode === 'focus' ? 'Trabalho Profundo' : 'Descanso'}
-          </span>
-        </div>
-      </div>
-
-      {/* Custom Timer Input */}
-      {!isActive && mode === 'focus' && (
-        <div className="flex flex-col items-center space-y-6 relative z-10">
-          {!showCustomInput ? (
-            <button
-              onClick={() => setShowCustomInput(true)}
-              className="px-10 py-4 rounded-2xl bg-zenit-text-primary text-zenit-black text-[10px] font-black uppercase tracking-[0.3em] hover:brightness-90 transition-all shadow-xl italic"
-            >
-              Customizar Protocolo
-            </button>
-          ) : (
-            <form onSubmit={handleCustomSubmit} className="flex flex-col items-center space-y-6 bg-zenit-surface-2 p-8 rounded-[2rem] border border-zenit-border-primary backdrop-blur-xl shadow-inner">
-              <div className="flex items-center space-x-4">
-                <div className="flex flex-col items-center space-y-2">
-                  <span className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest">Horas</span>
+      {/* Timer Section */}
+      <div className="flex items-center space-x-5 flex-1 min-w-0">
+        <div className="flex flex-col">
+          {showCustomInput && !isActive ? (
+            <form onSubmit={handleCustomSubmit} className="flex items-center space-x-1.5">
+              {[
+                { value: customDays, setter: setCustomDays, max: 365 },
+                { value: customHours, setter: setCustomHours, max: 23 },
+                { value: customMinutes, setter: setCustomMinutes, max: 59 },
+                { value: customSeconds, setter: setCustomSeconds, max: 59 }
+              ].map((input, idx) => (
+                <div key={idx} className="flex items-center">
                   <input
                     type="number"
                     min="0"
-                    max="23"
-                    value={customHours}
-                    onChange={(e) => setCustomHours(e.target.value)}
-                    className="w-16 bg-zenit-surface-3 border border-zenit-border-primary rounded-xl px-2 py-3 text-center text-zenit-text-primary font-black focus:outline-none focus:border-zenit-accent transition-all"
+                    max={input.max}
+                    value={input.value}
+                    onChange={(e) => input.setter(e.target.value)}
+                    className="w-10 bg-zenit-surface-2 border border-zenit-border-primary/50 rounded-xl py-2 text-xs text-center text-zenit-text-primary font-black focus:outline-none focus:border-zenit-accent transition-all"
                   />
+                  {idx < 3 && <span className="mx-1 text-zenit-text-tertiary/20 text-[8px]">:</span>}
                 </div>
-                <span className="text-xl font-black text-zenit-text-tertiary/20 mt-4">:</span>
-                <div className="flex flex-col items-center space-y-2">
-                  <span className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest">Minutos</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="59"
-                    value={customMinutes}
-                    onChange={(e) => setCustomMinutes(e.target.value)}
-                    className="w-16 bg-zenit-surface-3 border border-zenit-border-primary rounded-xl px-2 py-3 text-center text-zenit-text-primary font-black focus:outline-none focus:border-zenit-accent transition-all"
-                  />
-                </div>
-                <span className="text-xl font-black text-zenit-text-tertiary/20 mt-4">:</span>
-                <div className="flex flex-col items-center space-y-2">
-                  <span className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest">Segundos</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="59"
-                    value={customSeconds}
-                    onChange={(e) => setCustomSeconds(e.target.value)}
-                    className="w-16 bg-zenit-surface-3 border border-zenit-border-primary rounded-xl px-2 py-3 text-center text-zenit-text-primary font-black focus:outline-none focus:border-zenit-accent transition-all"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 w-full">
-                <button 
-                  type="button"
-                  onClick={() => setShowCustomInput(false)}
-                  className="flex-1 bg-zenit-surface-3 text-zenit-text-tertiary py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] italic border border-zenit-border-primary"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  className="flex-[2] bg-zenit-accent text-white py-3 rounded-xl text-[9px] font-black uppercase tracking-[0.3em] shadow-xl shadow-zenit-accent/20 italic"
-                >
-                  Confirmar
-                </button>
-              </div>
+              ))}
+              <button 
+                type="submit" 
+                className="ml-2 w-8 h-8 bg-zenit-accent text-white rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg"
+              >
+                <Zap size={14} fill="currentColor" />
+              </button>
             </form>
+          ) : (
+            <div className="flex flex-col" onClick={() => !isActive && setShowCustomInput(true)}>
+              <div className="flex items-center space-x-2 mb-1">
+                <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${mode === 'focus' ? 'bg-zenit-accent' : 'bg-emerald-400'}`} />
+                <span className="text-[8px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary italic">
+                  {mode === 'focus' ? 'Foco Neural' : 'Recuperação'}
+                </span>
+              </div>
+              <motion.div 
+                key={timeLeft}
+                initial={{ opacity: 0.8 }}
+                animate={{ opacity: 1 }}
+                className="text-4xl font-display font-black tracking-tighter text-zenit-text-primary italic leading-none"
+              >
+                {formatTime(timeLeft)}
+              </motion.div>
+            </div>
           )}
         </div>
-      )}
-
-      <div className="relative flex items-center justify-center py-6">
-        {/* Progress Ring */}
-        <svg className={`${isFullPage ? 'w-80 h-80' : 'w-72 h-72'} transform -rotate-90`}>
-          <circle
-            cx={isFullPage ? "160" : "144"}
-            cy={isFullPage ? "160" : "144"}
-            r={isFullPage ? "150" : "130"}
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="transparent"
-            className="text-zenit-border-primary opacity-20"
-          />
-          <motion.circle
-            cx={isFullPage ? "160" : "144"}
-            cy={isFullPage ? "160" : "144"}
-            r={isFullPage ? "150" : "130"}
-            stroke="currentColor"
-            strokeWidth="6"
-            fill="transparent"
-            strokeDasharray={isFullPage ? "942" : "816"}
-            animate={{ strokeDashoffset: (isFullPage ? 942 : 816) - ((isFullPage ? 942 : 816) * progress) / 100 }}
-            className={`${mode === 'focus' ? 'text-zenit-accent' : 'text-emerald-400'} transition-colors duration-1000`}
-            style={{ filter: `drop-shadow(0 0 12px ${mode === 'focus' ? 'var(--accent-glow)' : 'rgba(52,211,153,0.4)'})` }}
-            transition={{ duration: 1, ease: "linear" }}
-            strokeLinecap="round"
-          />
-        </svg>
-        
-        <div className="absolute inset-0 flex flex-col items-center justify-center space-y-3">
-          <motion.span 
-            key={timeLeft}
-            initial={{ opacity: 0.8, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className={`${isFullPage ? 'text-9xl' : 'text-7xl'} font-mono font-bold tracking-tighter text-zenit-text-primary italic drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]`}
-          >
-            {formatTime(timeLeft)}
-          </motion.span>
-          <div className={`flex items-center space-x-2 px-4 py-1.5 rounded-xl border transition-all duration-1000 ${mode === 'focus' ? 'text-zenit-accent bg-zenit-accent/10 border-zenit-accent/20' : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'}`}>
-            <Sparkles size={14} className="animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.3em]">
-              {mode === 'focus' ? '+100 XP' : 'Recuperando'}
-            </span>
-          </div>
-        </div>
       </div>
 
-      <div className="flex justify-center items-center space-x-10 w-full relative z-10 max-w-md">
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: -180 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={resetTimer}
-          className="w-16 h-16 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center hover:bg-zenit-surface-1 hover:border-zenit-accent/30 transition-all group shadow-sm"
-        >
-          <RotateCcw size={28} className="text-zenit-text-tertiary group-hover:text-zenit-accent transition-all" />
-        </motion.button>
-        
+      {/* Control Section - Square Button at the End */}
+      <div className="flex items-center space-x-3">
+        {isActive && (
+          <button 
+            onClick={resetTimer}
+            className="w-10 h-10 rounded-xl bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-accent transition-all"
+          >
+            <RotateCcw size={16} />
+          </button>
+        )}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={toggleTimer}
-          className={`w-28 h-28 rounded-[40px] flex items-center justify-center transition-all duration-500 relative border-2 ${
+          className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 relative border ${
             isActive 
               ? 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-primary' 
-              : 'bg-zenit-accent border-zenit-accent text-white shadow-[0_0_50px_var(--accent-glow)]'
+              : 'bg-zenit-accent border-zenit-accent text-white shadow-lg shadow-zenit-accent/20'
           }`}
         >
           {isActive ? (
-            <Pause size={48} fill="currentColor" />
+            <Pause size={24} fill="currentColor" stroke="none" />
           ) : (
-            <Play size={48} className="ml-1.5" fill="currentColor" />
-          )}
-          
-          {isActive && (
-            <motion.div
-              animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0, 0.4] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 rounded-[40px] border-2 border-zenit-accent/30"
-            />
+            <Play size={24} className="ml-0.5" fill="currentColor" stroke="none" />
           )}
         </motion.button>
-
-        <div className="w-16 h-16" />
       </div>
+
+      {/* Background Ambience */}
+      <div className={`absolute top-0 right-0 w-32 h-32 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none transition-colors duration-1000 ${mode === 'focus' ? 'bg-zenit-accent/10' : 'bg-emerald-500/10'}`} />
     </div>
+
   );
 };

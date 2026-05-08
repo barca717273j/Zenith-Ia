@@ -4,8 +4,13 @@ import {
   Search, User, Heart, MessageSquare, Share2, Plus, X, 
   Image as ImageIcon, Send, MoreHorizontal, Grid, 
   Bookmark, Shield, Award, Zap, Flame, Camera, 
-  ChevronRight, ArrowLeft, Loader2, ShieldCheck
+  ChevronRight, ArrowLeft, Loader2, ShieldCheck, RotateCcw, Users, Type
 } from 'lucide-react';
+
+const isVideo = (url?: string) => {
+  if (!url) return false;
+  return url.match(/\.(mp4|webm|ogg|mov)$/i) || url.includes('/videos/') || url.includes('video');
+};
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
@@ -50,6 +55,34 @@ interface Story {
   };
 }
 
+
+const NexusLogo = ({ size = 24 }: { size?: number }) => (
+  <div className="relative group overflow-hidden" style={{ width: size, height: size }}>
+    <div className="absolute inset-0 bg-zenit-crimson/10 blur-[15px] rounded-full group-hover:bg-zenit-accent/20 transition-all duration-700" />
+    <svg 
+      viewBox="0 0 100 100" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ width: '100%', height: '100%' }}
+      className="relative z-10 transition-transform duration-700 group-hover:scale-110"
+    >
+      <path 
+        d="M20 20L80 80M80 20L20 80" 
+        stroke="currentColor" 
+        strokeWidth="12" 
+        strokeLinecap="round" 
+        className="text-zenit-accent drop-shadow-[0_0_8px_var(--accent-glow)]"
+      />
+      <circle 
+        cx="50" 
+        cy="50" 
+        r="15" 
+        className="fill-zenit-crimson animate-pulse"
+      />
+    </svg>
+  </div>
+);
+
 export const Nexus: React.FC<SocialProps> = ({ t }) => {
   const { userData, refreshUserData, checkLimit, incrementUsage } = useUser();
   const [activeTab, setActiveTab] = useState<'feed' | 'discover' | 'profile'>('feed');
@@ -66,6 +99,9 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
   const [newNexusText, setNewNexusText] = useState('');
   const [nexusTextPos, setNexusTextPos] = useState({ x: 0, y: 0 });
   const [nexusTextScale, setNexusTextScale] = useState(1);
+  const [nexusTextRotation, setNexusTextRotation] = useState(0);
+  const [nexusTextColor, setNexusTextColor] = useState('#FFFFFF');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [newPostType, setNewPostType] = useState<Post['type']>('thought');
   const [newPostImage, setNewPostImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -288,7 +324,9 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
               text: newNexusText,
               x: nexusTextPos.x,
               y: nexusTextPos.y,
-              scale: nexusTextScale
+              scale: nexusTextScale,
+              rotation: nexusTextRotation,
+              color: nexusTextColor
             }),
           }
         ]);
@@ -299,6 +337,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
       setNewNexusText('');
       setNexusTextPos({ x: 0, y: 0 });
       setNexusTextScale(1);
+      setNexusTextRotation(0);
       setNewPostImage(null);
       setImagePreview(null);
       setIsNexusModalOpen(false);
@@ -365,7 +404,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
   };
 
   const renderFeed = () => (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-8 pb-24">
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-4">
           <Loader2 className="w-8 h-8 text-zenit-accent animate-spin" />
@@ -492,125 +531,134 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
       <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-zenit-accent/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-zenit-nav backdrop-blur-3xl px-8 h-24 flex items-center justify-between border-b border-zenit-border-primary">
-        <div className="flex items-center space-x-6">
-          {selectedUserId && activeTab === 'profile' ? (
-            <button 
-              onClick={() => {
-                setSelectedUserId(null);
-                setActiveTab('feed');
-              }}
-              className="w-12 h-12 flex items-center justify-center bg-zenit-glass hover:bg-zenit-surface-2 rounded-full transition-all active:scale-90 border border-zenit-glass-border shadow-2xl"
-            >
-              <ArrowLeft size={20} className="text-zenit-text-primary" />
-            </button>
-          ) : (
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-display font-black tracking-tighter text-zenit-text-primary italic leading-none uppercase">
+      {/* Header - Redesigned & Centered Logo */}
+      <header className="sticky top-0 z-50 bg-zenit-nav/90 backdrop-blur-3xl border-b border-zenit-border-primary">
+        <div className="max-w-3xl mx-auto px-6 h-32 flex flex-col justify-center relative">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center space-x-6 w-1/4">
+              {selectedUserId && activeTab === 'profile' ? (
+                <button 
+                  onClick={() => {
+                    setSelectedUserId(null);
+                    setActiveTab('feed');
+                  }}
+                  className="w-10 h-10 flex items-center justify-center bg-zenit-glass hover:bg-zenit-surface-2 rounded-xl transition-all active:scale-90 border border-zenit-glass-border"
+                >
+                  <ArrowLeft size={18} className="text-zenit-text-primary" />
+                </button>
+              ) : (
+                <div className="flex items-center space-x-2 opacity-50">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zenit-crimson animate-pulse" />
+                  <span className="text-[7px] font-black uppercase tracking-[0.4em] text-zenit-text-primary italic">Ativo</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col items-center group cursor-pointer" onClick={() => fetchPosts()}>
+              <div className="relative">
+                <div className="absolute inset-0 bg-zenit-accent/10 blur-2xl rounded-full group-hover:bg-zenit-accent/20 transition-colors" />
+                <NexusLogo size={56} />
+              </div>
+              <h1 className="text-2xl font-display font-black tracking-[0.5em] text-zenit-text-primary italic mt-2 ml-2">
                 NEXUS
               </h1>
-              <div className="flex items-center space-x-3 mt-2 opacity-30">
-                <div className="w-1 h-1 rounded-full bg-zenit-accent animate-ping" />
-                <span className="text-[7.5px] font-black uppercase tracking-[0.5em] text-zenit-text-primary">Neural Net v5.1</span>
-              </div>
             </div>
-          )}
+
+            <div className="flex items-center justify-end space-x-4 w-1/4">
+               <button 
+                onClick={() => setIsFabOpen(!isFabOpen)}
+                className="w-12 h-12 flex items-center justify-center bg-zenit-surface-2 hover:bg-zenit-surface-3 rounded-2xl text-zenit-text-primary transition-all relative border border-zenit-border-primary shadow-xl"
+              >
+                <Plus size={24} strokeWidth={2.5} className={`transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`} />
+                
+                {/* FAB Dropdown Menu */}
+                <AnimatePresence>
+                  {isFabOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      className="absolute top-full right-0 mt-4 w-48 bg-zenit-surface-1/98 backdrop-blur-3xl border border-zenit-border-primary rounded-[2.5rem] shadow-2xl overflow-hidden p-2 z-[60]"
+                    >
+                      <button
+                        onClick={() => {
+                          setIsNexusModalOpen(true);
+                          setIsFabOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-4 px-5 py-4 hover:bg-zenit-surface-2 rounded-2xl transition-all group"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-zenit-crimson flex items-center justify-center shadow-lg shadow-zenit-crimson/20">
+                          <Camera size={18} className="text-white" />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary group-hover:text-zenit-text-primary">Nexus Stream</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          setIsCreateModalOpen(true);
+                          setIsFabOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-4 px-5 py-4 hover:bg-zenit-surface-2 rounded-2xl transition-all group"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-zenit-accent flex items-center justify-center shadow-lg shadow-zenit-accent/20">
+                          <ImageIcon size={18} className="text-white" />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary group-hover:text-zenit-text-primary">Visual Post</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Search Bar - Fixed Width */}
-        <div className="flex-1 max-w-[200px] sm:max-w-md mx-6 relative" ref={searchRef}>
-          <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-all" />
+        {/* Global Search Sub-Header */}
+        <div className="max-w-3xl mx-auto px-6 pb-6 pt-2">
+          <div className="relative group" ref={searchRef}>
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-all" />
             <input 
               type="text"
-              placeholder="Explorar..."
+              placeholder="Sincronizar com outros agentes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zenit-glass border border-zenit-glass-border rounded-[2rem] py-3.5 pl-12 pr-6 text-[10px] uppercase font-black tracking-widest focus:outline-none focus:border-zenit-accent/20 focus:bg-zenit-surface-2 transition-all placeholder:text-zenit-text-tertiary/40 text-zenit-text-primary shadow-2xl"
+              className="w-full bg-zenit-surface-2/50 border border-zenit-border-primary rounded-[2rem] py-4 pl-14 pr-8 text-[9px] uppercase font-bold tracking-[0.2em] focus:outline-none focus:border-zenit-accent/30 focus:bg-zenit-surface-2 transition-all placeholder:text-zenit-text-tertiary/20 text-zenit-text-primary shadow-inner"
             />
-          </div>
 
-          {/* Search Results Dropdown */}
-          <AnimatePresence>
-            {isSearching && searchResults.length > 0 && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 right-0 mt-3 bg-zenit-surface-1 rounded-3xl overflow-hidden z-50 border border-zenit-border-primary shadow-2xl p-2"
-              >
-                {searchResults.map((user) => (
-                  <button
-                    key={user.id}
-                    onClick={() => {
-                      setSelectedUserId(user.id);
-                      setActiveTab('profile');
-                      setIsSearching(false);
-                      setSearchQuery('');
-                    }}
-                    className="w-full p-3 flex items-center space-x-3 hover:bg-zenit-surface-2 rounded-2xl transition-colors"
-                  >
-                    <img 
-                      src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
-                      className="w-9 h-9 rounded-full object-cover border border-zenit-border-primary"
-                    />
-                    <div className="text-left">
-                      <p className="text-xs font-black text-white">@{user.username}</p>
-                      <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest opacity-40">Nível {user.level}</p>
-                    </div>
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <div className="flex items-center space-x-1 sm:space-x-2">
-          <button 
-            onClick={() => setIsFabOpen(!isFabOpen)}
-            className="w-10 h-10 flex items-center justify-center bg-zenit-surface-2 hover:bg-zenit-surface-3 rounded-full text-zenit-text-primary transition-all relative border border-zenit-border-primary shadow-sm"
-          >
-            <Plus size={20} strokeWidth={2.5} className={`transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`} />
-            
-            {/* FAB Dropdown Menu */}
+            {/* Search Results Dropdown */}
             <AnimatePresence>
-              {isFabOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-4 w-44 bg-zenit-surface-1/95 backdrop-blur-2xl border border-zenit-border-primary rounded-[2rem] shadow-2xl overflow-hidden p-2 z-[60]"
+              {isSearching && searchResults.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute top-full left-0 right-0 mt-4 bg-zenit-surface-1 rounded-[2.5rem] overflow-hidden z-50 border border-zenit-border-primary shadow-[0_30px_60px_rgba(0,0,0,0.5)] p-2"
                 >
-                  <button
-                    onClick={() => {
-                      setIsNexusModalOpen(true);
-                      setIsFabOpen(false);
-                    }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-xl transition-all group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-zenit-crimson flex items-center justify-center">
-                      <Camera size={14} className="text-white" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary group-hover:text-zenit-text-primary">Nexus</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      setIsCreateModalOpen(true);
-                      setIsFabOpen(false);
-                    }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-zenit-surface-2 rounded-xl transition-all group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-zenit-accent flex items-center justify-center">
-                      <ImageIcon size={14} className="text-white" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary group-hover:text-zenit-text-primary">Post</span>
-                  </button>
+                  {searchResults.map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => {
+                        setSelectedUserId(user.id);
+                        setActiveTab('profile');
+                        setIsSearching(false);
+                        setSearchQuery('');
+                      }}
+                      className="w-full p-4 flex items-center space-x-4 hover:bg-zenit-surface-2 rounded-[1.5rem] transition-colors"
+                    >
+                      <img 
+                        src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
+                        className="w-12 h-12 rounded-2xl object-cover border border-zenit-border-primary"
+                      />
+                      <div className="text-left py-1">
+                        <p className="text-sm font-black text-white italic tracking-tight uppercase">@{user.username}</p>
+                        <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-widest opacity-40 mt-1">Sinal Neural: Nível {user.level}</p>
+                      </div>
+                    </button>
+                  ))}
                 </motion.div>
               )}
             </AnimatePresence>
-          </button>
+          </div>
         </div>
       </header>
 
@@ -620,17 +668,25 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
           {/* Futuristic Grid Line */}
           <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-zenit-accent/20 to-transparent" />
           
-          <div className="flex px-6 space-x-6 items-center overflow-x-auto scrollbar-hide">
+          <div className="flex px-6 pb-4 space-x-6 items-center overflow-x-auto scrollbar-hide">
             {/* Create Nexus - Discrete Action */}
             <div className="flex flex-col items-center space-y-3 flex-shrink-0">
-              <motion.button 
+              <motion.label 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setIsNexusModalOpen(true)}
-                className="w-16 h-16 rounded-full flex items-center justify-center bg-zenit-surface-2 border border-zenit-border-primary hover:border-zenit-accent/40 transition-colors group shadow-sm"
+                className="w-16 h-16 rounded-full flex items-center justify-center bg-zenit-surface-2 border border-zenit-border-primary hover:border-zenit-accent/40 transition-colors group shadow-sm cursor-pointer"
               >
+                <input 
+                  type="file" 
+                  accept="image/*,video/*" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    handleImageChange(e);
+                    setIsNexusModalOpen(true);
+                  }} 
+                />
                 <Plus size={24} className="text-zenit-text-tertiary group-hover:text-zenit-accent transition-colors" />
-              </motion.button>
+              </motion.label>
               <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.4em] italic">Capturar</span>
             </div>
             
@@ -681,7 +737,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-6 pb-44 space-y-12">
+      <main className="max-w-3xl mx-auto px-6 pb-64 space-y-14">
         {activeTab === 'feed' ? renderFeed() : activeTab === 'discover' ? renderDiscover() : renderProfile()}
       </main>
 
@@ -697,272 +753,182 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
         )}
       </AnimatePresence>
 
-      {/* Create Post Modal */}
-      <AnimatePresence>
-        {isCreateModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsCreateModalOpen(false)}
-              className="absolute inset-0 bg-black/95 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-sm bg-zenit-surface-1 rounded-[2.5rem] overflow-hidden max-h-[85vh] flex flex-col"
-            >
-              <div className="p-6 flex items-center justify-between">
-                <h2 className="text-base font-display font-bold uppercase tracking-tight text-zenit-text-primary">{t.social.post}</h2>
-                <button onClick={() => setIsCreateModalOpen(false)} className="p-2 hover:bg-zenit-surface-2 rounded-full transition-colors">
-                  <X size={18} className="text-zenit-text-tertiary" />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-6 overflow-y-auto scrollbar-hide">
-                {/* Post Type Selector */}
-                <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {(['thought', 'achievement', 'routine', 'reflection'] as Post['type'][]).map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => setNewPostType(type)}
-                      className={`px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest whitespace-nowrap transition-all border ${
-                        newPostType === type 
-                          ? 'bg-zenit-accent text-white' 
-                          : 'bg-zenit-surface-1 text-zenit-text-tertiary hover:bg-zenit-surface-2'
-                      }`}
-                    >
-                      {type === 'thought' ? 'Pensamento' : type === 'achievement' ? 'Conquista' : type === 'routine' ? 'Rotina' : 'Reflexão'}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Content Area */}
-                <div className="space-y-4">
-                  {error && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-[10px] uppercase tracking-widest font-bold flex flex-col space-y-2">
-                      <span>{error}</span>
-                    </div>
-                  )}
-
-                  {imagePreview && (
-                    <div className="relative rounded-2xl overflow-hidden aspect-[4/5]">
-                      <img src={imagePreview} className="w-full h-full object-cover" />
-                      
-                      {/* Text Overlay Preview for Post */}
-                      {newPostContent && (
-                        <div className="absolute inset-0 flex items-center justify-center px-10 text-center pointer-events-none">
-                          <p className="text-2xl font-display italic text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-                            {newPostContent}
-                          </p>
-                        </div>
-                      )}
-
-                      <button 
-                        onClick={() => {
-                          setNewPostImage(null);
-                          setImagePreview(null);
-                        }}
-                        className="absolute top-2 right-2 p-1.5 bg-zenit-black/60 backdrop-blur-md rounded-full text-zenit-text-primary hover:bg-zenit-black/80 transition-all"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-zenit-text-tertiary ml-2">Texto na Imagem</label>
-                    <textarea
-                      value={newPostContent}
-                      onChange={(e) => setNewPostContent(e.target.value)}
-                      placeholder="Escreva algo para aparecer na imagem..."
-                      className="w-full bg-zenit-surface-2 rounded-2xl p-5 text-sm text-zenit-text-primary placeholder:text-zenit-text-tertiary/40 focus:outline-none focus:border-zenit-accent/30 transition-all resize-none"
-                      rows={3}
-                    />
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-4">
-                  <label className="flex items-center space-x-2 px-4 py-2 bg-zenit-surface-1 rounded-xl cursor-pointer hover:bg-zenit-surface-2 transition-all">
-                    <ImageIcon size={16} className="text-zenit-accent" />
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-zenit-text-secondary">Foto</span>
-                    <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-                  </label>
-
-                  <button
-                    onClick={handleCreatePost}
-                    disabled={isPublishing || (!newPostContent.trim() && !newPostImage)}
-                    className="px-6 py-3 bg-zenit-text-primary text-zenit-black rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] flex items-center space-x-2 disabled:opacity-50 hover:opacity-90 transition-all"
-                  >
-                    {isPublishing ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <>
-                        <Send size={14} />
-                        <span>Publicar</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Story Detail Modal (Viewer) */}
-      <AnimatePresence>
-        {selectedStory && (
-          <StoryViewer 
-            story={selectedStory} 
-            onClose={() => setSelectedStory(null)} 
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Nexus Creation Modal (The Capture) */}
+      {/* Create Nexus Modal - Redesigned Streamlined Flow */}
       <AnimatePresence>
         {isNexusModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[150] flex items-center justify-center">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsNexusModalOpen(false)}
-              className="absolute inset-0 bg-black/95 backdrop-blur-xl"
+              className="absolute inset-0 bg-black/98 backdrop-blur-2xl"
             />
+            
             <motion.div 
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
-              className="relative w-full max-w-sm bg-zenit-surface-1 border border-zenit-border-primary rounded-[4rem] overflow-hidden flex flex-col p-2 shadow-2xl"
+              initial={{ opacity: 0, scale: 0.9, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 50 }}
+              className="relative w-full h-full sm:max-w-md sm:h-[85vh] bg-zenit-black sm:rounded-[4rem] overflow-hidden flex flex-col items-center justify-center selection:bg-zenit-crimson/40"
             >
-              <div className="p-8 space-y-8">
-                <div className="flex justify-between items-center">
-                  <div className="space-y-1">
-                    <h3 className="text-2xl font-display font-black text-zenit-text-primary uppercase italic tracking-tighter leading-none">NEXUS CAPTURE</h3>
-                    <div className="flex items-center space-x-2">
-                       <div className="w-1 h-1 rounded-full bg-zenit-accent animate-pulse" />
-                       <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em]">Neural Stream v5.0</p>
+              {imagePreview ? (
+                <div className="relative w-full h-full group">
+                  {isVideo(imagePreview) ? (
+                    <video src={imagePreview} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+                  ) : (
+                    <img src={imagePreview} className="w-full h-full object-cover" />
+                  )}
+
+                  {/* Top Control Bar - Elevated Crimson Buttons */}
+                  <div className="absolute top-12 inset-x-8 flex justify-between items-center z-50">
+                    <button 
+                      onClick={() => setIsNexusModalOpen(false)}
+                      className="w-14 h-14 bg-black/60 backdrop-blur-3xl rounded-2xl flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-2xl"
+                    >
+                      <X size={24} />
+                    </button>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button 
+                        onClick={() => setNewNexusText(newNexusText ? '' : 'Diga algo...')}
+                        className={`px-8 h-14 backdrop-blur-3xl rounded-2xl flex items-center justify-center border font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 shadow-2xl space-x-2 italic ${newNexusText ? 'bg-zenit-crimson text-white border-zenit-crimson' : 'bg-black/60 text-white border-white/10'}`}
+                      >
+                        <Type size={16} />
+                        <span>Texto</span>
+                      </button>
+
+                      <button
+                        onClick={handleCreateNexus}
+                        disabled={isPublishing}
+                        className="px-8 h-14 bg-zenit-crimson text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_15px_30px_rgba(255,38,33,0.3)] transition-all active:scale-95 flex items-center justify-center space-x-2 border border-white/20 italic"
+                      >
+                        {isPublishing ? <Loader2 className="animate-spin" size={16} /> : (
+                          <>
+                            <Zap size={16} />
+                            <span>Postar</span>
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
-                  <button onClick={() => setIsNexusModalOpen(false)} className="w-12 h-12 rounded-full bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:text-zenit-text-primary transition-all border border-zenit-border-primary shadow-sm">
-                    <X size={20} />
+
+                  {/* Floating Text Input */}
+                  {newNexusText !== '' && (
+                    <div className="absolute inset-0 flex items-center justify-center p-12 z-10 pointer-events-none">
+                      <motion.textarea
+                        autoFocus
+                        value={newNexusText}
+                        onChange={(e) => setNewNexusText(e.target.value)}
+                        className="w-full bg-transparent border-none text-center text-3xl font-display font-black text-white italic drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)] placeholder:text-white/20 focus:outline-none pointer-events-auto resize-none"
+                        style={{ textShadow: '0 5px 20px rgba(0,0,0,1)' }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-10 text-center space-y-8">
+                  <div className="w-32 h-32 rounded-[2.5rem] bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center mx-auto shadow-2xl animate-pulse">
+                    <Camera size={48} className="text-zenit-text-tertiary" />
+                  </div>
+                  <div className="space-y-3">
+                    <h2 className="text-2xl font-display font-black text-zenit-text-primary italic tracking-tight">VÁCUO NEURAL</h2>
+                    <p className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] max-w-[200px] mx-auto opacity-40">Selecione um sinal da sua galeria para transmissão.</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*,video/*';
+                      input.onchange = (e: any) => handleImageChange(e);
+                      input.click();
+                    }}
+                    className="px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-[10px] rounded-2xl active:scale-95 transition-all shadow-xl"
+                  >
+                    Abrir Galeria
                   </button>
                 </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
-                <div className="space-y-6">
-                  {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-[10px] uppercase tracking-widest font-black text-center">
-                      {error}
-                    </div>
-                  )}
 
-                  <div 
-                    onClick={() => !imagePreview && document.getElementById('nexus-image')?.click()}
-                    className="aspect-[3/4] w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[3rem] flex flex-col items-center justify-center cursor-pointer hover:bg-zenit-surface-3 transition-all overflow-hidden group relative shadow-inner"
-                  >
-                    {imagePreview ? (
-                      <>
-                        <img src={imagePreview} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/40" />
-                        
-                        {newNexusText && (
-                          <div className="absolute inset-0 z-20">
-                            <motion.div 
-                              drag
-                              dragMomentum={false}
-                              onDragEnd={(_, info) => {
-                                setNexusTextPos(prev => ({ 
-                                  x: prev.x + info.offset.x, 
-                                  y: prev.y + info.offset.y 
-                                }));
-                              }}
-                              animate={{ x: nexusTextPos.x, y: nexusTextPos.y, scale: nexusTextScale }}
-                              style={{ touchAction: 'none' }}
-                              className="cursor-move p-4 active:scale-95 transition-transform"
-                            >
-                              <p 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  document.getElementById('nexus-text-input')?.focus();
-                                }}
-                                className="text-3xl font-display font-black italic text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] uppercase tracking-tighter text-center"
-                              >
-                                {newNexusText}
-                              </p>
-                            </motion.div>
-                          </div>
-                        )}
-
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setNewPostImage(null);
-                            setImagePreview(null);
-                          }}
-                          className="absolute top-6 right-6 p-3 bg-black/80 rounded-full text-white shadow-2xl"
-                        >
-                          <X size={20} />
-                        </button>
-                      </>
-                    ) : (
-                      <div className="flex flex-col items-center space-y-4 group-hover:scale-110 transition-transform duration-500">
-                        <div className="w-20 h-20 rounded-[2rem] bg-zenit-surface-3 flex items-center justify-center border border-zenit-border-primary group-hover:bg-zenit-text-primary group-hover:text-zenit-black transition-all shadow-md">
-                          <Camera size={32} />
-                        </div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary group-hover:text-zenit-text-primary">Abrir Sinal Visual</p>
-                      </div>
-                    )}
-                    <input id="nexus-image" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center px-2">
-                      <label className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary italic">Tamanho do Ajuste</label>
-                      <span className="text-[8px] font-mono text-zenit-accent font-bold">{Math.round(nexusTextScale * 100)}%</span>
-                    </div>
-                    <input 
-                      type="range" 
-                      min="0.5" 
-                      max="2.5" 
-                      step="0.1"
-                      value={nexusTextScale}
-                      onChange={(e) => setNexusTextScale(parseFloat(e.target.value))}
-                      className="w-full h-1.5 bg-zenit-surface-2 rounded-full appearance-none cursor-pointer accent-zenit-accent"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary ml-2 italic">Mensagem Neural</label>
-                    <input
-                      id="nexus-text-input"
-                      value={newNexusText}
-                      onChange={(e) => setNewNexusText(e.target.value)}
-                      placeholder="ESCREVA SEU PROTOCOLO..."
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl p-5 text-xs font-black text-zenit-text-primary italic placeholder:text-zenit-text-tertiary/10 focus:outline-none focus:border-zenit-accent/30 transition-all uppercase tracking-widest shadow-inner"
-                      maxLength={60}
-                    />
-                  </div>
+      {/* Create Post Modal - Crimson Theme */}
+      <AnimatePresence>
+        {isCreateModalOpen && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute inset-0 bg-black/98 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm bg-zenit-surface-1 rounded-[3rem] overflow-hidden border-2 border-zenit-crimson/20 shadow-[0_0_80px_rgba(255,38,33,0.15)] flex flex-col"
+            >
+              <div className="p-8 pb-4 flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-1.5 h-6 bg-zenit-crimson rounded-full" />
+                  <h2 className="text-xl font-display font-black uppercase tracking-tight text-white italic">Fazer <span className="text-zenit-crimson">Postagem</span></h2>
                 </div>
-
-                <button
-                  onClick={handleCreateNexus}
-                  disabled={isPublishing || !newPostImage}
-                  className="w-full py-6 bg-zenit-text-primary text-zenit-black rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.5em] flex items-center justify-center space-x-3 disabled:opacity-20 hover:brightness-90 transition-all italic shadow-2xl"
-                >
-                  {isPublishing ? (
-                    <Loader2 size={18} className="animate-spin" />
-                  ) : (
-                    <>
-                      <Send size={18} />
-                      <span>Transmitir Nexus</span>
-                    </>
-                  )}
+                <button onClick={() => setIsCreateModalOpen(false)} className="w-12 h-12 flex items-center justify-center bg-zenit-surface-2 hover:bg-zenit-surface-3 rounded-2xl transition-all active:scale-90">
+                  <X size={20} className="text-zenit-text-tertiary" />
                 </button>
+              </div>
+
+              <div className="p-8 space-y-8 overflow-y-auto scrollbar-hide">
+                {imagePreview ? (
+                  <div className="relative rounded-[2.5rem] overflow-hidden aspect-[4/5] border border-zenit-border-primary">
+                    <img src={imagePreview} className="w-full h-full object-cover" />
+                    <button 
+                      onClick={() => {
+                        setNewPostImage(null);
+                        setImagePreview(null);
+                      }}
+                      className="absolute top-6 right-6 w-10 h-10 bg-black/40 backdrop-blur-xl rounded-xl flex items-center justify-center text-white border border-white/20 active:scale-95 transition-all"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*,video/*';
+                      input.onchange = (e: any) => handleImageChange(e);
+                      input.click();
+                    }}
+                    className="w-full aspect-[4/5] bg-zenit-surface-2 rounded-[2.5rem] border-2 border-dashed border-zenit-border-primary flex flex-col items-center justify-center group hover:border-zenit-crimson/50 transition-all duration-700"
+                  >
+                    <div className="p-6 rounded-[2rem] bg-zenit-surface-1 border border-zenit-border-primary group-hover:scale-110 transition-transform duration-700">
+                      <ImageIcon size={32} className="text-zenit-text-tertiary group-hover:text-zenit-crimson transition-colors" />
+                    </div>
+                    <span className="mt-6 text-[9px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary">Anexar Captura</span>
+                  </button>
+                )}
+
+                <div className="space-y-4">
+                  <textarea
+                    placeholder="O que está processando?"
+                    value={newPostContent}
+                    onChange={(e) => setNewPostContent(e.target.value)}
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[2.5rem] p-8 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-crimson/30 transition-all min-h-[140px] resize-none placeholder:text-zenit-text-tertiary/20 font-medium shadow-inner"
+                  />
+                  
+                  <button
+                    onClick={handleCreatePost}
+                    disabled={isPublishing || (!newPostContent.trim() && !newPostImage)}
+                    className="w-full py-6 bg-zenit-crimson text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.5em] shadow-[0_20px_50px_rgba(255,38,33,0.3)] hover:scale-105 transition-all active:scale-95 disabled:opacity-50 italic"
+                  >
+                    {isPublishing ? <Loader2 className="animate-spin mx-auto" size={18} /> : 'Processar Postagem'}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -980,9 +946,9 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
       if (story.content?.startsWith('{')) {
         return JSON.parse(story.content);
       }
-      return { text: story.content, x: 0, y: 0, scale: 1 };
+      return { text: story.content, x: 0, y: 0, scale: 1, rotation: 0, color: '#FFFFFF' };
     } catch (e) {
-      return { text: story.content, x: 0, y: 0, scale: 1 };
+      return { text: story.content, x: 0, y: 0, scale: 1, rotation: 0, color: '#FFFFFF' };
     }
   })();
 
@@ -1014,7 +980,7 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
         {/* Neural Sync Progress */}
         <div className="absolute top-0 left-0 right-0 p-8 z-30 space-y-4">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.5em] italic">Neural Sync In-Progress...</span>
+            <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.5em] italic">Preparando Transmissão...</span>
             <span className="text-[7.5px] font-mono text-zenit-text-tertiary">{Math.floor(progress)}%</span>
           </div>
           <div className="h-[2px] w-full bg-zenit-surface-2 rounded-full overflow-hidden backdrop-blur-md">
@@ -1050,25 +1016,38 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
 
         {/* Visual Stream Area */}
         <div className="w-full h-full relative">
-          <img 
-            src={story.image_url} 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
+          {isVideo(story.image_url) ? (
+            <video 
+              src={story.image_url} 
+              className="w-full h-full object-cover" 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+            />
+          ) : (
+            <img 
+              src={story.image_url} 
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          )}
           {/* Digital Distortion Overlays */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] [background-size:20px_20px]" />
           
           {storyData.text && (
-            <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
               <motion.p 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: storyData.scale || 1 }}
                 style={{ 
                   x: storyData.x || 0, 
-                  y: storyData.y || 0 
+                  y: storyData.y || 0,
+                  rotate: storyData.rotation || 0,
+                  color: storyData.color || '#FFFFFF'
                 }}
-                className="text-3xl font-display font-black italic text-white uppercase leading-none tracking-tighter drop-shadow-2xl text-center"
+                className="text-4xl font-display font-black italic uppercase leading-none tracking-tighter drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-center break-words max-w-[90%]"
               >
                 {storyData.text}
               </motion.p>
@@ -1079,8 +1058,8 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
         {/* Technical Footer Metadata */}
         <div className="absolute bottom-12 inset-x-0 px-8 flex items-center justify-between opacity-30 z-30">
           <div className="flex flex-col space-y-1">
-            <span className="text-[7px] font-black text-white uppercase tracking-[0.5em]">Bit-Stream Alpha v5.1</span>
-            <span className="text-[6px] font-mono text-white/50">HASH_{story.id.slice(0, 12).toUpperCase()}</span>
+            <span className="text-[7px] font-black text-white uppercase tracking-[0.5em]">Transmissão Protegida Zenith</span>
+            <span className="text-[6px] font-mono text-white/50">SECURE_{story.id.slice(0, 12).toUpperCase()}</span>
           </div>
           <div className="w-10 h-10 border border-white/20 rounded-lg flex items-center justify-center">
              <Zap size={12} className="text-white" />
@@ -1168,7 +1147,18 @@ const PostCard: React.FC<{ post: Post; onLike: () => void; onViewProfile: () => 
       <div className="relative" onDoubleClick={handleDoubleTap}>
         {post.image_url ? (
           <div className="aspect-[4/5] bg-zenit-black relative transition-all duration-700 overflow-hidden">
-            <img src={post.image_url} className="w-full h-full object-cover group-hover/card:scale-105 transition-all duration-[2s]" referrerPolicy="no-referrer" />
+            {isVideo(post.image_url) ? (
+              <video 
+                src={post.image_url} 
+                className="w-full h-full object-cover group-hover/card:scale-105 transition-all duration-[2s]" 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+              />
+            ) : (
+              <img src={post.image_url} className="w-full h-full object-cover group-hover/card:scale-105 transition-all duration-[2s]" referrerPolicy="no-referrer" />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
             
             {/* Minimal Typography Overlay */}
@@ -1351,7 +1341,16 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any 
         {/* Post Media */}
         <div className="md:w-3/5 bg-zenit-black flex items-center justify-center overflow-hidden">
           {post.image_url ? (
-            <img src={post.image_url} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+            isVideo(post.image_url) ? (
+              <video 
+                src={post.image_url} 
+                className="w-full h-full object-contain" 
+                controls
+                autoPlay
+              />
+            ) : (
+              <img src={post.image_url} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+            )
           ) : (
             <div className="p-12 text-center">
               <p className="text-xl font-display italic text-zenit-text-primary leading-relaxed">"{post.content}"</p>
@@ -1402,7 +1401,7 @@ const PostDetailModal: React.FC<{ post: any; onClose: () => void; userData: any 
               {loadingComments ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <Loader2 size={24} className="text-zenit-accent animate-spin" />
-                  <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold">Sincronizando Neural Network...</p>
+                  <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-bold">Carregando Reflexões...</p>
                 </div>
               ) : comments.length > 0 ? (
                 comments.map((comment) => (

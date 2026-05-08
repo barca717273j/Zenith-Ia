@@ -63,10 +63,10 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab,
         </div>
         <div className="flex-1 flex justify-center">
           <NavItem
-            icon={<ListTodo />}
-            label="Rotina"
-            isActive={activeTab === 'tasks'}
-            onClick={() => setActiveTab('tasks')}
+            icon={<Wallet />}
+            label="Finanças"
+            isActive={activeTab === 'finance'}
+            onClick={() => setActiveTab('finance')}
           />
         </div>
         
@@ -92,8 +92,16 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab,
 
         <div className="flex-1 flex justify-center">
           <NavItem
-            icon={<Users />}
-            label="Nexus"
+            icon={<Dumbbell />}
+            label="Exercícios"
+            isActive={activeTab === 'exercises'}
+            onClick={() => setActiveTab('exercises')}
+          />
+        </div>
+        <div className="flex-1 flex justify-center">
+          <NavItem
+            icon={<Zap />}
+            label="NEXUS"
             isActive={activeTab === 'social'}
             onClick={() => setActiveTab('social')}
           />

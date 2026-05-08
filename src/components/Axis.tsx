@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Brain, Target, Zap, Loader2, Sparkles, History, Trash2, CheckCircle2, AlertTriangle, Scale, ChevronRight, Activity, Dumbbell, Wallet, Shield, ArrowUpRight, Crown } from 'lucide-react';
+import { Brain, Target, Zap, Loader2, Sparkles, History, Trash2, CheckCircle2, AlertTriangle, Scale, ChevronRight, Activity, Dumbbell, Wallet, Shield, ArrowUpRight, Crown, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 import { askAI } from '../services/gemini';
@@ -13,7 +13,7 @@ interface Decision {
   created_at: string;
 }
 
-export const Axis: React.FC<{ t: any }> = ({ t }) => {
+export const Axis: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBack }) => {
   const { userData } = useUser();
   const { dailyProgress } = useGamification();
   const [query, setQuery] = useState('');
@@ -232,7 +232,7 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
   }, [areas, overallProgress, axisT.quotes]);
 
   return (
-    <div className="p-6 space-y-12 pb-32 max-w-2xl mx-auto min-h-screen bg-zenit-black text-zenit-text-primary relative overflow-hidden">
+    <div className="p-6 space-y-12 pb-56 max-w-2xl mx-auto min-h-screen bg-zenit-black text-zenit-text-primary relative overflow-hidden">
       {/* Living Background Elements */}
       <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-zenit-scarlet/5 rounded-full blur-[120px] animate-pulse-glow" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-zenit-scarlet/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
@@ -240,6 +240,14 @@ export const Axis: React.FC<{ t: any }> = ({ t }) => {
       <header className="space-y-4 relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
+            {onBack && (
+              <button 
+                onClick={onBack}
+                className="w-12 h-12 flex items-center justify-center bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-95"
+              >
+                <ArrowLeft size={20} />
+              </button>
+            )}
             <div className="w-16 h-16 rounded-[2rem] bg-zenit-surface-1/40 backdrop-blur-xl border border-zenit-border-primary flex items-center justify-center shadow-2xl">
               <Scale size={32} className="text-zenit-scarlet" />
             </div>

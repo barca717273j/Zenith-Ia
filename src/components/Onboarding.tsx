@@ -10,7 +10,7 @@ interface OnboardingProps {
   onComplete: () => void;
 }
 
-type OnboardingStep = 'welcome' | 'objective' | 'energy' | 'schedule' | 'identity' | 'focus' | 'finalizing';
+type OnboardingStep = 'welcome' | 'protocol' | 'schedule' | 'finalizing';
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const { userData } = useUser();
@@ -18,12 +18,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [loading, setLoading] = useState(false);
   
   // Form State
-  const [objective, setObjective] = useState('');
+  const [objective, setObjective] = useState('performance');
   const [energyLevel, setEnergyLevel] = useState(80);
   const [wakeTime, setWakeTime] = useState('06:00');
   const [sleepTime, setSleepTime] = useState('22:00');
   const [identity, setIdentity] = useState('');
-  const [focus, setFocus] = useState('');
+  const [focus, setFocus] = useState('productivity');
 
   const lang: Language = userData?.language || 'pt-BR';
   const t = translations[lang];
@@ -114,7 +114,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               </p>
             </div>
             <button
-              onClick={() => setStep('objective')}
+              onClick={() => setStep('protocol')}
               className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group shadow-[0_0_30px_rgba(255,38,33,0.3)]"
             >
               {t.common.start}
@@ -123,84 +123,48 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           </motion.div>
         );
 
-      case 'objective':
+      case 'protocol':
         return (
           <motion.div
-            key="objective"
+            key="protocol"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             className="space-y-8"
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-display font-bold text-white uppercase tracking-tight">{t.onboarding.step1Title}</h2>
-              <p className="text-white/40 text-sm">{t.onboarding.step1Desc}</p>
+              <h2 className="text-2xl font-display font-medium text-zenit-text-primary uppercase tracking-tight italic">Escolha seu Protocolo</h2>
+              <p className="text-zenit-text-tertiary text-sm">Defina a base neural da sua otimização.</p>
             </div>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {[
-                { id: 'performance', label: t.onboarding.objectives.performance, icon: <Zap size={20} /> },
-                { id: 'balance', label: t.onboarding.objectives.balance, icon: <Activity size={20} /> },
-                { id: 'health', label: t.onboarding.objectives.health, icon: <Target size={20} /> }
+                { id: 'discipline_warrior', label: t.onboarding.identities.discipline_warrior, icon: <Shield size={20} />, focus: 'discipline' },
+                { id: 'strategic_mind', label: t.onboarding.identities.strategic_mind, icon: <Brain size={20} />, focus: 'productivity' },
+                { id: 'mental_athlete', label: t.onboarding.identities.mental_athlete, icon: <Activity size={20} />, focus: 'mindfulness' },
+                { id: 'wealth_builder', label: t.onboarding.identities.wealth_builder, icon: <Target size={20} />, focus: 'discipline' },
+                { id: 'focus_monk', label: t.onboarding.identities.focus_monk, icon: <Wind size={20} />, focus: 'mindfulness' }
               ].map((opt) => (
                 <button
                   key={opt.id}
                   onClick={() => {
-                    setObjective(opt.id);
-                    setStep('energy');
+                    setIdentity(opt.id);
+                    setFocus(opt.focus);
+                    setStep('schedule');
                   }}
                   className={`flex items-center space-x-4 p-5 rounded-2xl border transition-all text-left group shadow-sm ${
-                    objective === opt.id ? 'bg-zenit-accent/20 border-zenit-accent text-zenit-text-primary' : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-2'
+                    identity === opt.id ? 'bg-zenit-accent/20 border-zenit-accent text-zenit-text-primary' : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-2'
                   }`}
                 >
-                  <div className={`transition-colors ${objective === opt.id ? 'text-zenit-accent' : 'text-zenit-text-tertiary/20 group-hover:text-zenit-text-tertiary'}`}>
+                  <div className={`transition-colors ${identity === opt.id ? 'text-zenit-accent' : 'text-zenit-text-tertiary/20 group-hover:text-zenit-text-tertiary'}`}>
                     {opt.icon}
                   </div>
-                  <span className="font-bold uppercase tracking-widest text-xs">{opt.label}</span>
+                  <div className="flex flex-col">
+                    <span className="font-bold uppercase tracking-widest text-[10px]">{opt.label}</span>
+                    <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-normal opacity-40">Protocolo Verificado</span>
+                  </div>
                 </button>
               ))}
             </div>
-          </motion.div>
-        );
-
-      case 'energy':
-        return (
-          <motion.div
-            key="energy"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-8"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-display font-medium text-zenit-text-primary uppercase tracking-tight italic">{t.onboarding.step2Title}</h2>
-              <p className="text-zenit-text-tertiary text-sm">{t.onboarding.step2Desc}</p>
-            </div>
-            <div className="space-y-12 py-10">
-              <div className="relative">
-                <input
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={energyLevel}
-                  onChange={(e) => setEnergyLevel(parseInt(e.target.value))}
-                  className="w-full h-2 bg-zenit-surface-2 rounded-full appearance-none cursor-pointer accent-zenit-accent"
-                />
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-zenit-accent text-white px-4 py-2 rounded-xl font-bold text-xl shadow-lg shadow-zenit-accent/20">
-                  {energyLevel}%
-                </div>
-              </div>
-              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary/20">
-                <span>{t.onboarding.energy.low}</span>
-                <span>{t.onboarding.energy.high}</span>
-              </div>
-            </div>
-            <button
-              onClick={() => setStep('schedule')}
-              className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group"
-            >
-              {t.common.save}
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </button>
           </motion.div>
         );
 
@@ -217,9 +181,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               <h2 className="text-2xl font-display font-medium text-zenit-text-primary uppercase tracking-tight italic">{t.onboarding.step3Title}</h2>
               <p className="text-zenit-text-tertiary text-sm">{t.onboarding.step3Desc}</p>
             </div>
-            <div className="grid grid-cols-1 gap-6">
-              <div className="space-y-3">
-                <label className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary/40">
+            <div className="flex flex-col items-center space-y-8">
+              <div className="w-full max-w-[200px] space-y-3">
+                <label className="flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary">
                   <Sun size={14} className="text-yellow-500" />
                   <span>Acordar</span>
                 </label>
@@ -227,11 +191,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   type="time"
                   value={wakeTime}
                   onChange={(e) => setWakeTime(e.target.value)}
-                  className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 text-2xl font-bold text-zenit-text-primary focus:outline-none focus:border-zenit-accent transition-all shadow-inner"
+                  className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-2 text-3xl font-bold text-zenit-text-primary text-center focus:outline-none focus:border-zenit-accent transition-all shadow-inner"
                 />
               </div>
-              <div className="space-y-3">
-                <label className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary/40">
+              <div className="w-full max-w-[200px] space-y-3">
+                <label className="flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary">
                   <Moon size={14} className="text-indigo-400" />
                   <span>Dormir</span>
                 </label>
@@ -239,104 +203,16 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   type="time"
                   value={sleepTime}
                   onChange={(e) => setSleepTime(e.target.value)}
-                  className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 px-6 text-2xl font-bold text-zenit-text-primary focus:outline-none focus:border-zenit-accent transition-all shadow-inner"
+                  className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-4 px-2 text-3xl font-bold text-zenit-text-primary text-center focus:outline-none focus:border-zenit-accent transition-all shadow-inner"
                 />
               </div>
             </div>
             <button
-              onClick={() => setStep('identity')}
+              onClick={handleComplete}
               className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group"
             >
-              {t.common.save}
+              Confirmar Sincronização
               <ChevronRight className="ml-2 w-5 h-5" />
-            </button>
-          </motion.div>
-        );
-
-      case 'identity':
-        return (
-          <motion.div
-            key="identity"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-8"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-display font-medium text-zenit-text-primary uppercase tracking-tight italic">{t.onboarding.step4Title}</h2>
-              <p className="text-zenit-text-tertiary text-sm">{t.onboarding.step4Desc}</p>
-            </div>
-            <div className="grid grid-cols-1 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-              {[
-                { id: 'discipline_warrior', label: t.onboarding.identities.discipline_warrior, icon: <Shield size={20} /> },
-                { id: 'strategic_mind', label: t.onboarding.identities.strategic_mind, icon: <Brain size={20} /> },
-                { id: 'mental_athlete', label: t.onboarding.identities.mental_athlete, icon: <Activity size={20} /> },
-                { id: 'wealth_builder', label: t.onboarding.identities.wealth_builder, icon: <Target size={20} /> },
-                { id: 'focus_monk', label: t.onboarding.identities.focus_monk, icon: <Wind size={20} /> }
-              ].map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => {
-                    setIdentity(opt.id);
-                    setStep('focus');
-                  }}
-                  className={`flex items-center space-x-4 p-5 rounded-2xl border transition-all text-left group shadow-sm ${
-                    identity === opt.id ? 'bg-zenit-accent/20 border-zenit-accent text-zenit-text-primary' : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-2'
-                  }`}
-                >
-                  <div className={`transition-colors ${identity === opt.id ? 'text-zenit-accent' : 'text-zenit-text-tertiary/20 group-hover:text-zenit-text-tertiary'}`}>
-                    {opt.icon}
-                  </div>
-                  <span className="font-bold uppercase tracking-widest text-xs">{opt.label}</span>
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        );
-
-      case 'focus':
-        return (
-          <motion.div
-            key="focus"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-8"
-          >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-display font-medium text-zenit-text-primary uppercase tracking-tight italic">{t.onboarding.step5Title}</h2>
-              <p className="text-zenit-text-tertiary text-sm">{t.onboarding.step5Desc}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { id: 'discipline', label: t.onboarding.focus.discipline, icon: <Shield size={20} /> },
-                { id: 'productivity', label: t.onboarding.focus.productivity, icon: <Zap size={20} /> },
-                { id: 'mindfulness', label: t.onboarding.focus.mindfulness, icon: <Wind size={20} /> },
-                { id: 'fitness', label: t.onboarding.focus.fitness, icon: <Dumbbell size={20} /> }
-              ].map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => {
-                    setFocus(opt.id);
-                  }}
-                  className={`flex flex-col items-center justify-center space-y-4 p-6 rounded-2xl border transition-all text-center group shadow-sm ${
-                    focus === opt.id ? 'bg-zenit-accent/20 border-zenit-accent text-zenit-text-primary' : 'bg-zenit-surface-1 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-2'
-                  }`}
-                >
-                  <div className={`transition-colors ${focus === opt.id ? 'text-zenit-accent' : 'text-zenit-text-tertiary/20 group-hover:text-zenit-text-tertiary'}`}>
-                    {opt.icon}
-                  </div>
-                  <span className="font-bold uppercase tracking-widest text-[10px]">{opt.label}</span>
-                </button>
-              ))}
-            </div>
-            <button
-              disabled={!focus}
-              onClick={handleComplete}
-              className="w-full py-5 bg-zenit-accent hover:bg-zenit-accent/80 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center group disabled:opacity-50 shadow-[0_0_30px_rgba(255,38,33,0.2)]"
-            >
-              {t.onboarding.complete}
-              <Check className="ml-2 w-5 h-5" />
             </button>
           </motion.div>
         );

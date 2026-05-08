@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Dumbbell, Wind, Brain, Play, Clock, ChevronRight, 
   X, Activity, Lock, Sparkles, History, Heart, 
-  Zap, Award, TrendingUp, CheckCircle2
+  Zap, Award, TrendingUp, CheckCircle2, ArrowLeft
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useGamification } from './GamificationContext';
@@ -32,9 +32,10 @@ interface ExerciseHistory {
 
 interface ExercisesProps {
   t: any;
+  onBack?: () => void;
 }
 
-export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
+export const Exercises: React.FC<ExercisesProps> = ({ t, onBack }) => {
   const { user: authUser, userData } = useUser();
   const [activeTab, setActiveTab] = useState<'browse' | 'history'>('browse');
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -129,6 +130,20 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
 
     if (!error) {
       addXP(exercise.xp_reward || 50);
+
+      // Create Nexus post for achievement
+      try {
+        await supabase.from('posts').insert([{
+          user_id: user.id,
+          content: `Concluiu o protocolo: ${exercise.title}`,
+          type: 'achievement',
+          likes_count: 0,
+          comments_count: 0
+        }]);
+      } catch (postErr) {
+        console.error('Error creating achievement post:', postErr);
+      }
+
       fetchHistory();
       setSelectedExercise(null);
     }
@@ -150,15 +165,25 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
     : exercises.filter(ex => ex.category === activeCategory);
 
   return (
-    <div className="flex flex-col gap-6 p-6 pb-32 max-w-2xl mx-auto min-h-screen">
+    <div className="flex flex-col gap-6 p-6 pb-56 max-w-2xl mx-auto min-h-screen">
       <header className="flex justify-between items-end">
-        <div className="space-y-2">
-          <h2 className="text-4xl font-display font-medium tracking-tight uppercase text-zenit-text-primary italic leading-none">
-            Bio <span className="text-zenit-scarlet">Hacking</span>
-          </h2>
-          <div className="flex items-center space-x-3">
-             <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
-             <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary opacity-60">Otimize seu hardware biológico</p>
+        <div className="flex items-center space-x-6">
+          {onBack && (
+            <button 
+              onClick={onBack}
+              className="w-12 h-12 flex items-center justify-center bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-95"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          )}
+          <div className="space-y-2">
+            <h2 className="text-4xl font-display font-medium tracking-tight uppercase text-zenit-text-primary italic leading-none">
+              Bio <span className="text-zenit-scarlet">Hacking</span>
+            </h2>
+            <div className="flex items-center space-x-3">
+               <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+               <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zenit-text-tertiary opacity-60">Otimize seu hardware biológico</p>
+            </div>
           </div>
         </div>
         <div className="flex bg-zenit-surface-1/40 backdrop-blur-xl p-1.5 rounded-[1.5rem] border border-zenit-border-primary">
@@ -223,6 +248,11 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
               <div className="space-y-4">
                 {filteredExercises.map(ex => {
                   const isLocked = ex.is_premium && !hasAccessToPremium;
+                  const isCompletedToday = history.some(h => 
+                    h.exercise_id === ex.id && 
+                    new Date(h.completed_at).toDateString() === new Date().toDateString()
+                  );
+
                   return (
                     <motion.div
                       key={ex.id}
@@ -230,48 +260,58 @@ export const Exercises: React.FC<ExercisesProps> = ({ t }) => {
                       onClick={() => !isLocked && setSelectedExercise(ex)}
                       className={`glass-card p-5 rounded-[2rem] flex items-center transition-all duration-500 border border-zenit-border-primary/50 relative overflow-hidden group ${
                         isLocked ? 'opacity-40 grayscale pointer-events-none' : 'bg-zenit-surface-1/60 active:scale-[0.98]'
-                      }`}
+                      } ${isCompletedToday ? 'border-emerald-500/30 bg-emerald-500/5' : ''}`}
                     >
+                      {isCompletedToday && (
+                        <div className="absolute top-0 right-0 p-2 bg-emerald-500/10 rounded-bl-[1.5rem] border-l border-b border-emerald-500/20">
+                          <CheckCircle2 size={12} className="text-emerald-500" />
+                        </div>
+                      )}
+                      
                       <div className="flex items-center space-x-5 flex-1 relative z-10 min-w-0">
-                        <div className="w-16 h-16 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary group-hover:scale-105 group-hover:text-zenit-scarlet transition-all duration-500 border border-zenit-border-primary">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 border border-zenit-border-primary ${
+                          isCompletedToday ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zenit-surface-2 text-zenit-text-tertiary group-hover:text-zenit-scarlet'
+                        }`}>
                           {ex.category === 'training' ? <Dumbbell size={24} /> : React.cloneElement((categories.find(c => c.id === ex.category)?.icon || <Activity />) as any, { size: 24 })}
                         </div>
                         
                         <div className="flex-1 min-w-0 space-y-1.5">
                           <div className="flex items-center justify-between gap-3">
-                             <h3 className="text-base font-bold text-zenit-text-primary tracking-tight truncate group-hover:text-zenit-scarlet transition-colors">
+                             <h3 className={`text-base font-bold tracking-tight truncate transition-colors ${
+                               isCompletedToday ? 'text-emerald-500' : 'text-zenit-text-primary group-hover:text-zenit-scarlet'
+                             }`}>
                                {ex.title}
                              </h3>
-                             {ex.is_premium && !isLocked && (
+                             {ex.is_premium && !isLocked && !isCompletedToday && (
                                 <Sparkles size={12} className="text-yellow-500 flex-shrink-0" />
                              )}
                           </div>
 
                           <div className="flex items-center space-x-3 text-[9px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-60">
                              <div className="flex items-center gap-1.5">
-                               <Clock size={10} className="text-zenit-scarlet" />
+                               <Clock size={10} className={isCompletedToday ? 'text-emerald-500' : 'text-zenit-scarlet'} />
                                <span>{ex.duration}</span>
                              </div>
                              <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
                              <div className="flex items-center gap-1.5">
-                               <Award size={10} className="text-zenit-scarlet" />
+                               <Award size={10} className={isCompletedToday ? 'text-emerald-500' : 'text-zenit-scarlet'} />
                                <span>{ex.difficulty}</span>
                              </div>
-                             {(ex as any).tags?.[0] && (
-                               <>
-                                 <span className="w-1 h-1 bg-zenit-border-primary rounded-full" />
-                                 <span className="truncate">#{(ex as any).tags[0]}</span>
-                               </>
-                             )}
                           </div>
                         </div>
                       </div>
                       
                       <div className="ml-4 flex flex-col items-end space-y-3">
-                         <div className="text-[10px] font-black font-mono text-zenit-scarlet bg-zenit-scarlet/5 px-3 py-1 rounded-full border border-zenit-scarlet/10">
-                           +{ex.xp_reward || 100} XP
+                         <div className={`text-[10px] font-black font-mono px-3 py-1 rounded-full border ${
+                           isCompletedToday 
+                             ? 'text-emerald-500 bg-emerald-500/5 border-emerald-500/10' 
+                             : 'text-zenit-scarlet bg-zenit-scarlet/5 border-zenit-scarlet/10'
+                         }`}>
+                           {isCompletedToday ? 'CONCLUÍDO' : `+${ex.xp_reward || 100} XP`}
                          </div>
-                         <ChevronRight size={16} className="text-zenit-text-tertiary group-hover:text-zenit-scarlet group-hover:translate-x-1 transition-all" />
+                         <ChevronRight size={16} className={`transition-all ${
+                           isCompletedToday ? 'text-emerald-500' : 'text-zenit-text-tertiary group-hover:text-zenit-scarlet group-hover:translate-x-1'
+                         }`} />
                       </div>
                     </motion.div>
                   );

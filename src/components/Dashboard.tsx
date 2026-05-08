@@ -193,12 +193,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
   };
 
   return (
-    <div className="px-6 pt-8 pb-40 max-w-xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
+    <div className="px-6 pt-12 pb-56 max-w-2xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
       {/* Living Background Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[80%] h-[50%] bg-zenit-accent/[0.03] rounded-full blur-[120px] animate-pulse-glow" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[50%] bg-zenit-accent/[0.03] rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
+      <div className="absolute top-[-5%] left-[-10%] w-[100%] h-[40%] bg-zenit-accent/[0.04] rounded-full blur-[140px] animate-pulse-glow" />
+      <div className="absolute bottom-[10%] right-[-10%] w-[70%] h-[40%] bg-zenit-accent/[0.03] rounded-full blur-[140px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
-      <header className="flex justify-between items-center bg-zenit-glass backdrop-blur-3xl p-5 rounded-[2.5rem] relative z-20 border border-zenit-glass-border shadow-2xl mb-10">
+      <header className="flex justify-between items-center bg-zenit-glass backdrop-blur-3xl p-6 rounded-[3rem] relative z-20 border border-zenit-glass-border shadow-2xl mb-20">
         <div className="flex items-center space-x-4 min-w-0">
           <div onClick={handleLogoClick} className="cursor-pointer flex items-center space-x-3 group flex-shrink-0">
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-zenit-accent to-zenit-crimson flex items-center justify-center group-hover:scale-105 transition-transform duration-500 shadow-lg shadow-zenit-accent/20">
@@ -206,7 +206,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-display font-black uppercase tracking-tighter text-zenit-text-primary leading-none italic">ZENITH</span>
-              <span className="text-[7px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary mt-1">Neural Interface</span>
+              <span className="text-[7px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary mt-1">SISTEMA INTEGRADO</span>
             </div>
           </div>
           
@@ -227,26 +227,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
             </div>
             <div className="flex flex-col items-start min-w-0">
               <span className="text-[10px] font-black uppercase tracking-widest text-zenit-text-primary group-hover:text-zenit-accent transition-colors truncate">{userData?.display_name?.split(' ')[0] || 'Usuário'}</span>
-              <div className="flex items-center space-x-1.5 mt-0.5">
-                <Crown size={8} className="text-zenit-accent opacity-70" />
-                <span className="text-[7px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary">Nível {userData?.level || 1}</span>
+              <div className="flex items-center space-x-3 mt-0.5">
+                <div className="flex items-center space-x-1">
+                  <Crown size={8} className="text-zenit-accent opacity-70" />
+                  <span className="text-[7px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary">LVL {userData?.level || 1}</span>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-zenit-border-primary" />
+                <NotificationCenter userId={userData?.id || ''} />
               </div>
             </div>
           </button>
         </div>
 
-        <div className="flex items-center flex-shrink-0">
-          <NotificationCenter userId={userData?.id || ''} />
+        <div className="flex items-center flex-shrink-0 opacity-0 pointer-events-none">
+          {/* Hidden but kept for spacing balance if needed, or removed */}
+          <div className="w-10 h-10" />
         </div>
       </header>
 
       {/* AI Mentor Hero */}
-      <section className="relative overflow-hidden group rounded-[3rem] bg-zenit-glass border border-zenit-glass-border p-10 mb-12 shadow-2xl">
+      <section className="relative overflow-hidden group rounded-[3.5rem] bg-zenit-glass border border-zenit-glass-border p-12 mb-20 shadow-2xl">
         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-          <Brain size={160} className="text-zenit-accent" />
+          <Brain size={180} className="text-zenit-accent" />
         </div>
         
-        <div className="relative z-10 flex flex-col items-center gap-8">
+        <div className="relative z-10 flex flex-col items-center gap-10">
           <div className="relative">
             <div className="w-28 h-28 rounded-[2.5rem] bg-gradient-to-br from-zenit-accent via-zenit-crimson to-zenit-accent p-0.5 animate-pulse-slow">
               <div className="w-full h-full rounded-[2.4rem] bg-zenit-black flex items-center justify-center overflow-hidden border-2 border-zenit-black">
@@ -261,7 +266,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
           <div className="text-center space-y-6">
             <div className="space-y-3">
               <div className="flex items-center justify-center space-x-2">
-                <div className="px-3 py-1 bg-zenit-accent/10 text-zenit-accent text-[7px] font-black uppercase tracking-[0.4em] rounded-full border border-zenit-accent/20 italic">Neural Core v5.0</div>
+                <div className="px-3 py-1 bg-zenit-accent/10 text-zenit-accent text-[7px] font-black uppercase tracking-[0.4em] rounded-full border border-zenit-accent/20 italic">Acesso Premium</div>
                 <div className="flex space-x-1">
                   {[1, 2].map(i => <div key={i} className="w-1 h-1 rounded-full bg-zenit-accent/40 animate-ping" style={{ animationDelay: `${i * 0.2}s` }} />)}
                 </div>
@@ -285,50 +290,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
         </div>
       </section>
 
-      {/* Sincronização de Protocolo (Timer) */}
-      <section className="space-y-6 px-1 mb-12">
-        <div className="flex items-center justify-between px-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-1 h-4 bg-zenit-accent rounded-full shadow-[0_0_15px_var(--accent-glow)]" />
-            <h3 className="text-[9px] font-black text-zenit-text-primary uppercase tracking-[0.5em] italic leading-none">Timeline Protocol</h3>
-          </div>
-          <div className="flex items-center space-x-2 text-zenit-accent/60">
-             <Timer size={14} className="animate-pulse" />
-             <span className="text-[7.5px] font-black uppercase tracking-widest leading-none">Real-Time Sync</span>
-          </div>
-        </div>
-        
-        <div className="rounded-[3rem] overflow-hidden border border-zenit-glass-border bg-zenit-glass shadow-2xl p-2">
-          <FocusTimer t={t} />
-        </div>
-      </section>
-
       {/* Quick Access - Bento Grid Style */}
-      <section className="space-y-6 px-1 mb-12">
+      <section className="space-y-8 px-1 mb-20">
         <div className="flex items-center justify-between px-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-1 h-4 bg-zenit-scarlet rounded-full shadow-[0_0_15px_rgba(255,0,0,0.4)]" />
-            <h3 className="text-[9px] font-black uppercase tracking-[0.5em] text-zenit-text-primary italic leading-none">Módulos Ativos</h3>
+          <div className="flex items-center space-x-5">
+            <div className="w-1 h-5 bg-zenit-scarlet rounded-full shadow-[0_0_20px_rgba(255,0,0,0.5)]" />
+            <h3 className="text-[10px] font-black uppercase tracking-[0.5em] h-full text-white italic leading-none">Módulos Ativos</h3>
           </div>
-          <span className="text-[8px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary italic">ver. 5.1</span>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          {/* Axis - Large Featured Card */}
+        <div className="grid grid-cols-2 gap-5">
+          {/* NEXUS - Large Featured Card */}
           <motion.div
             whileHover={{ y: -5 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setActiveTab('axis')}
+            onClick={() => setActiveTab('nexus')}
             className="col-span-2 relative group p-0.5 rounded-[3rem] bg-gradient-to-br from-zenit-scarlet/20 via-transparent to-transparent overflow-hidden cursor-pointer"
           >
             <div className="p-10 rounded-[2.9rem] bg-zenit-glass backdrop-blur-xl border border-zenit-glass-border flex items-center justify-between shadow-2xl">
               <div className="flex items-center space-x-6">
                 <div className="w-14 h-14 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-scarlet border border-zenit-border-primary group-hover:scale-110 transition-all duration-500">
-                  <Brain size={28} strokeWidth={2.5} />
+                  <Zap size={28} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h4 className="text-2xl font-display font-black text-zenit-text-primary tracking-tighter italic leading-none">AXIS</h4>
-                  <p className="text-[7.5px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary mt-2 italic leading-none">Neural Mapping</p>
+                  <h4 className="text-2xl font-display font-black text-zenit-text-primary tracking-tighter italic leading-none uppercase">NEXUS</h4>
+                  <p className="text-[7.5px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary mt-2 italic leading-none">Neural Connectivity</p>
                 </div>
               </div>
               <div className="flex -space-x-4 opacity-20 group-hover:opacity-100 transition-all duration-500">
@@ -342,34 +328,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
           </motion.div>
 
           <QuickAction 
-            icon={<Dumbbell />} 
-            label="Corpo" 
-            onClick={() => setActiveTab('exercises')} 
-            color="scarlet"
+            icon={<Wallet />} 
+            label="Finanças" 
+            onClick={() => setActiveTab('finance')} 
+            color="cyan"
           />
           <QuickAction 
             icon={<Target />} 
             label="Hábitos" 
             onClick={() => setActiveTab('tasks')} 
-            color="scarlet"
+            color="cyan"
           />
           <QuickAction 
-            icon={<Wallet />} 
-            label="Finanças" 
-            onClick={() => setActiveTab('finance')} 
-            color="scarlet"
+            icon={<Dumbbell />} 
+            label="Exercícios" 
+            onClick={() => setActiveTab('exercises')} 
+            color="cyan"
           />
           <QuickAction 
             icon={<Gamepad2 />} 
             label="Mental" 
             onClick={() => setActiveTab('gym')} 
-            color="scarlet"
+            color="cyan"
           />
         </div>
       </section>
 
       {/* Today's Routine */}
-      <section className="space-y-6 px-1 mb-12">
+      <section className="space-y-8 px-1 mb-20">
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center space-x-4">
             <div className="w-1 h-4 bg-zenit-accent rounded-full shadow-[0_0_15px_var(--accent-glow)]" />
@@ -380,6 +366,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
           <RoutineSystem t={t} userData={userData} />
         </div>
       </section>
+
+      {/* Sincronização de Protocolo (Timer) - Repositioned to bottom */}
+      <section className="space-y-8 px-1 mb-20">
+        <div className="flex items-center justify-between px-6">
+          <div className="flex items-center space-x-5">
+            <div className="w-1.5 h-6 bg-zenit-accent rounded-full shadow-[0_0_25px_var(--accent-glow)]" />
+            <h3 className="text-sm font-black text-white uppercase tracking-[0.6em] italic leading-none">Timeline Protocol</h3>
+          </div>
+          <div className="flex items-center space-x-3 text-zenit-accent">
+             <Timer size={18} className="animate-pulse" />
+             <span className="text-[10px] font-black uppercase tracking-widest leading-none">Sync Ativo</span>
+          </div>
+        </div>
+        
+        <div className="w-full rounded-[4rem] overflow-hidden border border-zenit-glass-border bg-zenit-glass shadow-2xl p-3">
+          <FocusTimer t={t} />
+        </div>
+      </section>
+
 
       <AIAssistant 
         isOpen={isAIOpen} 

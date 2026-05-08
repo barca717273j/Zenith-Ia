@@ -153,18 +153,33 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log('Fetching user data for:', userId);
       setLoading(true);
       
-      // Robust fetch with column detection
+      // Robust fetch with explicit column lists to avoid "column not found" errors
+      // if some columns haven't been added to the Supabase project yet.
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, username, display_name, full_name, avatar_url, photo_url, bio, plan, subscription_tier, xp, level, streak, onboarding_completed, life_score, is_private, is_admin, role, language')
         .eq('id', userId)
         .maybeSingle();
 
       if (error) {
         console.error('Error fetching user data:', error);
-        // If the error is about missing columns, it's a critical schema mismatch
-        if (error.message.includes('column') || error.code === '42703') {
-          console.warn('Schema mismatch detected. Falling back to safe profile creation.');
+        // If the error is about missing columns, try a safer fallback select
+        if (error.code === '42703' || error.message?.includes('column')) {
+          console.warn('Schema mismatch detected. Falling back to safe profile fetch.');
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from('profiles')
+            .select('id, email, username, xp')
+            .eq('id', userId)
+            .maybeSingle();
+          
+          if (!fallbackError && fallbackData) {
+            setUserData({
+              ...fallbackData,
+              display_name: fallbackData.username || 'Usuário Zenith',
+              subscription_tier: 'basic'
+            } as any);
+            return;
+          }
         }
       }
 

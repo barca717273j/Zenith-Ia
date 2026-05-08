@@ -118,7 +118,7 @@ export const NotificationCenter: React.FC<{ userId: string }> = ({ userId }) => 
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute right-0 mt-4 w-80 max-h-[480px] z-[90] glass-card bg-zenit-black/95 border-white/10 shadow-2xl flex flex-col overflow-hidden"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm max-h-[60vh] z-[100] glass-card bg-zenit-black border-2 border-zenit-border-primary shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden rounded-[2.5rem]"
             >
               <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
                 <div className="space-y-1">

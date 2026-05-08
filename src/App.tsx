@@ -26,6 +26,8 @@ import { FloatingThemeToggle } from './components/FloatingThemeToggle';
 import { ZenitLogo } from './components/ZenitLogo';
 import { translations, Language } from './translations';
 import { GamificationProvider } from './components/GamificationContext';
+import { FastActionModal } from './components/FastActionModal';
+import { NewPostModal } from './components/NewPostModal';
 import { useUser } from './contexts/UserContext';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
@@ -44,7 +46,13 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState('home');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isNewProtocolOpen, setIsNewProtocolOpen] = useState(false);
+  const [isFastActionOpen, setIsFastActionOpen] = useState(false);
+  const [isNewPostOpen, setIsNewPostOpen] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
   const handleRetry = async () => {
     setIsRetrying(true);
@@ -205,7 +213,7 @@ function AppContent() {
                 ZENITH
               </h1>
               <p className="text-zenit-accent text-[10px] font-black uppercase tracking-[0.6em] ml-2">
-                Nexus OS
+                HUMAN OS
               </p>
             </motion.div>
             
@@ -219,7 +227,7 @@ function AppContent() {
                 />
               </div>
               <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary animate-pulse italic">
-                Sincronizando Sistema Neural...
+                Otimizando seu LiveOS...
               </p>
             </div>
           </div>
@@ -246,9 +254,9 @@ function AppContent() {
       case 'tasks':
         return <HabitTracker key="tasks" t={t} />;
       case 'exercises':
-        return <Exercises key="exercises" t={t} />;
+        return <Exercises key="exercises" t={t} onBack={() => setActiveTab('home')} />;
       case 'focus':
-        return <FocusTimer key="focus" t={t} isFullPage />;
+        return <FocusTimer key="focus" t={t} isFullPage onBack={() => setActiveTab('home')} />;
       case 'finance':
         return <FinanceTracker key="finance" t={t} language={lang} setAppTab={setActiveTab} />;
       case 'profile':
@@ -261,8 +269,8 @@ function AppContent() {
         return <Protocols key="protocols" t={t} />;
       case 'stats':
         return <Stats key="stats" />;
-      case 'axis':
-        return <Axis key="axis" t={t} />;
+      case 'nexus':
+        return <Axis key="axis" t={t} onBack={() => setActiveTab('home')} />;
       case 'admin':
         return userData?.is_admin ? <AdminPanel key="admin" t={t} onBack={() => setActiveTab('profile')} /> : null;
       case 'gym':
@@ -296,7 +304,7 @@ function AppContent() {
           <div className="fixed top-4 right-4 z-50">
             <div className="bg-zenit-scarlet/20 backdrop-blur-md border border-zenit-scarlet/30 px-3 py-1.5 rounded-full flex items-center space-x-2 shadow-lg">
               <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
-              <span className="text-[10px] font-bold text-white uppercase tracking-widest">Neural Offline / Demo</span>
+              <span className="text-[10px] font-bold text-white uppercase tracking-widest">Local Mode / Demo</span>
             </div>
           </div>
         )}
@@ -304,6 +312,17 @@ function AppContent() {
         <Navigation activeTab={activeTab} setActiveTab={setActiveTab} onPlusClick={() => setIsNewProtocolOpen(true)} t={t} />
         
         <NewProtocolModal isOpen={isNewProtocolOpen} onClose={() => setIsNewProtocolOpen(false)} t={t} />
+        <FastActionModal 
+          isOpen={isFastActionOpen}
+          onClose={() => setIsFastActionOpen(false)}
+          onCreateProtocol={() => setIsNewProtocolOpen(true)}
+          onCreatePost={() => setIsNewPostOpen(true)}
+        />
+        <NewPostModal 
+          isOpen={isNewPostOpen}
+          onClose={() => setIsNewPostOpen(false)}
+          t={t}
+        />
 
         {/* Background Ambience */}
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-zenit-black">

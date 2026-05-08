@@ -270,10 +270,24 @@ export const Auth: React.FC = () => {
             <h1 className="text-5xl font-display font-bold tracking-tighter uppercase leading-none text-zenit-text-primary italic">ZENITH</h1>
             <div className="flex items-center justify-center space-x-3 text-zenit-accent">
               <Sparkles size={14} className="animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.5em]">Life Operating System</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em]">Sistema de Otimização Humana</span>
             </div>
           </div>
         </div>
+
+        {authMode === 'register' && (
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center px-4"
+            >
+              <p className="text-sm font-bold text-zenit-text-secondary italic">
+                “Bem-vindo ao Zenith. Vamos otimizar seu LifeOS.”
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        )}
 
         <AnimatePresence mode="wait">
           {error && (
@@ -421,11 +435,10 @@ export const Auth: React.FC = () => {
               className="space-y-8"
             >
               <form onSubmit={handleAuth} className="space-y-8">
-                <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">E-mail ou Usuário</label>
+                <div className="space-y-4">
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
-                      <Mail size={20} />
+                    <div className="absolute inset-y-0 left-6 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
+                      <Mail size={22} strokeWidth={2.5} />
                     </div>
                     <input
                       type="text"
@@ -435,26 +448,16 @@ export const Auth: React.FC = () => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-14 pr-5 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[1.5rem] py-6 pl-16 pr-6 focus:outline-none focus:border-zenit-accent transition-all text-base font-bold text-zenit-text-primary shadow-inner"
                       placeholder="E-mail ou Usuário"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.3em] font-black ml-1">{t.common.password}</label>
-                    <button 
-                      type="button" 
-                      onClick={() => setAuthMode('forgot')}
-                      className="text-[10px] text-zenit-accent hover:text-white uppercase tracking-widest font-black transition-colors"
-                    >
-                      {t.common.forgotPassword}
-                    </button>
-                  </div>
+                <div className="space-y-4">
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-5 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
-                      <Lock size={20} />
+                    <div className="absolute inset-y-0 left-6 flex items-center text-zenit-text-tertiary group-focus-within:text-zenit-accent transition-colors">
+                      <Lock size={22} strokeWidth={2.5} />
                     </div>
                     <input
                       type={showPassword ? "text" : "password"}
@@ -464,15 +467,24 @@ export const Auth: React.FC = () => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl py-5 pl-14 pr-14 focus:outline-none focus:border-zenit-accent transition-all text-sm font-bold text-zenit-text-primary shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[1.5rem] py-6 pl-16 pr-16 focus:outline-none focus:border-zenit-accent transition-all text-base font-bold text-zenit-text-primary shadow-inner"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-5 flex items-center text-zenit-text-tertiary hover:text-zenit-accent transition-colors"
+                      className="absolute inset-y-0 right-6 flex items-center text-zenit-text-tertiary hover:text-zenit-accent transition-colors"
                     >
-                      {showPassword ? <Shield size={20} /> : <Sparkles size={20} />}
+                      {showPassword ? <Shield size={22} /> : <Sparkles size={22} />}
+                    </button>
+                  </div>
+                  <div className="flex justify-end pr-2">
+                    <button 
+                      type="button" 
+                      onClick={() => setAuthMode('forgot')}
+                      className="text-[11px] text-zenit-text-tertiary hover:text-zenit-accent uppercase tracking-widest font-black transition-colors"
+                    >
+                      {t.common.forgotPassword}
                     </button>
                   </div>
                 </div>
@@ -503,7 +515,7 @@ export const Auth: React.FC = () => {
                       <span>{t.common.entering}</span>
                     </div>
                   ) : (
-                    <span>Acessar Núcleo</span>
+                    <span>Entrar no Sistema</span>
                   )}
                 </button>
               </form>
@@ -685,7 +697,7 @@ export const Auth: React.FC = () => {
             <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
             <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
-          <span>Neural Link Google</span>
+          <span>Continuar com Google</span>
         </button>
 
         <div className="flex items-center justify-center space-x-3 text-zenit-text-tertiary opacity-60">

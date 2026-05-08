@@ -65,7 +65,7 @@ export const Protocols: React.FC<{ t: any }> = ({ t }) => {
   };
 
   return (
-    <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
+    <div className="p-6 space-y-10 pb-56 max-w-2xl mx-auto min-h-screen">
       <header className="space-y-2">
         <div className="flex items-center space-x-3">
           <div className="w-1.5 h-6 bg-zenit-accent rounded-full shadow-[0_0_15px_var(--accent-glow)]" />

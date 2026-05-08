@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  X, Clock, Activity, Brain, Dumbbell, Wind, TrendingUp, Zap, Sparkles
+  X, Clock, Activity, Brain, Dumbbell, Wind, TrendingUp, Zap, Sparkles, Loader2
 } from 'lucide-react';
 import { CustomSlider } from './CustomSlider';
 import { supabase } from '../lib/supabase';
@@ -132,42 +132,45 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
               </button>
             </div>
 
-            <div className="px-8 pb-10 space-y-8 overflow-y-auto scrollbar-hide flex-1 relative">
+            <div className="px-8 pb-10 space-y-10 overflow-y-auto scrollbar-hide flex-1 relative">
               {/* Background Glow */}
-              <div className="absolute top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-zenit-accent/5 rounded-full blur-[80px] pointer-events-none" />
+              <div className="absolute top-20 left-1/2 -translate-x-1/2 w-80 h-80 bg-zenit-accent/5 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="space-y-3 relative z-10">
-                <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em] ml-4">Nome da Tarefa</label>
-                <input
-                  type="text"
-                  value={newTask}
-                  onChange={(e) => setNewTask(e.target.value)}
-                  placeholder="Ex: Meditação Alpha..."
-                  className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full px-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all placeholder:text-zenit-text-tertiary/30 shadow-inner"
-                />
+              <div className="space-y-4 relative z-10 pt-2">
+                <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] ml-6 italic opacity-60">Nome do Protocolo</label>
+                <div className="relative group">
+                  <input
+                    type="text"
+                    value={newTask}
+                    onChange={(e) => setNewTask(e.target.value)}
+                    placeholder="Ex: Meditação Alpha..."
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[2rem] px-8 py-7 text-base text-zenit-text-primary focus:outline-none focus:border-zenit-accent/40 focus:ring-1 focus:ring-zenit-accent/20 transition-all placeholder:text-zenit-text-tertiary/20 shadow-inner group-hover:border-zenit-border-primary/80"
+                  />
+                  <Sparkles size={14} className="absolute right-8 top-1/2 -translate-y-1/2 text-zenit-accent/30 group-hover:text-zenit-accent transition-colors" />
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
-                <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em] ml-4">Horário</label>
-                  <div className="relative">
-                    <Clock size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-zenit-accent pointer-events-none" />
+              <div className="grid grid-cols-2 gap-6 relative z-10">
+                <div className="space-y-4">
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] ml-6 italic opacity-60">Início</label>
+                  <div className="relative group">
+                    <Clock size={16} className="absolute left-8 top-1/2 -translate-y-1/2 text-zenit-accent pointer-events-none" />
                     <input
                       type="time"
                       value={newTime}
                       onChange={(e) => setNewTime(e.target.value)}
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full pl-14 pr-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all shadow-inner"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full pl-16 pr-6 py-6 text-base text-zenit-text-primary focus:outline-none focus:border-zenit-accent/40 transition-all shadow-inner"
                     />
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em] ml-4">Duração</label>
-                  <div className="relative">
-                    <Zap size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-zenit-accent pointer-events-none" />
+                <div className="space-y-4">
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] ml-6 italic opacity-60">Janela</label>
+                  <div className="relative group">
+                    <Zap size={16} className="absolute left-8 top-1/2 -translate-y-1/2 text-zenit-accent pointer-events-none" />
                     <select
                       value={newDuration}
                       onChange={(e) => setNewDuration(e.target.value)}
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full pl-14 pr-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all appearance-none shadow-inner cursor-pointer"
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full pl-16 pr-8 py-6 text-base text-zenit-text-primary focus:outline-none focus:border-zenit-accent/40 transition-all appearance-none shadow-inner cursor-pointer"
                     >
                       <option value="15min">15 min</option>
                       <option value="30min">30 min</option>
@@ -179,71 +182,67 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
-                <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em] ml-4">Prioridade</label>
-                  <div className="flex gap-1.5 p-1.5 bg-zenit-surface-2 rounded-full border border-zenit-border-primary shadow-inner">
-                    {priorities.map(p => (
-                      <button
-                        key={p.id}
-                        onClick={() => setNewPriority(p.id as any)}
-                        className={`flex-1 py-3 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${newPriority === p.id ? p.color : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em] ml-4">Frequência</label>
-                  <div className="relative">
-                    <select
-                      value={newFrequency}
-                      onChange={(e) => setNewFrequency(e.target.value as any)}
-                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-full px-8 py-5 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/30 focus:ring-1 focus:ring-zenit-accent/30 transition-all appearance-none shadow-inner cursor-pointer"
-                    >
-                      <option value="daily">Diária</option>
-                      <option value="weekly">Semanal</option>
-                      <option value="custom">Personalizada</option>
-                    </select>
-                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <TrendingUp size={14} className="text-zenit-text-tertiary" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-4 relative z-10">
-                <div className="flex items-center justify-between px-4">
-                  <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em]">Categoria</label>
-                  <Sparkles size={12} className="text-zenit-accent animate-pulse" />
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] ml-6 italic opacity-60">Categoria</label>
+                <div className="grid grid-cols-4 gap-3">
                   {categories.map(cat => (
                     <button
-                        key={cat.id}
-                        onClick={() => setNewCategory(cat.id)}
-                        className={`flex flex-col items-center justify-center p-5 rounded-3xl border transition-all active:scale-95 group ${newCategory === cat.id ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_10px_20px_var(--accent-glow)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-3 shadow-sm hover:shadow-md'}`}
+                      key={cat.id}
+                      onClick={() => setNewCategory(cat.id)}
+                      className={`flex flex-col items-center justify-center p-5 rounded-3xl border transition-all active:scale-95 group ${newCategory === cat.id ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_10px_20px_rgba(255,38,33,0.3)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-3'}`}
                     >
                       <div className={`transition-transform duration-300 ${newCategory === cat.id ? 'scale-125' : 'group-hover:scale-110'}`}>{cat.icon}</div>
-                      <span className="text-[9px] mt-3 font-bold uppercase tracking-widest">{cat.label}</span>
+                      <span className="text-[8px] mt-2.5 font-bold uppercase tracking-widest">{cat.label}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-4 relative z-10 px-2">
+              <div className="space-y-6 relative z-10">
+                <div className="flex items-center justify-between px-4">
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic opacity-60">Intensidade</label>
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${newPriority === 'high' ? 'text-zenit-accent' : newPriority === 'medium' ? 'text-amber-400' : 'text-blue-400'}`}>
+                    {newPriority.toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex gap-3 p-1.5 bg-zenit-surface-2 rounded-full border border-zenit-border-primary shadow-inner">
+                  {priorities.map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => setNewPriority(p.id as any)}
+                      className={`flex-1 py-4 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all ${newPriority === p.id ? p.color + ' shadow-lg border border-white/5' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-6 relative z-10 px-2">
                 <CustomSlider
                   min={0}
                   max={100}
                   value={newEnergy}
                   onChange={setNewEnergy}
-                  label="Energia Esperada"
+                  label="Bio-Energia Exigida"
                 />
               </div>
 
-              <div className="space-y-4 relative z-10">
-                <label className="text-[10px] text-zenit-text-tertiary font-bold uppercase tracking-[0.4em] ml-4">Repetição Semanal</label>
+              <div className="space-y-6 relative z-10">
+                <div className="flex items-center justify-between px-4">
+                    <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic opacity-60">Repetição</label>
+                    <div className="flex items-center space-x-2">
+                        <select
+                            value={newFrequency}
+                            onChange={(e) => setNewFrequency(e.target.value as any)}
+                            className="bg-transparent text-[10px] font-black uppercase tracking-widest text-zenit-accent focus:outline-none cursor-pointer"
+                        >
+                            <option value="daily">Diária</option>
+                            <option value="weekly">Semanal</option>
+                            <option value="custom">Manual</option>
+                        </select>
+                    </div>
+                </div>
                 <div className="grid grid-cols-7 gap-2">
                   {weekDays.map(day => (
                     <button
@@ -255,7 +254,7 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                           setSelectedDays([...selectedDays, day.id]);
                         }
                       }}
-                      className={`h-12 rounded-2xl text-[10px] font-bold transition-all active:scale-90 border flex items-center justify-center ${selectedDays.includes(day.id) ? 'bg-zenit-accent border-zenit-accent text-white shadow-[0_10px_15px_var(--accent-glow)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:bg-zenit-surface-3 shadow-inner'}`}
+                      className={`h-11 rounded-xl text-[9px] font-bold transition-all active:scale-90 border flex items-center justify-center ${selectedDays.includes(day.id) ? 'bg-zenit-accent border-zenit-accent text-white shadow-lg' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary shadow-inner'}`}
                     >
                       {day.label}
                     </button>
@@ -263,18 +262,28 @@ export const NewProtocolModal: React.FC<NewProtocolModalProps> = ({ isOpen, onCl
                 </div>
               </div>
 
-              <button 
-                onClick={handleSave}
-                disabled={isSaving || !newTask}
-                className="w-full py-6 rounded-full bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white text-[12px] font-bold uppercase tracking-[0.5em] hover:brightness-110 transition-all active:scale-[0.98] shadow-[0_0_30px_var(--accent-glow)] mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? (
-                  <div className="flex items-center justify-center space-x-3">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Processando...</span>
-                  </div>
-                ) : 'Agendar Protocolo'}
-              </button>
+              <div className="pt-4 pb-12">
+                <button 
+                  onClick={handleSave}
+                  disabled={isSaving || !newTask}
+                  className="w-full py-7 rounded-[2rem] bg-gradient-to-r from-zenit-accent to-zenit-crimson text-white text-[12px] font-black uppercase tracking-[0.5em] hover:brightness-110 transition-all active:scale-[0.98] shadow-[0_15px_40px_rgba(255,38,33,0.3)] disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                  <span className="relative z-10 flex items-center justify-center space-x-3">
+                    {isSaving ? (
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        <span>Sincronizando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap size={20} className="text-white animate-pulse" />
+                        <span>Agendar Protocolo</span>
+                      </>
+                    )}
+                  </span>
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

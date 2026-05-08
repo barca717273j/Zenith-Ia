@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Brain, Target, Puzzle, Gamepad2, ArrowLeft, Zap, Sparkles, Trophy, ChevronLeft, Award, Play, RotateCcw } from 'lucide-react';
+import { Brain, Target, Puzzle, Gamepad2, ArrowLeft, Zap, Sparkles, Trophy, ChevronLeft, Award, Play, RotateCcw, X } from 'lucide-react';
 import { TetrisGame } from './TetrisGame';
 import { useGamification } from './GamificationContext';
 import { supabase } from '../lib/supabase';
@@ -100,7 +100,7 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
 
   if (mode !== 'menu') {
     return (
-      <div className="min-h-screen p-6 pb-32">
+      <div className="min-h-screen p-6 pb-56">
         <button 
           onClick={() => setMode('menu')}
           className="flex items-center space-x-2 text-zenit-text-tertiary hover:text-zenit-text-primary transition-colors mb-8"
@@ -114,7 +114,7 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
   }
 
   return (
-    <div className="p-6 space-y-12 pb-32 max-w-4xl mx-auto min-h-screen">
+    <div className="p-6 space-y-12 pb-56 max-w-4xl mx-auto min-h-screen">
       <header className="space-y-6">
         <div className="flex items-center space-x-6">
           <div className="w-16 h-16 rounded-[2rem] bg-zenit-surface-1/40 backdrop-blur-xl border border-zenit-border-primary flex items-center justify-center text-zenit-scarlet shadow-2xl">
@@ -393,7 +393,7 @@ const FocusGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
   const handleHit = () => {
     if (!isPlaying) return;
     setScore(s => s + 1);
-    addXP(5);
+    addXP(10); // More XP for focus
     moveTarget();
   };
 
@@ -407,38 +407,35 @@ const FocusGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
       onGameOver(score);
     }
     return () => clearInterval(timer);
-  }, [isPlaying, timeLeft]);
+  }, [isPlaying, timeLeft, score, onGameOver]);
 
   return (
     <div className="max-w-md mx-auto space-y-10">
       <div className="flex justify-between items-end">
         <div className="space-y-1">
-          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Tempo Restante</p>
+          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Sequência Focus</p>
           <p className="text-5xl font-display font-bold italic text-zenit-text-primary leading-none">{timeLeft}s</p>
         </div>
         <div className="text-right space-y-1">
-          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Alvos Atingidos</p>
+          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Hardware Sync</p>
           <p className="text-5xl font-display font-bold italic text-zenit-accent leading-none">{score}</p>
         </div>
       </div>
 
-      <div className="aspect-square premium-card relative overflow-hidden border-zenit-border-primary bg-zenit-surface-1 group">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,59,59,0.03)_0%,transparent_70%)]" />
+      <div className="aspect-square premium-card relative overflow-hidden border-zenit-border-primary bg-zenit-surface-1 group cursor-crosshair">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,59,59,0.05)_0%,transparent_70%)]" />
         
         {isPlaying && (
           <motion.button
             initial={false}
             animate={{ left: `${targetPos.x}%`, top: `${targetPos.y}%` }}
+            transition={{ type: 'spring', damping: 15, stiffness: 400 }}
             onClick={handleHit}
-            className="absolute w-16 h-16 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zenit-accent shadow-[0_0_30px_var(--accent-glow)] flex items-center justify-center group/target"
+            className="absolute w-20 h-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zenit-accent shadow-[0_0_40px_var(--accent-glow)] flex items-center justify-center group/target active:scale-90"
           >
-            <motion.div 
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="w-10 h-10 rounded-full border-2 border-white/40 flex items-center justify-center"
-            >
-              <div className="w-2 h-2 rounded-full bg-white" />
-            </motion.div>
+            <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center">
+              <div className="w-3 h-3 rounded-full bg-white shadow-[0_0_10px_white]" />
+            </div>
             <div className="absolute inset-0 rounded-full border-4 border-white/10 animate-ping" />
           </motion.button>
         )}
@@ -476,158 +473,100 @@ const FocusGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => v
 };
 
 const LogicGame: React.FC<{ t: any; onBack: () => void; addXP: (xp: number) => void; onGameOver: (score: number) => void }> = ({ t, onBack, addXP, onGameOver }) => {
-  const [problem, setProblem] = useState({ a: 0, b: 0, op: '+', ans: 0 });
-  const [userAns, setUserAns] = useState('');
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameState, setGameState] = useState<'idle' | 'waiting' | 'ready' | 'result' | 'early'>('idle');
+  const [startTime, setStartTime] = useState(0);
+  const [reactionTime, setReactionTime] = useState(0);
+  const [timeoutId, setTimeoutId] = useState<any>(null);
 
-  const generateProblem = () => {
-    const ops = ['+', '-', '*'];
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    let a, b, ans;
-    
-    if (op === '*') {
-      a = Math.floor(Math.random() * 12) + 1;
-      b = Math.floor(Math.random() * 12) + 1;
-      ans = a * b;
-    } else {
-      a = Math.floor(Math.random() * 50) + 1;
-      b = Math.floor(Math.random() * 50) + 1;
-      ans = op === '+' ? a + b : a - b;
-    }
-    
-    setProblem({ a, b, op, ans });
-    setUserAns('');
+  const startReflex = () => {
+    setGameState('waiting');
+    const delay = Math.random() * 3000 + 2000;
+    const tid = setTimeout(() => {
+      setGameState('ready');
+      setStartTime(Date.now());
+    }, delay);
+    setTimeoutId(tid);
   };
 
-  const handleNumberInput = (num: number) => {
-    const newAns = userAns + num;
-    setUserAns(newAns);
-    
-    if (parseInt(newAns) === problem.ans) {
-      setScore(s => s + 1);
-      addXP(15);
-      setTimeout(generateProblem, 200);
+  const handleTrigger = () => {
+    if (gameState === 'waiting') {
+      clearTimeout(timeoutId);
+      setGameState('early');
+      return;
+    }
+    if (gameState === 'ready') {
+      const time = Date.now() - startTime;
+      setReactionTime(time);
+      setGameState('result');
+      addXP(Math.max(10, 200 - Math.floor(time / 2)));
+      onGameOver(time);
     }
   };
-
-  const handleSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    const val = parseInt(userAns);
-    if (isNaN(val)) return;
-
-    if (val === problem.ans) {
-      setScore(s => s + 1);
-      addXP(15);
-      generateProblem();
-    } else {
-      setUserAns('');
-    }
-  };
-
-  React.useEffect(() => {
-    let timer: any;
-    if (isPlaying && timeLeft > 0) {
-      timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
-    } else if (timeLeft === 0 && isPlaying) {
-      setIsPlaying(false);
-      setGameOver(true);
-      onGameOver(score);
-    }
-    return () => clearInterval(timer);
-  }, [isPlaying, timeLeft, score, onGameOver]);
 
   return (
     <div className="max-w-md mx-auto space-y-10">
-      <div className="flex justify-between items-end">
-        <div className="space-y-1">
-          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Tempo</p>
-          <p className="text-5xl font-display font-bold italic text-zenit-text-primary leading-none">{timeLeft}s</p>
-        </div>
-        <div className="text-right space-y-1">
-          <p className="text-[11px] text-zenit-text-tertiary uppercase font-black tracking-[0.3em]">Equações</p>
-          <p className="text-5xl font-display font-bold italic text-emerald-400 leading-none">{score}</p>
-        </div>
+      <div className="text-center space-y-3">
+        <p className="text-[11px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em]">Hardware Reflex Test</p>
+        <h2 className="text-4xl font-display font-bold italic uppercase tracking-tighter text-zenit-text-primary">
+          Protocolo <span className="text-zenit-accent">Reflexo</span>
+        </h2>
       </div>
 
-      <div className="premium-card p-8 sm:p-12 text-center space-y-10 border-zenit-border-primary bg-zenit-surface-1 relative overflow-hidden">
-        {isPlaying ? (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="space-y-10"
-          >
-            <div className="text-6xl sm:text-7xl font-display font-bold tracking-tighter text-zenit-text-primary italic">
-              {problem.a} <span className="text-zenit-accent">{problem.op === '*' ? '×' : problem.op}</span> {problem.b}
+      <motion.button
+        onClick={gameState === 'idle' || gameState === 'result' || gameState === 'early' ? startReflex : handleTrigger}
+        className={`w-full aspect-square rounded-[3rem] border-2 transition-all duration-300 flex flex-col items-center justify-center space-y-6 relative overflow-hidden ${
+          gameState === 'waiting' ? 'bg-zenit-surface-1 border-amber-500/30' :
+          gameState === 'ready' ? 'bg-zenit-accent border-zenit-accent shadow-[0_0_50px_var(--accent-glow)]' :
+          gameState === 'early' ? 'bg-red-900/40 border-red-500/30' :
+          'bg-zenit-surface-1 border-zenit-border-primary'
+        }`}
+      >
+        <div className="relative z-10 flex flex-col items-center space-y-4">
+          {gameState === 'idle' && (
+            <>
+              <Zap size={64} className="text-zenit-text-tertiary opacity-20" />
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-zenit-text-tertiary">Clique para Iniciar</p>
+            </>
+          )}
+          {gameState === 'waiting' && (
+            <>
+              <motion.div 
+                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <Target size={64} className="text-amber-500" />
+              </motion.div>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-500">Aguarde o Sinal...</p>
+            </>
+          )}
+          {gameState === 'ready' && (
+            <div className="animate-bounce-short">
+              <Zap size={80} fill="white" className="text-white" />
+              <p className="text-xl font-display font-black uppercase tracking-[0.2em] text-white mt-4 italic">CLIQUE AGORA!</p>
             </div>
-
-            <div className="relative">
-              <div className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[2rem] py-8 text-center text-5xl font-bold text-zenit-text-primary min-h-[100px] flex items-center justify-center shadow-inner">
-                {userAns || <span className="text-zenit-text-tertiary opacity-20">?</span>}
+          )}
+          {gameState === 'result' && (
+            <>
+              <div className="text-6xl font-display font-black italic text-white tracking-tighter">
+                {reactionTime}ms
               </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                <motion.button
-                  key={num}
-                  whileHover={{ backgroundColor: 'var(--surface-2)', scale: 1.05 }}
-                  whileTap={{ scale: 0.92 }}
-                  onClick={() => handleNumberInput(num)}
-                  className="py-6 bg-zenit-surface-2 rounded-2xl border border-zenit-border-primary text-3xl font-bold text-zenit-text-primary transition-all shadow-sm hover:border-zenit-accent/30"
-                >
-                  {num}
-                </motion.button>
-              ))}
-              <motion.button
-                whileTap={{ scale: 0.92 }}
-                onClick={() => setUserAns('')}
-                className="py-6 bg-zenit-accent/10 rounded-2xl border border-zenit-accent/20 text-zenit-accent font-black text-2xl uppercase tracking-widest"
-              >
-                C
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.92 }}
-                onClick={() => handleNumberInput(0)}
-                className="py-6 bg-zenit-surface-2 rounded-2xl border border-zenit-border-primary text-3xl font-bold text-zenit-text-primary"
-              >
-                0
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.92 }}
-                onClick={() => handleSubmit()}
-                className="py-6 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-emerald-400 font-black text-2xl uppercase tracking-widest"
-              >
-                OK
-              </motion.button>
-            </div>
-          </motion.div>
-        ) : gameOver ? (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <p className="text-zenit-accent font-black uppercase tracking-[0.4em] text-sm">Lógica Concluída</p>
-              <p className="text-zenit-text-tertiary text-[11px] font-bold uppercase tracking-widest">Processamento Finalizado</p>
-            </div>
-            <button 
-              onClick={() => { setGameOver(false); setIsPlaying(true); setTimeLeft(30); setScore(0); generateProblem(); }}
-              className="neon-button w-full py-6 text-xs font-black uppercase tracking-[0.3em]"
-            >
-              <RotateCcw size={20} />
-              <span>Tentar Novamente</span>
-            </button>
-          </div>
-        ) : (
-          <button 
-            onClick={() => { setIsPlaying(true); setTimeLeft(30); setScore(0); generateProblem(); }}
-            className="neon-button w-full py-6 text-xs font-black uppercase tracking-[0.3em]"
-          >
-            <Puzzle size={20} />
-            <span>Iniciar Lógica</span>
-          </button>
-        )}
-      </div>
+              <div className="space-y-4">
+                <p className="text-xs font-black uppercase tracking-[0.3em] text-zenit-accent">Latência Neural Detectada</p>
+                <div className="px-8 py-3 bg-white/10 rounded-2xl border border-white/20">
+                   <p className="text-[10px] font-bold text-white uppercase tracking-widest">Toque para Reiniciar</p>
+                </div>
+              </div>
+            </>
+          )}
+          {gameState === 'early' && (
+            <>
+              <X size={64} className="text-zenit-accent" />
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-zenit-accent">Falso Início Detectado</p>
+              <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-widest">Aguarde o sinal vermelho</p>
+            </>
+          )}
+        </div>
+      </motion.button>
     </div>
   );
 };

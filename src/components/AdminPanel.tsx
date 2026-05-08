@@ -248,7 +248,7 @@ export const AdminPanel: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBac
   );
 
   return (
-    <div className="p-6 space-y-10 pb-32 max-w-4xl mx-auto min-h-screen relative">
+    <div className="p-6 space-y-10 pb-56 max-w-4xl mx-auto min-h-screen relative">
       <button 
         onClick={onBack}
         className="fixed top-8 left-8 z-[60] p-4 bg-zenit-surface-1 rounded-[20px] border border-zenit-border-primary backdrop-blur-xl hover:bg-zenit-surface-2 transition-all group"

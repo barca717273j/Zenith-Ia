@@ -339,7 +339,7 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
     : 0;
 
   return (
-    <div className="flex flex-col gap-8 p-6 pb-32 max-w-2xl mx-auto min-h-screen bg-zenit-black">
+    <div className="flex flex-col gap-8 p-6 pb-56 max-w-2xl mx-auto min-h-screen bg-zenit-black">
       <header className="flex justify-between items-end">
         <div className="space-y-2">
           <h2 className="text-4xl font-display font-medium tracking-tight text-zenit-text-primary uppercase italic leading-none">
@@ -475,11 +475,21 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
         <div className="absolute left-[39px] top-10 bottom-10 w-px bg-gradient-to-b from-zenit-scarlet/20 via-zenit-border-primary/40 to-transparent" />
         
         {filteredRoutines.length === 0 ? (
-          <div className="py-24 text-center space-y-6 opacity-30">
-            <div className="w-20 h-20 rounded-[2rem] bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center mx-auto shadow-inner">
-              <Zap size={36} className="text-zenit-text-tertiary" />
+          <div className="py-24 text-center space-y-10 relative">
+            <div className="absolute inset-0 bg-zenit-accent/5 blur-[100px] rounded-full -z-10" />
+            <div className="w-24 h-24 rounded-[2.5rem] bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center mx-auto shadow-2xl rotate-12 group-hover:rotate-0 transition-transform">
+              <Sparkles size={48} className="text-zenit-text-tertiary" />
             </div>
-            <p className="text-[12px] font-black uppercase tracking-[0.5em] text-zenit-text-tertiary">{t.routine.noActiveProtocols}</p>
+            <div className="space-y-4">
+              <p className="text-[14px] font-display font-black uppercase tracking-[0.5em] text-zenit-text-primary italic leading-none">Vácuo Proposital</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary max-w-[200px] mx-auto leading-relaxed">Nenhum protocolo ativo detectado. Ative a IA para arquitetar seu dia.</p>
+            </div>
+            <button 
+              onClick={() => setIsAdding(true)}
+              className="px-10 py-4 bg-zenit-surface-2 hover:bg-zenit-surface-3 rounded-2xl text-[9px] font-black uppercase tracking-[0.4em] text-zenit-accent border border-zenit-accent/20 transition-all active:scale-95 shadow-xl italic"
+            >
+              Iniciar Sincronia
+            </button>
           </div>
         ) : filteredRoutines.map((r, idx) => (
           <motion.div
@@ -494,7 +504,6 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
               <div className={`relative z-10 w-6 h-6 rounded-full border transition-all duration-700 flex items-center justify-center ${r.completed ? 'bg-zenit-scarlet border-zenit-scarlet shadow-[0_0_20px_rgba(255,0,0,0.4)] scale-110' : 'bg-zenit-black border-zenit-border-primary group-hover:border-zenit-scarlet/50 scale-100 group-hover:scale-110'}`}>
                 {r.completed && <Check size={12} className="text-white" strokeWidth={3} />}
               </div>
-              <p className={`text-[12px] font-black font-mono tracking-tight transition-colors duration-500 italic ${r.completed ? 'text-zenit-scarlet opacity-40' : 'text-zenit-text-tertiary group-hover:text-zenit-text-primary'}`}>{r.time}</p>
             </div>
 
             {/* Task Card - Ultra Premium */}

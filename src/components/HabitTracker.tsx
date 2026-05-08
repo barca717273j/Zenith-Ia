@@ -322,7 +322,7 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
   ];
 
   return (
-    <div className="flex flex-col gap-8 p-6 pb-40 max-w-2xl mx-auto min-h-screen">
+    <div className="flex flex-col gap-8 p-6 pb-56 max-w-2xl mx-auto min-h-screen">
       <header className="flex justify-between items-start mb-4">
         <div className="space-y-3">
           <h1 className="text-4xl sm:text-5xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary italic">

@@ -118,7 +118,7 @@ export const SubscriptionScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 pb-32 relative overflow-hidden">
+    <div className="min-h-screen bg-black text-white p-6 pb-56 relative overflow-hidden">
       {/* Background Ambience */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#111,0%,#000,100%)]" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full pointer-events-none">

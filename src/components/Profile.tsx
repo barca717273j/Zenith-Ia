@@ -368,7 +368,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
         return <Journal t={t} />;
       case 'edit-profile':
         return (
-          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen relative">
+          <div className="p-6 space-y-10 pb-56 max-w-2xl mx-auto min-h-screen relative">
             {/* Background Glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
             
@@ -385,7 +385,7 @@ export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab 
                   <h2 className="text-4xl font-display font-bold uppercase tracking-tighter text-zenit-text-primary italic leading-none">
                     {t.profile.editProfile.split(' ')[0]} <span className="text-zenit-accent">{t.profile.editProfile.split(' ')[1]}</span>
                   </h2>
-                  <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-bold mt-2 ml-1">{t.profile.neuralSync}</p>
+                  <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-bold mt-2 ml-1">Configuração de Agente</p>
                 </div>
               </div>
             </header>
@@ -557,7 +557,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
         );
       case 'security':
         return (
-          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen relative">
+          <div className="p-6 space-y-10 pb-56 max-w-2xl mx-auto min-h-screen relative">
             {/* Background Glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -656,7 +656,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
         );
       case 'preferences':
         return (
-          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen relative">
+          <div className="p-6 space-y-10 pb-56 max-w-2xl mx-auto min-h-screen relative">
             {/* Background Glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -748,7 +748,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
       case 'followers':
       case 'following':
         return (
-          <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen relative">
+          <div className="p-6 space-y-10 pb-56 max-w-2xl mx-auto min-h-screen relative">
             {/* Background Glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -814,7 +814,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
       default:
         if (loading) return <div className="flex items-center justify-center min-h-screen bg-zenit-black"><div className="w-8 h-8 border-2 border-zenit-scarlet border-t-transparent rounded-full animate-spin" /></div>;
         return (
-          <div className="pb-32 max-w-6xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
+          <div className="pb-56 max-w-6xl mx-auto min-h-screen bg-zenit-black relative overflow-hidden">
             {/* Background Glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-zenit-accent/5 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-zenit-crimson/5 rounded-full blur-[100px] pointer-events-none" />
@@ -960,10 +960,10 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                     <>
                       <button 
                         onClick={() => setView('edit-profile')}
-                        className="flex-1 py-5 rounded-[2rem] bg-zenit-text-primary text-zenit-black text-[9px] font-black uppercase tracking-[0.4em] hover:brightness-90 transition-all active:scale-[0.98] shadow-2xl flex items-center justify-center space-x-2"
+                        className="flex-1 py-5 rounded-[2.5rem] bg-zenit-accent text-white text-[9px] font-black uppercase tracking-[0.4em] hover:brightness-110 transition-all active:scale-[0.98] shadow-2xl shadow-zenit-accent/30 flex items-center justify-center space-x-3 border border-zenit-accent/50"
                       >
                         <User size={14} />
-                        <span>Editar Protocolo</span>
+                        <span>Ajustar Perfil</span>
                       </button>
                     </>
                   ) : (
@@ -1079,8 +1079,8 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                 {/* System Footer Info */}
                 <div className="pt-12 pb-8 flex flex-col items-center space-y-3 opacity-20 text-zenit-text-tertiary">
                   <p className="text-[7.5px] font-black uppercase tracking-[1em]">Project Zenith</p>
-                  <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-zenit-text-tertiary to-transparent" />
-                  <p className="text-[6px] font-black uppercase tracking-[0.4em] italic">v5.0.2 - Protocol Verified</p>
+                  <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-zenit-accent to-transparent opacity-40" />
+                  <p className="text-[6px] font-black uppercase tracking-[0.4em] italic">Protocolo de Otimização Humana</p>
                 </div>
               </div>
             )}

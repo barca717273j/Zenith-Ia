@@ -110,7 +110,7 @@ export const Stats: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 space-y-8 pb-32">
+    <div className="p-6 space-y-8 pb-56">
       <header>
         <h1 className="text-2xl font-bold uppercase tracking-tight">Analytics</h1>
         <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Desempenho Semanal</p>

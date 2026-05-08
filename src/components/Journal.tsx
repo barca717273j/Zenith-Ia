@@ -125,7 +125,7 @@ export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {
   };
 
   return (
-    <div className="p-6 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
+    <div className="p-6 space-y-10 pb-56 max-w-2xl mx-auto min-h-screen">
       <header className="flex justify-between items-end">
         <div className="space-y-2">
           <h1 className="text-4xl font-display font-medium tracking-tight text-zenit-text-primary italic leading-none uppercase">

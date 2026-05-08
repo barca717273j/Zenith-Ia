@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, CreditCard, PiggyBank, TrendingUp, TrendingDown, Sparkles, Zap, MessageSquare, X, Send, Bot, Activity, Timer, BarChart3, PieChart } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, CreditCard, PiggyBank, TrendingUp, TrendingDown, Sparkles, Zap, MessageSquare, X, Send, Bot, Activity, Timer, BarChart3, PieChart, ArrowLeft, Cpu, Terminal, Target } from 'lucide-react';
 import { askAI } from '../services/gemini';
 import { supabase } from '../lib/supabase';
 import { Language } from '../translations';
@@ -380,167 +380,197 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
   };
 
   return (
-    <div className="p-4 space-y-10 pb-32 max-w-2xl mx-auto min-h-screen">
-      <header className="flex justify-between items-center px-2">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-display font-black uppercase tracking-tighter text-white italic">
-            Fluxo <span className="text-zenit-accent font-black">Capital</span>
-          </h1>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-px bg-white/20 rounded-full" />
-            <p className="text-[9px] text-white/40 font-black uppercase tracking-[0.4em]">
-              Central de Liquidez
-            </p>
+    <div className="p-0 space-y-0 pb-56 max-w-2xl mx-auto min-h-screen bg-zenit-black selection:bg-zenit-scarlet/30">
+      {/* High-End Technical Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-zenit-black/80 backdrop-blur-3xl border-b border-zenit-border-primary px-6 py-6">
+        <div className="max-w-2xl mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-6">
+            <button 
+              onClick={() => setAppTab('home')}
+              className="w-11 h-11 flex items-center justify-center bg-zenit-surface-2 border border-zenit-border-secondary rounded-2xl text-zenit-text-tertiary hover:text-white hover:border-white/20 transition-all active:scale-95 group shadow-inner"
+            >
+              <ArrowLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
+            </button>
+            <div className="space-y-0.5">
+              <h1 className="text-2xl font-display font-black uppercase tracking-tighter text-white italic">
+                ZENITH <span className="text-zenit-scarlet drop-shadow-[0_0_8px_rgba(255,26,26,0.3)]">CAPITAL</span>
+              </h1>
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-[1.5px] bg-zenit-scarlet/40 rounded-full" />
+                <p className="text-[7.5px] text-zenit-text-tertiary font-black uppercase tracking-[0.5em] italic">Neural Wealth Hub</p>
+              </div>
+            </div>
           </div>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowAIChat(true)}
+            className="w-11 h-11 rounded-2xl bg-zenit-surface-2 border border-zenit-border-secondary flex items-center justify-center text-zenit-scarlet transition-all shadow-lg active:bg-zenit-scarlet active:text-white"
+          >
+            <Bot size={20} className="animate-pulse" />
+          </motion.button>
         </div>
-        <motion.button 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setShowAIChat(true)}
-          className="w-11 h-11 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center text-zenit-accent transition-all shadow-sm"
-        >
-          <Zap size={20} className="animate-pulse" />
-        </motion.button>
       </header>
 
-      {/* Main Balance Card */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative p-10 rounded-[2.5rem] bg-zenit-text-primary text-zenit-bg overflow-hidden shadow-2xl"
-      >
-        <div className="absolute top-0 right-0 p-10 opacity-5 -translate-x-4 -translate-y-4">
-          <Wallet size={120} />
-        </div>
-        
-        <div className="relative z-10 flex flex-col items-center text-center space-y-8">
-          <div className="space-y-1">
-            <span className="text-[9px] opacity-40 uppercase tracking-[0.4em] font-black italic">Balanço Consolidado</span>
-            <h2 className="text-5xl font-display font-black tracking-tighter truncate max-w-full italic">
-              {formatCurrency(balance)}
-            </h2>
-          </div>
+      <div className="pt-32 px-4 space-y-10">
+        {/* Futuristic Liquidity Gauge */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative p-10 rounded-[3.5rem] bg-zenit-surface-1 border border-zenit-border-primary overflow-hidden shadow-2xl group"
+        >
+          {/* Animated Background Mesh */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,26,26,0.05)_0%,transparent_50%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] [background-size:30px_30px] opacity-20" />
           
-          <div className="flex w-full divide-x divide-zenit-bg/5 pt-6 border-t border-zenit-bg/5">
-            <div className="flex-1 flex flex-col items-center space-y-1">
-              <span className="text-[8px] opacity-40 uppercase tracking-[0.3em] font-black leading-none">Entradas</span>
-              <span className="text-sm font-black italic opacity-80">{formatCurrency(totalIncome)}</span>
+          <div className="relative z-10 flex flex-col items-center text-center space-y-10">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="flex items-center space-x-3 px-3 py-1 rounded-full bg-zenit-scarlet/5 border border-zenit-scarlet/10 mb-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
+                <span className="text-[8px] text-zenit-scarlet font-black uppercase tracking-[0.5em] italic">Liquidez Estável</span>
+              </div>
+              <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.5em] font-black italic">PATRIMÔNIO LÍQUIDO</p>
+              <h2 className="text-5xl font-display font-black tracking-tighter text-white italic drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
+                {formatCurrency(balance)}
+              </h2>
             </div>
-            <div className="flex-1 flex flex-col items-center space-y-1">
-              <span className="text-[8px] opacity-40 uppercase tracking-[0.3em] font-black leading-none">Saídas</span>
-              <span className="text-sm font-black italic opacity-80">{formatCurrency(totalExpense)}</span>
+            
+            {/* Real-time Ticker Data */}
+            <div className="grid grid-cols-2 w-full gap-8 p-8 rounded-[2.5rem] bg-zenit-black/20 border border-white/5 backdrop-blur-md">
+              <div className="flex flex-col items-center space-y-2 group/stat">
+                <span className="text-[7.5px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black italic">INPUT_FLOW</span>
+                <div className="flex items-center space-x-2">
+                  <ArrowUpRight size={14} className="text-emerald-500" />
+                  <span className="text-lg font-display font-black italic text-emerald-500">{formatCurrency(totalIncome)}</span>
+                </div>
+                <div className="w-full h-0.5 bg-zenit-surface-3 rounded-full overflow-hidden mt-1">
+                  <div className="h-full bg-emerald-500/40 w-[70%] animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col items-center space-y-2 group/stat">
+                <span className="text-[7.5px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black italic">OUTPUT_FLOW</span>
+                <div className="flex items-center space-x-2">
+                  <ArrowDownLeft size={14} className="text-zenit-scarlet" />
+                  <span className="text-lg font-display font-black italic text-zenit-text-primary">{formatCurrency(totalExpense)}</span>
+                </div>
+                <div className="w-full h-0.5 bg-zenit-surface-3 rounded-full overflow-hidden mt-1">
+                  <div className="h-full bg-zenit-scarlet/40 w-[40%] animate-pulse" />
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="flex w-full gap-3">
-            <button 
-              onClick={() => { setType('income'); setShowAddModal(true); }}
-              className="flex-1 bg-zenit-bg/5 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-zenit-bg/10 transition-all border border-zenit-bg/5 italic"
-            >
-              Provimento
-            </button>
-            <button 
-              onClick={() => { setType('expense'); setShowAddModal(true); }}
-              className="flex-1 bg-zenit-bg text-zenit-text-primary py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-all italic shadow-lg"
-            >
-              Alocação
-            </button>
+            <div className="flex w-full gap-4">
+              <button 
+                onClick={() => { setType('income'); setShowAddModal(true); }}
+                className="flex-1 h-14 bg-zenit-surface-2 hover:bg-zenit-surface-3 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.4em] transition-all border border-zenit-border-secondary active:scale-95 italic shadow-lg"
+              >
+                Injetar Capital
+              </button>
+              <button 
+                onClick={() => { setType('expense'); setShowAddModal(true); }}
+                className="flex-1 h-14 bg-zenit-scarlet hover:brightness-110 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.4em] transition-all active:scale-95 italic shadow-[0_10px_30px_rgba(255,26,26,0.25)] border border-white/10"
+              >
+                Alocar Débito
+              </button>
+            </div>
           </div>
+        </motion.div>
+
+        {/* Dense Technical Tabs */}
+        <div className="flex bg-zenit-surface-1 p-1.5 rounded-[1.8rem] border border-zenit-border-primary backdrop-blur-xl shadow-2xl relative overflow-hidden">
+          {(['flow', 'budget', 'goals'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 py-4 text-[8px] uppercase tracking-[0.4em] font-black rounded-[1.2rem] transition-all relative italic ${
+                activeTab === tab ? 'text-zenit-black' : 'text-zenit-text-tertiary hover:text-white'
+              }`}
+            >
+              {activeTab === tab && (
+                <motion.div 
+                  layoutId="finance-tab-active"
+                  className="absolute inset-0 bg-white shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                  style={{ borderRadius: 'inherit' }}
+                />
+              )}
+              <span className="relative z-10 transition-colors duration-500">
+                {tab === 'flow' ? 'TRANSACTIONS' : tab === 'budget' ? 'ALOCATIONS' : 'PROJECTIONS'}
+              </span>
+            </button>
+          ))}
         </div>
-      </motion.div>
 
-      {/* Tab Switcher */}
-      <div className="flex bg-zenit-surface-2 p-1 rounded-2xl border border-zenit-border-primary backdrop-blur-xl shadow-inner">
-        {(['flow', 'budget', 'goals'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 text-[9px] uppercase tracking-[0.3em] font-black rounded-xl transition-all relative italic ${
-              activeTab === tab 
-                ? 'text-zenit-bg' 
-                : 'text-zenit-text-tertiary hover:text-zenit-text-primary'
-            }`}
-          >
-            {activeTab === tab && (
-              <motion.div 
-                layoutId="finance-tab-active"
-                className="absolute inset-0 bg-zenit-text-primary"
-                style={{ borderRadius: 'inherit' }}
-              />
-            )}
-            <span className="relative z-10">
-              {tab === 'flow' ? t.finance.flow : tab === 'budget' ? t.finance.budgets : t.finance.goals}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Dynamic Content Area */}
-      <div className="space-y-6">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <div className="w-6 h-6 border-2 border-zenit-scarlet border-t-transparent rounded-full animate-spin" />
-            <p className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.2em] font-black">Escaneando Dataset...</p>
-          </div>
-        ) : (
+        {/* Dynamic Content Area - Technical Data Strips */}
+        <div className="pb-20">
           <AnimatePresence mode="wait">
             {activeTab === 'flow' && (
               <motion.div 
                 key="flow"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
                 className="space-y-4"
               >
-                {/* Flow List */}
-                <div className="flex items-center justify-between px-2">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary">{t.finance.recentTransactions}</h3>
-                  <div className="flex items-center space-x-1 text-zenit-scarlet">
-                    <Activity size={10} />
-                    <span className="text-[8px] font-bold uppercase tracking-widest">Tempo Real</span>
+                <div className="flex items-center justify-between px-4 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <Activity size={14} className="text-zenit-scarlet" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenit-text-secondary italic">Neural Log Stream</h3>
+                  </div>
+                  <div className="px-3 py-1 rounded-md bg-zenit-surface-2 border border-zenit-border-secondary text-[7px] font-mono text-zenit-text-tertiary">
+                    RECORDS: {transactions.length}
                   </div>
                 </div>
 
                 {transactions.length === 0 ? (
-                  <div className="glass-card p-10 rounded-[2.5rem] border-dashed border-2 border-zenit-border-primary text-center space-y-4 opacity-50">
-                    <p className="text-[10px] text-zenit-text-tertiary uppercase font-bold tracking-widest">{t.finance.noTransactions}</p>
+                  <div className="p-16 rounded-[3rem] border border-dashed border-zenit-border-primary bg-zenit-surface-1/30 flex flex-col items-center justify-center space-y-6">
+                    <div className="w-16 h-16 rounded-3xl bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center opacity-20">
+                       <BarChart3 size={24} />
+                    </div>
+                    <p className="text-[10px] text-zenit-text-tertiary uppercase font-black tracking-[0.4em] italic opacity-40">Dataset Vazio</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {transactions.map((t_item, idx) => (
                       <motion.div 
                         key={t_item.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="glass-card p-5 rounded-3xl flex items-center justify-between border-zenit-border-primary bg-zenit-surface-1/40 hover:bg-zenit-surface-1 transition-all group"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.03 }}
+                        className="group flex flex-col p-6 rounded-[2rem] bg-zenit-surface-1 border border-zenit-border-primary hover:border-zenit-scarlet/30 transition-all duration-500 shadow-lg relative overflow-hidden"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${
-                            t_item.type === 'income' 
-                              ? 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10' 
-                              : 'bg-zenit-scarlet/5 text-zenit-scarlet border-zenit-scarlet/10'
-                          }`}>
-                            {t_item.type === 'income' ? <ArrowUpRight size={18} /> : <ArrowDownLeft size={18} />}
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-zenit-text-primary tracking-tight">{t_item.title}</p>
-                            <p className="text-[9px] text-zenit-text-tertiary uppercase font-black tracking-widest opacity-60">
-                              {t_item.category || 'Geral'} • {new Date(t_item.date).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className={`text-base font-display font-medium ${t_item.type === 'income' ? 'text-emerald-500' : 'text-zenit-text-primary'}`}>
-                            {t_item.type === 'income' ? '+' : '-'} {formatCurrency(t_item.amount)}
-                          </p>
-                          <button 
-                            onClick={() => deleteTransaction(t_item.id)}
-                            className="text-[7px] text-zenit-text-tertiary hover:text-zenit-scarlet uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-opacity mt-1"
-                          >
-                            Excluir
-                          </button>
-                        </div>
+                         <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:opacity-20 transition-opacity">
+                            <span className="text-[6px] font-mono">HASH_{t_item.id.slice(0,8).toUpperCase()}</span>
+                         </div>
+                         
+                         <div className="flex items-center justify-between relative z-10">
+                            <div className="flex items-center space-x-6">
+                               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 transition-all ${
+                                  t_item.type === 'income' 
+                                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
+                                    : 'bg-zenit-scarlet/10 text-zenit-scarlet border-zenit-scarlet/20'
+                               }`}>
+                                  {t_item.type === 'income' ? <Plus size={20} /> : <div className="w-4 h-0.5 bg-current" />}
+                               </div>
+                               <div>
+                                  <h4 className="text-base font-black text-white italic tracking-tight uppercase group-hover:translate-x-1 transition-transform">{t_item.title}</h4>
+                                  <div className="flex items-center space-x-3 mt-1.5">
+                                     <span className="text-[8px] px-2 py-0.5 rounded bg-zenit-surface-2 text-zenit-text-tertiary font-black uppercase tracking-widest">{t_item.category || 'GLOBAL'}</span>
+                                     <span className="text-[8px] text-zenit-text-tertiary/40 font-mono tracking-tighter">{new Date(t_item.date).toLocaleDateString()}</span>
+                                  </div>
+                               </div>
+                            </div>
+                            <div className="text-right flex flex-col items-end">
+                               <span className={`text-xl font-display font-black italic ${t_item.type === 'income' ? 'text-emerald-500' : 'text-white'}`}>
+                                  {t_item.type === 'income' ? '+' : '-'} {formatCurrency(t_item.amount)}
+                                </span>
+                                <button 
+                                  onClick={() => deleteTransaction(t_item.id)}
+                                  className="text-[7px] text-zenit-text-tertiary/30 hover:text-zenit-scarlet uppercase tracking-widest font-black transition-all mt-2 opacity-0 group-hover:opacity-100"
+                                >
+                                  EXPURGAR_DADO
+                                </button>
+                            </div>
+                         </div>
                       </motion.div>
                     ))}
                   </div>
@@ -551,43 +581,79 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
             {activeTab === 'budget' && (
               <motion.div 
                 key="budget"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
                 className="space-y-6"
               >
-                <div className="flex items-center justify-between px-2">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary uppercase">Alocação de Tetos</h3>
-                  <button onClick={() => setShowAddBudgetModal(true)} className="p-2 bg-zenit-surface-1 rounded-xl border border-zenit-border-primary text-zenit-scarlet">
-                    <Plus size={16} />
-                  </button>
+                <div className="flex items-center justify-between px-4 mb-6">
+                   <div className="flex items-center space-x-3">
+                      <BarChart3 size={14} className="text-zenit-scarlet" />
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenit-text-secondary italic">Neural Budget Clusters</h3>
+                   </div>
+                   <button 
+                     onClick={() => setShowAddBudgetModal(true)}
+                     className="w-10 h-10 rounded-xl bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet border border-zenit-scarlet/20 hover:bg-zenit-scarlet hover:text-white transition-all shadow-lg active:scale-90"
+                   >
+                     <Plus size={18} />
+                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  {budgets.map((b) => (
-                    <div key={b.id} className="glass-card p-6 rounded-[2rem] border-zenit-border-primary bg-zenit-surface-1/40 space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <p className="text-lg font-bold text-zenit-text-primary tracking-tight">{b.category}</p>
-                          <p className="text-[9px] text-zenit-text-tertiary uppercase font-black tracking-widest">
-                            Consumo: {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <span className={`text-xl font-display font-bold ${b.spent > b.limit ? 'text-zenit-scarlet' : 'text-zenit-text-primary'}`}>
-                            {Math.round((b.spent / b.limit) * 100)}%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="h-1.5 w-full bg-zenit-surface-2 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.min((b.spent / b.limit) * 100, 100)}%` }}
-                          className={`h-full ${b.spent > b.limit ? 'bg-zenit-scarlet shadow-[0_0_10px_rgba(255,0,0,0.3)]' : 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'}`}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                  {budgets.map((b, idx) => {
+                    const progress = (b.spent / b.limit) * 100;
+                    const isOver = progress > 100;
+                    return (
+                      <motion.div 
+                        key={idx} 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-8 rounded-[3rem] bg-zenit-surface-1 border border-zenit-border-primary hover:border-zenit-scarlet/40 transition-all duration-700 relative overflow-hidden group shadow-xl"
+                      >
+                         <div className="flex justify-between items-start mb-8 relative z-10">
+                            <div className="space-y-2">
+                               <h4 className="text-xl font-display font-black text-white italic uppercase tracking-tighter">{b.category}</h4>
+                               <div className="flex items-center space-x-3">
+                                  <div className={`w-2 h-2 rounded-full ${isOver ? 'bg-zenit-scarlet animate-ping' : 'bg-emerald-500'}`} />
+                                  <span className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic">
+                                     SAÚDE DO LIMITE: {isOver ? 'CRÍTICO' : 'ESTÁVEL'}
+                                  </span>
+                               </div>
+                            </div>
+                            <div className="text-right">
+                               <span className={`text-4xl font-display font-black italic ${isOver ? 'text-zenit-scarlet drop-shadow-[0_0_15px_rgba(255,26,26,0.4)]' : 'text-white'}`}>
+                                  {Math.round(progress)}%
+                               </span>
+                            </div>
+                         </div>
+
+                         <div className="space-y-4">
+                            <div className="flex justify-between text-[8px] font-black uppercase tracking-[0.3em] text-zenit-text-tertiary bg-zenit-surface-2 p-3 rounded-xl border border-zenit-border-primary">
+                               <span>CONSUMIDO: {formatCurrency(b.spent)}</span>
+                               <span className="opacity-40">TETO: {formatCurrency(b.limit)}</span>
+                            </div>
+                            <div className="relative h-1.5 w-full bg-zenit-surface-2 rounded-full overflow-hidden shadow-inner">
+                               <motion.div
+                                 initial={{ width: 0 }}
+                                 animate={{ width: `${Math.min(100, progress)}%` }}
+                                 className={`h-full relative rounded-full transition-all duration-1000 ${
+                                   isOver ? 'bg-zenit-scarlet' : 'bg-white'
+                                 }`}
+                               >
+                                  <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                               </motion.div>
+                            </div>
+                         </div>
+                         
+                         <button 
+                            onClick={() => deleteBudget(b.id)}
+                            className="absolute bottom-4 right-8 text-[7px] text-zenit-text-tertiary/20 hover:text-zenit-scarlet uppercase tracking-widest font-black transition-all opacity-0 group-hover:opacity-100"
+                         >
+                            CANCEL_LIMIT
+                         </button>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}
@@ -595,46 +661,44 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
             {activeTab === 'goals' && (
               <motion.div 
                 key="goals"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
                 className="space-y-6"
               >
-                <div className="flex items-center justify-between px-2">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary uppercase">Projeção de Ativos</h3>
-                  <button onClick={() => setShowAddGoalModal(true)} className="p-2 bg-zenit-surface-1 rounded-xl border border-zenit-border-primary text-zenit-scarlet">
-                    <Plus size={16} />
-                  </button>
+                <div className="flex items-center justify-between px-4 mb-6">
+                   <div className="flex items-center space-x-3">
+                      <PiggyBank size={14} className="text-zenit-scarlet" />
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zenit-text-secondary italic">Neural Profit Targets</h3>
+                   </div>
+                   <button 
+                     onClick={() => setShowAddGoalModal(true)}
+                     className="w-10 h-10 rounded-xl bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet border border-zenit-border-secondary hover:bg-zenit-scarlet hover:text-white transition-all shadow-lg active:scale-90"
+                   >
+                     <Plus size={18} />
+                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
-                  {goals.map((goal) => (
-                    <div key={goal.id} className="glass-card p-6 rounded-[2rem] border-zenit-border-primary bg-zenit-surface-1/40 space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <p className="text-lg font-bold text-zenit-text-primary tracking-tight">{goal.name}</p>
-                          <p className="text-[9px] text-zenit-text-tertiary uppercase font-black tracking-widest">
-                            Aportado: {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
-                          </p>
-                        </div>
-                        <div className="w-12 h-12 rounded-2xl bg-zenit-scarlet/5 border border-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet">
-                          <PiggyBank size={24} />
-                        </div>
-                      </div>
-                      <div className="h-1.5 w-full bg-zenit-surface-2 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}
-                          className="h-full bg-zenit-scarlet shadow-[0_0_10px_rgba(255,0,0,0.3)]"
-                        />
-                      </div>
-                    </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {goals.map((goal, idx) => (
+                    <GoalCard 
+                      key={goal.id}
+                      idx={idx}
+                      icon={<TrendingUp size={24} />} 
+                      label={goal.name} 
+                      current={goal.current} 
+                      target={goal.target} 
+                      color="scarlet" 
+                      formatCurrency={formatCurrency}
+                      t={t}
+                      onDelete={() => deleteGoal(goal.id)}
+                    />
                   ))}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        )}
+        </div>
       </div>
 
       {/* Simplified AI Chat Entry */}
@@ -699,8 +763,8 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
               </Bar>
               <defs>
                 <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ff1a1a" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#ff1a1a" stopOpacity={0.3} />
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.3} />
                 </linearGradient>
                 <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="currentColor" stopOpacity={0.2} className="text-zenit-text-tertiary" />
@@ -1127,74 +1191,94 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
       {/* AI Assistant Modal */}
       <AnimatePresence>
         {showAIChat && (
-          <div className="fixed inset-0 z-[100] flex flex-col bg-zenit-black transition-colors duration-500">
+          <div className="fixed inset-0 z-[100] flex flex-col bg-zenit-black/95 backdrop-blur-2xl transition-colors duration-500">
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="flex flex-col h-full max-w-2xl mx-auto w-full"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              className="flex flex-col h-full max-w-2xl mx-auto w-full relative overflow-hidden"
             >
-              <div className="p-8 border-b border-zenit-border-primary flex justify-between items-center bg-zenit-surface-1">
-                <div className="flex items-center space-x-5">
-                  <div className="w-14 h-14 rounded-[20px] bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet shadow-2xl shadow-zenit-scarlet/20">
-                    <Bot size={32} />
+              {/* Technical Overlays */}
+              <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle_at_center,white_0%,transparent_100%)]" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-zenit-scarlet/30 animate-pulse" />
+
+              <div className="p-8 border-b border-zenit-border-primary flex justify-between items-center bg-zenit-surface-1 relative z-10">
+                <div className="flex items-center space-x-6">
+                  <div className="w-16 h-16 rounded-[24px] bg-zenit-scarlet/10 flex items-center justify-center text-zenit-scarlet shadow-2xl relative">
+                    <div className="absolute inset-0 rounded-[24px] border border-zenit-scarlet/20 animate-pulse" />
+                    <Bot size={36} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-display font-bold uppercase tracking-tight text-zenit-text-primary">{t.finance.zenitStrategist}</h3>
-                    <p className="text-[10px] text-zenit-scarlet font-black uppercase tracking-[0.3em]">{t.finance.activeFinanceIntelligence}</p>
+                    <h3 className="text-2xl font-display font-black uppercase tracking-tight text-white italic">NEURAL <span className="text-zenit-scarlet">STRATEGIST</span></h3>
+                    <p className="text-[8px] text-zenit-scarlet font-black uppercase tracking-[0.4em] mt-1 italic">ACTIVE FLOW INTELLIGENCE v4.2</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setShowAIChat(false)} 
-                  className="w-12 h-12 rounded-2xl bg-zenit-surface-1 flex items-center justify-center text-zenit-text-tertiary hover:bg-zenit-surface-2 hover:text-zenit-text-primary transition-all"
+                  className="w-12 h-12 rounded-2xl bg-zenit-surface-2 flex items-center justify-center text-zenit-text-tertiary hover:bg-zenit-surface-3 hover:text-white transition-all border border-zenit-border-secondary shadow-inner"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 space-y-10">
+              <div className="flex-1 overflow-y-auto p-8 space-y-12 scrollbar-hide relative z-10">
                 {aiResponse ? (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="max-w-none"
                   >
-                    <div className="glass-card p-10 border-zenit-border-primary bg-zenit-surface-1 rounded-[40px] leading-relaxed text-zenit-text-secondary font-light text-lg shadow-2xl">
-                      <Markdown>{aiResponse}</Markdown>
+                    <div className="p-10 border border-zenit-border-primary bg-zenit-surface-1/50 rounded-[40px] leading-relaxed text-zenit-text-secondary font-light text-xl shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 left-0 w-1 h-full bg-zenit-scarlet/20 group-hover:bg-zenit-scarlet transition-colors" />
+                      <div className="markdown-body prose prose-invert max-w-none prose-p:leading-relaxed prose-p:text-zenit-text-secondary">
+                        <Markdown>{aiResponse}</Markdown>
+                      </div>
                     </div>
                   </motion.div>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center space-y-8 opacity-20">
+                  <div className="h-full flex flex-col items-center justify-center space-y-12 opacity-30">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-zenit-scarlet/20 blur-[60px] rounded-full animate-pulse" />
-                      <Bot size={100} className="relative z-10 text-zenit-scarlet" />
+                      <div className="absolute inset-0 bg-zenit-scarlet/20 blur-[100px] rounded-full animate-pulse" />
+                      <div className="relative z-10 w-32 h-32 rounded-[40px] bg-zenit-surface-2 border border-zenit-border-primary flex items-center justify-center">
+                        <Cpu size={60} className="text-zenit-scarlet animate-pulse" />
+                      </div>
                     </div>
-                    <p className="text-[10px] uppercase tracking-[0.5em] font-black text-zenit-text-primary">{t.finance.waitingAnalysisCommand}</p>
+                    <div className="text-center space-y-2">
+                       <p className="text-[10px] uppercase tracking-[0.6em] font-black text-white italic">aguardando protocolo de análise</p>
+                       <p className="text-[7px] uppercase tracking-[0.4em] text-zenit-text-tertiary font-black italic">nexus secure connection stable</p>
+                    </div>
                   </div>
                 )}
                 {isAiLoading && (
-                  <div className="flex items-center space-x-4 text-zenit-scarlet">
-                    <div className="w-3 h-3 rounded-full bg-zenit-scarlet animate-ping" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t.finance.processingDataFlow}</span>
+                  <div className="flex items-center space-x-6 text-zenit-scarlet animate-pulse">
+                    <div className="flex space-x-1.5 pt-1">
+                       <div className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:-0.3s]" />
+                       <div className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:-0.15s]" />
+                       <div className="w-1.5 h-1.5 rounded-full bg-current animate-bounce" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-[0.5em] italic">Sincronizando Dataset de Fluxo...</span>
                   </div>
                 )}
               </div>
 
-              <div className="p-8 bg-zenit-surface-1 border-t border-zenit-border-primary">
+              <div className="p-8 bg-zenit-surface-1 border-t border-zenit-border-primary relative z-10">
                 <div className="relative max-w-2xl mx-auto">
+                  <div className="absolute left-6 top-6 pointer-events-none">
+                     <Terminal size={18} className="text-zenit-scarlet" />
+                  </div>
                   <textarea 
                     value={aiMessage}
                     onChange={(e) => setAiMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), askFinanceAI())}
-                    placeholder={t.finance.aiFinancePlaceholder}
-                    className="w-full bg-zenit-surface-1 border border-zenit-border-primary rounded-[32px] p-6 pr-20 text-zenit-text-primary placeholder:text-zenit-text-tertiary focus:outline-none focus:border-zenit-scarlet/50 transition-all resize-none h-28 font-light text-lg"
+                    placeholder="DIGITAR COMANDO DE ESTRATÉGIA..."
+                    className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-[32px] p-6 pl-16 pr-24 text-zenit-text-primary placeholder:text-zenit-text-tertiary focus:outline-none focus:border-zenit-scarlet/50 transition-all resize-none h-24 font-black text-xs uppercase tracking-widest shadow-inner shadow-black/40"
                   />
                   <button 
                     onClick={askFinanceAI}
                     disabled={isAiLoading || !aiMessage.trim()}
-                    className="absolute right-4 bottom-4 w-16 h-16 rounded-[20px] bg-zenit-scarlet text-white flex items-center justify-center shadow-2xl shadow-zenit-scarlet/40 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                    className="absolute right-3 top-3 w-14 h-14 rounded-[20px] bg-zenit-scarlet text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:grayscale"
                   >
-                    <Send size={28} />
+                    <Send size={24} />
                   </button>
                 </div>
               </div>
@@ -1218,46 +1302,84 @@ const GoalCard: React.FC<{ idx: number; icon: React.ReactNode; label: string; cu
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: idx * 0.1 }}
-      whileHover={{ y: -4 }}
-      className="glass-card p-8 space-y-6 border border-zenit-border-primary bg-zenit-surface-1/40 hover:bg-zenit-surface-1 transition-all duration-500 rounded-[32px] relative overflow-hidden group shadow-lg"
+      className="p-8 space-y-10 border border-zenit-border-primary bg-zenit-surface-1 rounded-[4rem] relative overflow-hidden group shadow-[0_40px_80px_rgba(0,0,0,0.4)]"
     >
-      <div className="absolute -right-4 -top-4 w-32 h-32 bg-zenit-accent/5 rounded-full blur-3xl group-hover:bg-zenit-accent/10 transition-colors" />
+      {/* High-Tech Background Artifacts */}
+      <div className="absolute top-0 right-0 p-12 opacity-[0.03] text-white pointer-events-none group-hover:scale-125 group-hover:rotate-12 transition-transform duration-1000">
+         <Target size={160} />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-zenit-scarlet/20 to-transparent animate-scanline" />
       
       <div className="flex justify-between items-start relative z-10">
-        <div className={`w-14 h-14 rounded-[20px] bg-zenit-surface-2 flex items-center justify-center ${accentColor} border border-zenit-border-primary group-hover:scale-110 transition-transform duration-500 shadow-inner`}>
-          {icon}
+        <div className="space-y-2">
+           <div className={`w-20 h-20 rounded-[28px] bg-zenit-surface-2 flex items-center justify-center ${accentColor} border-2 border-zenit-border-primary shadow-inner group-hover:bg-zenit-surface-3 transition-colors duration-500`}>
+             {icon}
+           </div>
+           <p className="text-[7.5px] text-zenit-text-tertiary font-black uppercase tracking-[0.5em] italic mt-4 pl-1">ID_ PROTOCOL_TARGET</p>
         </div>
-        <div className="text-right flex flex-col items-end space-y-2">
-          <span className={`text-3xl font-display font-bold text-zenit-text-primary`}>{Math.round(progress)}%</span>
-          <p className="text-[9px] text-zenit-text-tertiary font-black uppercase tracking-widest mt-1">{t.finance.completed}</p>
-          <button 
-            onClick={onDelete}
-            className="text-[9px] text-zenit-text-tertiary/40 hover:text-zenit-scarlet uppercase tracking-widest font-black transition-colors opacity-0 group-hover:opacity-100"
-          >
-            Excluir
-          </button>
+        <div className="text-right">
+          <p className="text-[9px] text-zenit-text-tertiary font-black uppercase tracking-[0.5em] italic mb-3 opacity-40">PROJEÇÃO_PERCENTUAL</p>
+          <div className="relative inline-block">
+             <span className="text-6xl font-display font-black text-white italic tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">{Math.round(progress)}%</span>
+             <div className="absolute -bottom-1 inset-x-0 h-0.5 bg-zenit-scarlet scale-x-50 opacity-50" />
+          </div>
         </div>
       </div>
 
-      <div className="space-y-4 relative z-10">
+      <div className="space-y-8 relative z-10">
         <div className="flex justify-between items-end">
-          <div>
-            <h4 className="text-xl font-bold text-zenit-text-primary tracking-tight">{label}</h4>
-            <p className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.2em] mt-1">
-              {t.finance.remaining} {formatCurrency(remaining)}
-            </p>
+          <div className="space-y-2">
+            <h4 className="text-3xl font-black text-white italic tracking-tighter uppercase group-hover:translate-x-2 transition-transform duration-500">{label}</h4>
+            <div className="flex items-center space-x-3">
+               <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-ping" />
+               <p className="text-[10px] text-zenit-scarlet font-black uppercase tracking-[0.4em] italic bg-zenit-scarlet/5 px-3 py-1 rounded-full border border-zenit-scarlet/10">
+                  DÉFICIT: {formatCurrency(remaining)}
+               </p>
+            </div>
           </div>
-          <p className="text-sm font-bold text-zenit-text-tertiary">
-            {formatCurrency(target)}
-          </p>
+          <div className="text-right space-y-1">
+             <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] mb-1 italic opacity-40">OBJETIVO_FINAL_ZENITH</p>
+             <p className="text-2xl font-display font-black text-white/40 tracking-tighter italic">{formatCurrency(target)}</p>
+          </div>
         </div>
         
-        <div className="relative h-2 w-full bg-zenit-surface-2 rounded-full overflow-hidden shadow-inner">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.min(100, progress)}%` }}
-            className={`absolute inset-y-0 left-0 ${barColor} ${glowColor} rounded-full transition-all duration-1000`}
-          />
+        {/* Futuristic Liquidity Gauge */}
+        <div className="relative py-4">
+           <div className="relative h-2.5 w-full bg-zenit-surface-2 rounded-full overflow-hidden shadow-inner border border-white/5">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(100, progress)}%` }}
+                className={`absolute inset-y-0 left-0 ${barColor} ${glowColor} rounded-full transition-all duration-1000 flex items-center justify-end overflow-hidden`}
+              >
+                 <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.2)_50%,transparent_100%)] animate-scanline" />
+                 <div className="w-4 h-full bg-white/20 blur-md mr-1 animate-pulse" />
+              </motion.div>
+           </div>
+           {/* Progress Markers */}
+           <div className="flex justify-between mt-3 px-1">
+              {[0, 25, 50, 75, 100].map(m => (
+                <div key={m} className={`flex flex-col items-center space-y-1 ${progress >= m ? 'text-white' : 'text-zenit-text-tertiary opacity-20'}`}>
+                   <div className={`w-[1px] h-1.5 transition-colors ${progress >= m ? 'bg-zenit-scarlet' : 'bg-zenit-text-tertiary'}`} />
+                   <span className="text-[7px] font-mono font-black italic">{m}%</span>
+                </div>
+              ))}
+           </div>
+        </div>
+
+        <div className="flex justify-between items-center bg-zenit-black/30 p-6 rounded-[2rem] border border-white/5 backdrop-blur-3xl group-hover:border-zenit-scarlet/20 transition-all duration-700">
+           <div className="flex items-center space-x-4">
+              <div className="w-2 h-2 rounded-full bg-zenit-scarlet animate-pulse shadow-[0_0_10px_rgba(255,26,26,0.5)]" />
+              <div className="space-y-0.5">
+                 <span className="text-[9px] text-white font-black uppercase tracking-[0.4em] italic block">SINAL_PROTOCOL_ESTÁVEL</span>
+                 <span className="text-[7px] text-zenit-text-tertiary font-black uppercase tracking-[0.2em] italic">Transmissão Criptografada Zenith v9.1</span>
+              </div>
+           </div>
+           <button 
+             onClick={onDelete}
+             className="px-6 py-2.5 rounded-xl text-[8px] text-zenit-text-tertiary/40 hover:text-white hover:bg-zenit-scarlet uppercase tracking-widest font-black transition-all border border-transparent hover:border-zenit-scarlet shadow-2xl shadow-zenit-scarlet/20"
+           >
+             ANULAR_PROJEÇÃO
+           </button>
         </div>
       </div>
     </motion.div>
