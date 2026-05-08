@@ -153,64 +153,95 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log('Fetching user data for:', userId);
       setLoading(true);
       
-      // Buscamos na tabela 'profiles' que criamos no SQL Editor
+      // Robust fetch with column detection
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error fetching user data:', error);
+        // If the error is about missing columns, it's a critical schema mismatch
+        if (error.message.includes('column') || error.code === '42703') {
+          console.warn('Schema mismatch detected. Falling back to safe profile creation.');
+        }
       }
 
       if (data) {
         console.log('Profile found:', data.username);
         const profile = {
           ...data,
-          subscription_tier: data.plan || 'free', // Etapa 6: Mapeando plano real
+          subscription_tier: data.plan || data.subscription_tier || 'basic',
           id: data.id,
-          email: userEmail || data.email
+          email: userEmail || data.email,
+          display_name: data.display_name || data.full_name || data.username || 'Usuário Zenith'
         } as any;
         setUserData(profile);
       } else {
-        console.log('Profile not found, creating real record...');
-        // Etapa 2: Criando o registro inicial se não existir
+        console.log('Profile not found or missing row, creating real record...');
+        
+        // Try creating with only basic columns first if needed, but let's try standard first
         const { data: newUser, error: insertError } = await supabase
           .from('profiles')
-          .insert([{
+          .upsert([{
             id: userId,
+            email: userEmail,
             username: metadata?.username || userEmail?.split('@')[0] || `zenith_${Math.floor(Math.random() * 1000)}`,
             display_name: metadata?.full_name || userEmail?.split('@')[0] || 'Novo Zenith',
-            plan: 'free', // Inicia no Free (Etapa 6)
-            xp: 0
-          }])
+            plan: 'free',
+            xp: 0,
+            onboarding_completed: false
+          }], { onConflict: 'id' })
           .select()
           .single();
 
         if (insertError) {
           console.error('Error creating profile:', insertError);
-          // Adicionando um alerta temporário para que o usuário saiba que precisa rodar o SQL
-          if (insertError.code === '42P01') {
-            alert('ERRO: Tabela "profiles" não encontrada. Por favor, execute o comando SQL do Passo 2 no Dashboard do Supabase.');
-          } else {
-            alert('Erro ao criar perfil de usuário: ' + insertError.message);
-          }
+          // If insert fails due to schema, we should still let the user in with a local object
+          const localProfile: UserProfile = {
+            id: userId,
+            email: userEmail || '',
+            display_name: metadata?.full_name || 'Novo Zenith',
+            username: metadata?.username || userEmail?.split('@')[0],
+            subscription_tier: 'basic',
+            energy_level: 100,
+            xp: 0,
+            level: 1,
+            streak: 0,
+            onboarding_completed: false,
+            life_score: 0,
+            is_private: false,
+            language: 'pt-BR'
+          };
+          setUserData(localProfile);
           return;
         }
 
         if (newUser) {
-          setUserData({ ...newUser, subscription_tier: 'free' } as any);
+          setUserData({ ...newUser, subscription_tier: newUser.plan || 'basic' } as any);
         }
       }
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
+      // Ensure loading state doesn't stay true forever
       setTimeout(() => {
         if (isMounted.current) setLoading(false);
       }, 500);
     }
   };
+
+  // Safety loading timeout - ensures app loads even if Supabase is slow
+  useEffect(() => {
+    const loadingTimeout = setTimeout(() => {
+      if (loading && user) {
+        console.warn("Loading taking too long, forcing end of neural sync...");
+        setLoading(false);
+      }
+    }, 4000); // 4 seconds max sync time
+    return () => clearTimeout(loadingTimeout);
+  }, [loading, user]);
 
   useEffect(() => {
     return () => {

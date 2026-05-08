@@ -1,37 +1,36 @@
 {
   "name": "Zenith",
   "short_name": "Zenith",
-  "description": "Seu Protocolo de Evolução Humana. Alta Performance, Biohacking e Foco Absoluto.",
+  "description": "Neural Interface for Human Performance Optimization",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F8F9FA",
+  "background_color": "#020202",
   "theme_color": "#E31C25",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Zenith&backgroundColor=E31C25&shape1Color=ffffff",
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Zenith&backgroundColor=e31c25&shape1Color=ffffff",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Zenith&backgroundColor=E31C25&shape1Color=ffffff",
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Zenith&backgroundColor=e31c25&shape1Color=ffffff",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "health", "fitness"],
   "shortcuts": [
     {
-      "name": "Foco",
-      "url": "/focus",
-      "description": "Iniciar Protocolo de Foco"
+      "name": "Nexus",
+      "url": "/?tab=social",
+      "icons": [{ "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Nexus&backgroundColor=e31c25", "sizes": "192x192" }]
     },
     {
-      "name": "Nexus",
-      "url": "/social",
-      "description": "Acessar Nexus Social"
+      "name": "Rotina",
+      "url": "/?tab=tasks",
+      "icons": [{ "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Routine&backgroundColor=e31c25", "sizes": "192x192" }]
     }
   ]
 }

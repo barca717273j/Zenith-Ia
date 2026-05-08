@@ -59,7 +59,7 @@ export const testSupabaseConnection = async (retryCount = 0): Promise<{ connecte
       if (errMessage.includes('AbortError') || errMessage.includes('aborted')) {
         return { 
           connected: false, 
-          error: 'Conexão interrompida por tempo limite (30s). O servidor Supabase pode estar demorando para responder ou o projeto está pausado.' 
+          error: 'Sincronização neural lenta. O servidor está processando os dados (isso pode ocorrer se o sistema estiver em repouso).' 
         };
       }
 
@@ -93,7 +93,7 @@ export const testSupabaseConnection = async (retryCount = 0): Promise<{ connecte
     if (err.name === 'AbortError' || errorMessage.includes('aborted')) {
       return { 
         connected: false, 
-        error: 'Tempo limite de conexão excedido (30s). Verifique se o projeto Supabase não está pausado.' 
+        error: 'Sincronização neural excedeu o tempo limite. Tente atualizar a página ou verifique sua conexão.' 
       };
     }
     

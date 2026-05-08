@@ -871,7 +871,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                         <div className="absolute inset-0 bg-black/40" />
                         
                         {newNexusText && (
-                          <div className="absolute inset-0 flex items-center justify-center p-4">
+                          <div className="absolute inset-0 z-20">
                             <motion.div 
                               drag
                               dragMomentum={false}
@@ -882,13 +882,16 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                                 }));
                               }}
                               animate={{ x: nexusTextPos.x, y: nexusTextPos.y, scale: nexusTextScale }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                document.getElementById('nexus-text-input')?.focus();
-                              }}
+                              style={{ touchAction: 'none' }}
                               className="cursor-move p-4 active:scale-95 transition-transform"
                             >
-                              <p className="text-3xl font-display font-black italic text-white drop-shadow-2xl uppercase tracking-tighter text-center pointer-events-none">
+                              <p 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  document.getElementById('nexus-text-input')?.focus();
+                                }}
+                                className="text-3xl font-display font-black italic text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] uppercase tracking-tighter text-center"
+                              >
                                 {newNexusText}
                               </p>
                             </motion.div>

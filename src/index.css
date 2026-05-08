@@ -85,6 +85,20 @@
     transition: background-color 0.3s ease, color 0.3s ease;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Full screen content handling */
+  #root {
+    @apply min-h-screen flex flex-col;
+    height: 100%;
+  }
+
+  main {
+    @apply flex-1 overflow-y-auto overflow-x-hidden;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { AlertCircle, ExternalLink, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { FloatingThemeToggle } from './components/FloatingThemeToggle';
 
+import { ZenitLogo } from './components/ZenitLogo';
 import { translations, Language } from './translations';
 import { GamificationProvider } from './components/GamificationContext';
 import { useUser } from './contexts/UserContext';
@@ -157,61 +158,67 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zenit-black relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center bg-[#020202] relative overflow-hidden">
         {/* Background Animation */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-fluid-marble opacity-30" />
+          <div className="absolute inset-0 bg-fluid-marble opacity-20" />
           <motion.div 
             animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.2, 0.1]
+              scale: [1, 1.3, 1],
+              opacity: [0.1, 0.2, 0.1],
+              rotate: [0, 90, 180, 270, 360]
             }}
-            transition={{ duration: 8, repeat: Infinity }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-zenit-scarlet/20 rounded-full blur-[120px]"
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-zenit-scarlet/10 rounded-full blur-[150px]"
           />
         </div>
 
-        <div className="relative z-10 text-center space-y-12">
+        <div className="relative z-10 text-center space-y-16">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
-            <div className="relative z-10 w-24 h-24 mx-auto bg-gradient-to-br from-zenit-scarlet to-zenit-crimson rounded-[2rem] flex items-center justify-center shadow-[0_0_50px_rgba(255,36,0,0.4)]">
-              <span className="text-4xl font-display font-black text-white italic tracking-tighter">Z</span>
+            <div className="relative z-10 w-28 h-28 mx-auto bg-zenit-surface-1 rounded-full border border-zenit-border-primary flex items-center justify-center shadow-[0_0_60px_rgba(255,36,0,0.2)] backdrop-blur-3xl">
+              <ZenitLogo size={60} className="text-zenit-text-primary" />
             </div>
             {/* Animated Ring */}
             <motion.div 
               animate={{ 
-                scale: [1, 1.5],
-                opacity: [0.5, 0]
+                scale: [1, 1.8],
+                opacity: [0.4, 0]
               }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-              className="absolute inset-0 border-2 border-zenit-scarlet rounded-[2rem]"
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut" }}
+              className="absolute inset-0 border border-zenit-scarlet rounded-full"
             />
           </motion.div>
 
-          <div className="space-y-4">
-            <motion.h1 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-4xl font-display font-black text-white tracking-tighter italic uppercase"
+              className="space-y-2"
             >
-              ZENITH <span className="text-zenit-accent">IA</span>
-            </motion.h1>
+              <h1 className="text-5xl font-display font-black text-white tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                ZENITH
+              </h1>
+              <p className="text-zenit-accent text-[10px] font-black uppercase tracking-[0.6em] ml-2">
+                Nexus OS
+              </p>
+            </motion.div>
             
-            <div className="flex flex-col items-center space-y-2">
-              <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-56 h-[2px] bg-white/5 rounded-full overflow-hidden">
                 <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="h-full bg-zenit-accent shadow-[0_0_10px_var(--accent-glow)]"
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-full h-full bg-gradient-to-r from-transparent via-zenit-accent to-transparent shadow-[0_0_15px_rgba(255,36,0,0.5)]"
                 />
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary animate-pulse italic">
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary animate-pulse italic">
                 Sincronizando Sistema Neural...
               </p>
             </div>
@@ -219,7 +226,7 @@ function AppContent() {
         </div>
 
         {/* Scanline Effect */}
-        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] z-50 bg-[length:100%_4px,3px_100%]" />
+        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.05)_50%),linear-gradient(90deg,rgba(255,0,0,0.01),rgba(0,255,0,0.005),rgba(0,0,255,0.01))] z-50 bg-[length:100%_4px,3px_100%]" />
       </div>
     );
   }
@@ -295,6 +302,7 @@ function AppContent() {
         )}
 
         <Navigation activeTab={activeTab} setActiveTab={setActiveTab} onPlusClick={() => setIsNewProtocolOpen(true)} t={t} />
+        
         <NewProtocolModal isOpen={isNewProtocolOpen} onClose={() => setIsNewProtocolOpen(false)} t={t} />
 
         {/* Background Ambience */}
