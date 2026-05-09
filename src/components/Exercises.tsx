@@ -32,7 +32,7 @@ interface ExerciseHistory {
 
 interface ExercisesProps {
   t: any;
-  onBack?: () => void;
+  onBack: () => void;
 }
 
 export const Exercises: React.FC<ExercisesProps> = ({ t, onBack }) => {
@@ -152,7 +152,7 @@ export const Exercises: React.FC<ExercisesProps> = ({ t, onBack }) => {
   const categories = [
     { id: 'all', label: 'Todos', icon: <Activity size={18} /> },
     { id: 'training', label: 'Treino', icon: <Dumbbell size={18} /> },
-    { id: 'body', label: 'Corpo', icon: <Heart size={18} /> },
+    { id: 'body', label: 'Exercício', icon: <Heart size={18} /> },
     { id: 'mind', label: 'Mente', icon: <Brain size={18} /> },
     { id: 'spirituality', label: 'Espírito', icon: <Sparkles size={18} /> },
     { id: 'nutrition', label: 'Nutrição', icon: <Zap size={18} /> },

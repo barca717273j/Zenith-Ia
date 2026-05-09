@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTheme } from '../contexts/ThemeContext';
-import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield, Camera, Mail, Lock, Globe, Save, AlertCircle, Timer, Grid, Heart, MessageSquare, Send, Loader2, X, Moon, Sun } from 'lucide-react';
+import { Settings, CreditCard, Brain, LogOut, ChevronRight, Book, User, Award, Zap, Target, Flame, Sparkles, Shield, Camera, Mail, Lock, Globe, Save, AlertCircle, Timer, Grid, Heart, MessageSquare, Send, Loader2, X, Moon, Sun, ArrowLeft } from 'lucide-react';
 import { Subscription } from './Subscription';
 import { TetrisGame } from './TetrisGame';
 import { Journal } from './Journal';
@@ -15,11 +15,12 @@ interface ProfileProps {
   t: any;
   targetUserId?: string;
   setActiveTab?: (tab: string) => void;
+  onBack: () => void;
 }
 
 type ProfileView = 'main' | 'subscription' | 'gym' | 'journal' | 'edit-profile' | 'security' | 'preferences' | 'followers' | 'following';
 
-export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab }) => {
+export const Profile: React.FC<ProfileProps> = ({ t, targetUserId, setActiveTab, onBack }) => {
   const { user: authUser, userData, refreshUserData } = useUser();
   const { theme, toggleTheme } = useTheme();
   const [view, setView] = useState<ProfileView>('main');
@@ -880,7 +881,13 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
             </AnimatePresence>
 
             {/* Top Bar Actions */}
-            <div className="absolute top-8 right-8 z-20 flex space-x-3">
+            <div className="absolute top-8 left-8 right-8 z-20 flex justify-between items-center">
+              <button 
+                onClick={onBack}
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-zenit-glass text-zenit-text-tertiary hover:text-white transition-all active:scale-[0.98] border border-zenit-glass-border backdrop-blur-xl"
+              >
+                <ArrowLeft size={20} />
+              </button>
               <button 
                 onClick={() => setView('preferences')}
                 className="w-12 h-12 flex items-center justify-center rounded-2xl bg-zenit-glass text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-[0.98] border border-zenit-glass-border backdrop-blur-xl"
@@ -963,7 +970,7 @@ CREATE POLICY "Users can delete their own avatar" ON storage.objects FOR DELETE 
                         className="flex-1 py-5 rounded-[2.5rem] bg-zenit-accent text-white text-[9px] font-black uppercase tracking-[0.4em] hover:brightness-110 transition-all active:scale-[0.98] shadow-2xl shadow-zenit-accent/30 flex items-center justify-center space-x-3 border border-zenit-accent/50"
                       >
                         <User size={14} />
-                        <span>Ajustar Perfil</span>
+                        <span>Editar Perfil</span>
                       </button>
                     </>
                   ) : (

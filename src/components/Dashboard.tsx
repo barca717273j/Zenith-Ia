@@ -212,9 +212,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
           
           <div className="h-8 w-[1px] bg-zenit-border-primary flex-shrink-0" />
 
-          <button 
+          <div 
             onClick={() => setActiveTab('profile')}
-            className="flex items-center space-x-3 group min-w-0"
+            className="flex items-center space-x-3 group min-w-0 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && setActiveTab('profile')}
           >
             <div className="w-10 h-10 rounded-full overflow-hidden bg-zenit-surface-2 transition-all p-0.5 border border-zenit-border-primary flex-shrink-0">
               <div className="w-full h-full rounded-full overflow-hidden shadow-inner">
@@ -227,7 +230,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
             </div>
             <div className="flex flex-col items-start min-w-0">
               <span className="text-[10px] font-black uppercase tracking-widest text-zenit-text-primary group-hover:text-zenit-accent transition-colors truncate">{userData?.display_name?.split(' ')[0] || 'Usuário'}</span>
-              <div className="flex items-center space-x-3 mt-0.5">
+              <div className="flex items-center space-x-3 mt-0.5" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center space-x-1">
                   <Crown size={8} className="text-zenit-accent opacity-70" />
                   <span className="text-[7px] font-black uppercase tracking-[0.2em] text-zenit-text-tertiary">LVL {userData?.level || 1}</span>
@@ -236,7 +239,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ t, setActiveTab }) => {
                 <NotificationCenter userId={userData?.id || ''} />
               </div>
             </div>
-          </button>
+          </div>
         </div>
 
         <div className="flex items-center flex-shrink-0 opacity-0 pointer-events-none">

@@ -42,7 +42,7 @@ interface FinanceTrackerProps {
   setAppTab: (tab: string) => void;
 }
 
-export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, setAppTab }) => {
+export const FinanceTracker: React.FC<FinanceTrackerProps & { onBack: () => void }> = ({ t, language, setAppTab, onBack }) => {
   const { userData } = useUser();
   const tier = userData?.subscription_tier || 'basic';
 
@@ -386,7 +386,7 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
         <div className="max-w-2xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-6">
             <button 
-              onClick={() => setAppTab('home')}
+              onClick={onBack}
               className="w-11 h-11 flex items-center justify-center bg-zenit-surface-2 border border-zenit-border-secondary rounded-2xl text-zenit-text-tertiary hover:text-white hover:border-white/20 transition-all active:scale-95 group shadow-inner"
             >
               <ArrowLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
@@ -413,65 +413,86 @@ export const FinanceTracker: React.FC<FinanceTrackerProps> = ({ t, language, set
       </header>
 
       <div className="pt-32 px-4 space-y-10">
-        {/* Futuristic Liquidity Gauge */}
+        {/* High-End Technical Liquidity Hub */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="relative p-10 rounded-[3.5rem] bg-zenit-surface-1 border border-zenit-border-primary overflow-hidden shadow-2xl group"
+          className="relative p-10 rounded-[3.5rem] bg-zenit-surface-1/40 border border-zenit-border-primary overflow-hidden shadow-2xl group backdrop-blur-3xl"
         >
-          {/* Animated Background Mesh */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,26,26,0.05)_0%,transparent_50%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] [background-size:30px_30px] opacity-20" />
+          {/* Neural Gradient Underlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,26,26,0.1)_0%,transparent_50%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
           
-          <div className="relative z-10 flex flex-col items-center text-center space-y-10">
-            <div className="flex flex-col items-center space-y-2">
-              <div className="flex items-center space-x-3 px-3 py-1 rounded-full bg-zenit-scarlet/5 border border-zenit-scarlet/10 mb-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse" />
-                <span className="text-[8px] text-zenit-scarlet font-black uppercase tracking-[0.5em] italic">Liquidez Estável</span>
+          <div className="relative z-10 flex flex-col items-center space-y-12">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="flex items-center space-x-3 px-4 py-1.5 rounded-full bg-zenit-surface-2 border border-zenit-border-primary mb-2 shadow-inner">
+                <div className="w-1.5 h-1.5 rounded-full bg-zenit-scarlet animate-pulse shadow-[0_0_8px_rgba(255,26,26,0.8)]" />
+                <span className="text-[9px] text-white font-black uppercase tracking-[0.4em] italic">Ativos_Sincronizados</span>
               </div>
-              <p className="text-[9px] text-zenit-text-tertiary uppercase tracking-[0.5em] font-black italic">PATRIMÔNIO LÍQUIDO</p>
-              <h2 className="text-5xl font-display font-black tracking-tighter text-white italic drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
+              <p className="text-[10px] text-zenit-text-tertiary uppercase tracking-[0.6em] font-black italic opacity-40">SALDO TOTAL DISPONÍVEL</p>
+              <h2 className="text-6xl font-display font-black tracking-tight text-white italic drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]">
                 {formatCurrency(balance)}
               </h2>
             </div>
             
-            {/* Real-time Ticker Data */}
-            <div className="grid grid-cols-2 w-full gap-8 p-8 rounded-[2.5rem] bg-zenit-black/20 border border-white/5 backdrop-blur-md">
-              <div className="flex flex-col items-center space-y-2 group/stat">
-                <span className="text-[7.5px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black italic">INPUT_FLOW</span>
+            {/* Split Flow Metrics */}
+            <div className="grid grid-cols-2 w-full gap-6 p-6 rounded-[2.5rem] bg-black/40 border border-white/5 backdrop-blur-md relative overflow-hidden">
+              <div className="absolute top-0 bottom-0 left-1/2 w-px bg-white/5" />
+              
+              <div className="flex flex-col space-y-3">
                 <div className="flex items-center space-x-2">
-                  <ArrowUpRight size={14} className="text-emerald-500" />
-                  <span className="text-lg font-display font-black italic text-emerald-500">{formatCurrency(totalIncome)}</span>
+                  <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                    <ArrowUpRight size={14} className="text-emerald-500" />
+                  </div>
+                  <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black italic">Entradas</span>
                 </div>
-                <div className="w-full h-0.5 bg-zenit-surface-3 rounded-full overflow-hidden mt-1">
-                  <div className="h-full bg-emerald-500/40 w-[70%] animate-pulse" />
+                <span className="text-xl font-display font-black italic text-emerald-500">{formatCurrency(totalIncome)}</span>
+                <div className="w-full h-1 bg-zenit-surface-3 rounded-full overflow-hidden mt-1">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${totalIncome > 0 ? 100 : 0}%` }}
+                    className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" 
+                  />
                 </div>
               </div>
-              <div className="flex flex-col items-center space-y-2 group/stat">
-                <span className="text-[7.5px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black italic">OUTPUT_FLOW</span>
+
+              <div className="flex flex-col space-y-3 pl-2">
                 <div className="flex items-center space-x-2">
-                  <ArrowDownLeft size={14} className="text-zenit-scarlet" />
-                  <span className="text-lg font-display font-black italic text-zenit-text-primary">{formatCurrency(totalExpense)}</span>
+                  <div className="p-2 rounded-lg bg-zenit-scarlet/10 border border-zenit-scarlet/20">
+                    <ArrowDownLeft size={14} className="text-zenit-scarlet" />
+                  </div>
+                  <span className="text-[8px] text-zenit-text-tertiary uppercase tracking-[0.4em] font-black italic">Saídas</span>
                 </div>
-                <div className="w-full h-0.5 bg-zenit-surface-3 rounded-full overflow-hidden mt-1">
-                  <div className="h-full bg-zenit-scarlet/40 w-[40%] animate-pulse" />
+                <span className="text-xl font-display font-black italic text-white">{formatCurrency(totalExpense)}</span>
+                <div className="w-full h-1 bg-zenit-surface-3 rounded-full overflow-hidden mt-1">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(totalExpense / (totalIncome || 1)) * 100}%` }}
+                    className="h-full bg-zenit-scarlet shadow-[0_0_10px_rgba(255,26,26,0.4)]" 
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="flex w-full gap-4">
-              <button 
+            <div className="flex w-full gap-5">
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => { setType('income'); setShowAddModal(true); }}
-                className="flex-1 h-14 bg-zenit-surface-2 hover:bg-zenit-surface-3 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.4em] transition-all border border-zenit-border-secondary active:scale-95 italic shadow-lg"
+                className="flex-1 h-16 bg-zenit-surface-2 hover:bg-zenit-surface-3 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.5em] transition-all border border-zenit-border-secondary active:scale-95 italic shadow-lg flex items-center justify-center space-x-3"
               >
-                Injetar Capital
-              </button>
-              <button 
+                <Plus size={16} />
+                <span>Fixar Receita</span>
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => { setType('expense'); setShowAddModal(true); }}
-                className="flex-1 h-14 bg-zenit-scarlet hover:brightness-110 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.4em] transition-all active:scale-95 italic shadow-[0_10px_30px_rgba(255,26,26,0.25)] border border-white/10"
+                className="flex-1 h-16 bg-zenit-scarlet hover:brightness-110 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.5em] transition-all active:scale-95 italic shadow-[0_15px_40px_rgba(255,26,26,0.3)] border border-white/10 flex items-center justify-center space-x-3"
               >
-                Alocar Débito
-              </button>
+                <CreditCard size={16} />
+                <span>Lançar Gasto</span>
+              </motion.button>
             </div>
           </div>
         </motion.div>

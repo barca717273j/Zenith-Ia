@@ -46,27 +46,31 @@ interface NavigationProps {
   t: any;
 }
 
+const mainTabs = ['home', 'tasks', 'social', 'profile'];
+
 export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, onPlusClick, t }) => {
+  if (!mainTabs.includes(activeTab)) return null;
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center p-4 sm:p-6 pb-6 overflow-visible pointer-events-none">
-      <nav className="bg-zenit-surface-1/90 backdrop-blur-2xl border border-zenit-border-primary rounded-[2.5rem] px-4 py-3 flex items-center shadow-[0_20px_50px_rgba(0,0,0,0.15)] w-full max-w-md pointer-events-auto relative overflow-visible">
+      <nav className="bg-zenit-surface-1/90 backdrop-blur-2xl border border-zenit-border-primary rounded-[2.5rem] px-4 py-3 flex items-center shadow-[0_30px_60px_rgba(0,0,0,0.4)] w-full max-w-md pointer-events-auto relative overflow-visible">
         {/* Subtle Inner Glow */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zenit-accent/20 to-transparent" />
         
         <div className="flex-1 flex justify-center">
           <NavItem
             icon={<Home />}
-            label="Dashboard"
+            label="Home"
             isActive={activeTab === 'home'}
             onClick={() => setActiveTab('home')}
           />
         </div>
         <div className="flex-1 flex justify-center">
           <NavItem
-            icon={<Wallet />}
-            label="Finanças"
-            isActive={activeTab === 'finance'}
-            onClick={() => setActiveTab('finance')}
+            icon={<ListTodo />}
+            label="Rotina"
+            isActive={activeTab === 'tasks'}
+            onClick={() => setActiveTab('tasks')}
           />
         </div>
         
@@ -76,12 +80,10 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab,
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.9 }}
             onClick={onPlusClick}
-            className="w-14 h-14 rounded-full bg-zenit-accent flex items-center justify-center text-white shadow-xl shadow-zenit-accent/30 active:scale-95 transition-all border-[3.5px] border-zenit-surface-1 relative group overflow-visible"
+            className="w-14 h-14 rounded-full bg-zenit-accent flex items-center justify-center text-white shadow-[0_15px_30px_rgba(227,28,37,0.4)] active:scale-95 transition-all border-[3.5px] border-zenit-surface-1 relative group overflow-visible"
           >
             <Plus size={28} strokeWidth={3} className="relative z-10" />
             
-            {/* Pulsing Outer Ring */}
-            <div className="absolute -inset-[3.5px] rounded-full border-[3.5px] border-zenit-surface-1 pointer-events-none" />
             <motion.div 
               animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -89,15 +91,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab,
             />
           </motion.button>
         </div>
-
-        <div className="flex-1 flex justify-center">
-          <NavItem
-            icon={<Dumbbell />}
-            label="Exercícios"
-            isActive={activeTab === 'exercises'}
-            onClick={() => setActiveTab('exercises')}
-          />
-        </div>
+ 
         <div className="flex-1 flex justify-center">
           <NavItem
             icon={<Zap />}

@@ -11,7 +11,7 @@ import { Exercises } from './components/Exercises';
 import { FocusTimer } from './components/FocusTimer';
 import { Onboarding } from './components/Onboarding';
 import { MentalGym } from './components/MentalGym';
-import { Nexus as Social } from './components/Social';
+import { Social } from './components/Social';
 import { AdminPanel } from './components/AdminPanel';
 import { Journal } from './components/Journal';
 import { NewProtocolModal } from './components/NewProtocolModal';
@@ -252,29 +252,29 @@ function AppContent() {
       case 'home':
         return <Dashboard key="home" t={t} setActiveTab={setActiveTab} />;
       case 'tasks':
-        return <HabitTracker key="tasks" t={t} />;
+        return <HabitTracker key="tasks" t={t} onBack={() => setActiveTab('home')} />;
       case 'exercises':
         return <Exercises key="exercises" t={t} onBack={() => setActiveTab('home')} />;
       case 'focus':
         return <FocusTimer key="focus" t={t} isFullPage onBack={() => setActiveTab('home')} />;
       case 'finance':
-        return <FinanceTracker key="finance" t={t} language={lang} setAppTab={setActiveTab} />;
+        return <FinanceTracker key="finance" t={t} language={lang} setAppTab={setActiveTab} onBack={() => setActiveTab('home')} />;
       case 'profile':
-        return <Profile key="profile" t={t} setActiveTab={setActiveTab} />;
+        return <Profile key="profile" t={t} setActiveTab={setActiveTab} onBack={() => setActiveTab('home')} />;
       case 'social':
-        return <Social key="social" t={t} />;
+        return <Social key="social" t={t} onBack={() => setActiveTab('home')} />;
       case 'journal':
-        return <Journal key="journal" t={t} />;
+        return <Journal key="journal" t={t} onBack={() => setActiveTab('home')} />;
       case 'protocols':
-        return <Protocols key="protocols" t={t} />;
+        return <Protocols key="protocols" t={t} onBack={() => setActiveTab('home')} />;
       case 'stats':
-        return <Stats key="stats" />;
+        return <Stats key="stats" onBack={() => setActiveTab('home')} />;
       case 'nexus':
         return <Axis key="axis" t={t} onBack={() => setActiveTab('home')} />;
       case 'admin':
         return userData?.is_admin ? <AdminPanel key="admin" t={t} onBack={() => setActiveTab('profile')} /> : null;
       case 'gym':
-        return <MentalGym key="gym" t={t} />;
+        return <MentalGym key="gym" t={t} onBack={() => setActiveTab('home')} />;
       case 'subscription':
         return <SubscriptionScreen key="subscription" />;
       default:

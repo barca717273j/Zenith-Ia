@@ -235,15 +235,22 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
     }
 
     const xpReward = newPriority === 'high' ? 100 : newPriority === 'medium' ? 50 : 25;
+    
+    // Default times for periods if time is hidden
+    const periodTimes: Record<string, string> = {
+      morning: '08:00',
+      afternoon: '14:00',
+      evening: '20:00'
+    };
 
     const { data, error } = await supabase
       .from('routines')
       .insert([{ 
         user_id: userData.id, 
         title: newTask, 
-        name: newTask, // Adicionando 'name' conforme solicitado pelo usuário
+        name: newTask,
         description: '',
-        time: newTime, 
+        time: periodTimes[newPeriod] || '08:00', 
         duration: newDuration,
         category: newCategory,
         icon:
@@ -450,110 +457,81 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
         </div>
       </div>
 
-            {/* Period Selector */}
-            <div className="flex space-x-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-              <button
-                onClick={() => setActivePeriod('all')}
-                className={`px-6 py-3 text-[10px] uppercase tracking-[0.3em] font-bold rounded-2xl border transition-all whitespace-nowrap active:scale-95 shadow-lg ${activePeriod === 'all' ? 'bg-zenit-text-primary text-zenit-black border-zenit-text-primary' : 'bg-zenit-glass border-zenit-glass-border text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-1'}`}
-              >
-                {t.routine.all}
-              </button>
-              {periods.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => setActivePeriod(p.id as any)}
-                  className={`px-6 py-3 text-[10px] uppercase tracking-[0.3em] font-bold rounded-2xl border transition-all whitespace-nowrap flex items-center space-x-2 active:scale-95 shadow-lg ${activePeriod === p.id ? 'bg-zenit-text-primary text-zenit-black border-zenit-text-primary' : 'bg-zenit-glass border-zenit-glass-border text-zenit-text-tertiary hover:text-zenit-text-primary hover:bg-zenit-surface-1'}`}
-                >
-                  {p.icon}
-                  <span>{p.label}</span>
-                </button>
-              ))}
-            </div>
+            {/* Routine Sections Groups */}
+      <div className="space-y-12">
+        {periods.map(period => {
+          const periodRoutines = routines.filter(r => r.period === period.id);
+          
+          return (
+            <div key={period.id} className="space-y-6">
+              <div className="flex items-center space-x-4 px-2">
+                <div className={`w-1.5 h-6 rounded-full shadow-[0_0_15px_var(--accent-glow)] ${period.id === 'morning' ? 'bg-amber-400' : period.id === 'afternoon' ? 'bg-orange-500' : 'bg-zenit-accent'}`} />
+                <div className="flex items-center space-x-3">
+                  {period.icon}
+                  <h3 className="text-sm font-black uppercase tracking-[0.4em] text-zenit-text-primary italic">{period.label}</h3>
+                </div>
+                <div className="flex-1 h-px bg-zenit-border-primary/20" />
+                <span className="text-[8px] font-black uppercase tracking-widest text-zenit-text-tertiary italic">
+                  {periodRoutines.length} {periodRoutines.length === 1 ? 'Tarefa' : 'Tarefas'}
+                </span>
+              </div>
 
-      {/* Timeline View */}
-      <div className="relative space-y-12 pl-8">
-        <div className="absolute left-[39px] top-10 bottom-10 w-px bg-gradient-to-b from-zenit-scarlet/20 via-zenit-border-primary/40 to-transparent" />
-        
-        {filteredRoutines.length === 0 ? (
-          <div className="py-24 text-center space-y-10 relative">
-            <div className="absolute inset-0 bg-zenit-accent/5 blur-[100px] rounded-full -z-10" />
-            <div className="w-24 h-24 rounded-[2.5rem] bg-zenit-surface-1 border border-zenit-border-primary flex items-center justify-center mx-auto shadow-2xl rotate-12 group-hover:rotate-0 transition-transform">
-              <Sparkles size={48} className="text-zenit-text-tertiary" />
-            </div>
-            <div className="space-y-4">
-              <p className="text-[14px] font-display font-black uppercase tracking-[0.5em] text-zenit-text-primary italic leading-none">Vácuo Proposital</p>
-              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zenit-text-tertiary max-w-[200px] mx-auto leading-relaxed">Nenhum protocolo ativo detectado. Ative a IA para arquitetar seu dia.</p>
-            </div>
-            <button 
-              onClick={() => setIsAdding(true)}
-              className="px-10 py-4 bg-zenit-surface-2 hover:bg-zenit-surface-3 rounded-2xl text-[9px] font-black uppercase tracking-[0.4em] text-zenit-accent border border-zenit-accent/20 transition-all active:scale-95 shadow-xl italic"
-            >
-              Iniciar Sincronia
-            </button>
-          </div>
-        ) : filteredRoutines.map((r, idx) => (
-          <motion.div
-            key={r.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="relative flex items-start space-x-12 group"
-          >
-            {/* Timeline Dot & Time */}
-            <div className="flex flex-col items-center space-y-4 pt-4">
-              <div className={`relative z-10 w-6 h-6 rounded-full border transition-all duration-700 flex items-center justify-center ${r.completed ? 'bg-zenit-scarlet border-zenit-scarlet shadow-[0_0_20px_rgba(255,0,0,0.4)] scale-110' : 'bg-zenit-black border-zenit-border-primary group-hover:border-zenit-scarlet/50 scale-100 group-hover:scale-110'}`}>
-                {r.completed && <Check size={12} className="text-white" strokeWidth={3} />}
+              <div className="relative space-y-4 pl-4 border-l border-zenit-border-primary/20 ml-2.5">
+                {periodRoutines.length === 0 ? (
+                  <div className="py-8 pl-8 opacity-20 italic">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zenit-text-tertiary">Sincronia Pendente...</p>
+                  </div>
+                ) : (
+                  periodRoutines.map((r, idx) => (
+                    <motion.div
+                      key={r.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="group"
+                    >
+                      <div className={`glass-card p-1 rounded-[2.5rem] bg-gradient-to-br from-zenit-border-primary/20 to-transparent ${r.completed ? 'opacity-40 grayscale-[0.5] scale-[0.98]' : 'hover:scale-[1.01]'} transition-all duration-500`}>
+                        <div className="p-6 rounded-[2.4rem] bg-zenit-surface-1/80 backdrop-blur-xl flex items-center justify-between">
+                          <div className="flex items-center space-x-5">
+                            <button 
+                              onClick={() => toggleRoutine(r.id, r.completed)}
+                              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all active:scale-90 border ${r.completed ? 'bg-zenit-scarlet border-zenit-scarlet text-white' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary'}`}
+                            >
+                              {r.completed ? <Check size={20} strokeWidth={3} /> : <Circle size={20} />}
+                            </button>
+                            <div className="space-y-1">
+                              <h4 className={`text-lg font-display font-bold tracking-tight italic ${r.completed ? 'text-zenit-text-tertiary line-through' : 'text-zenit-text-primary'}`}>
+                                {r.title}
+                              </h4>
+                              <div className="flex items-center space-x-3">
+                                <div className={`w-1 h-1 rounded-full ${categories.find(c => c.id === r.category)?.color}`} />
+                                <span className={`text-[8px] font-black uppercase tracking-widest ${categories.find(c => c.id === r.category)?.color}`}>
+                                  {categories.find(c => c.id === r.category)?.label}
+                                </span>
+                                {r.duration && (
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-zenit-text-tertiary opacity-40">
+                                    • {r.duration}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <button 
+                            onClick={() => deleteRoutine(r.id)}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-zenit-text-tertiary/20 hover:text-zenit-scarlet transition-all opacity-0 group-hover:opacity-100"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
               </div>
             </div>
-
-            {/* Task Card - Ultra Premium */}
-            <div className={`flex-1 glass-card p-1 rounded-[2.5rem] bg-gradient-to-br from-zenit-border-primary/20 to-transparent ${r.completed ? 'opacity-40 grayscale-[0.5] scale-[0.98]' : 'hover:scale-[1.02]'} transition-all duration-500`}>
-               <div className="p-8 rounded-[2.4rem] bg-zenit-surface-1/80 backdrop-blur-xl space-y-6">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-3">
-                    <div className="space-y-1">
-                      <h3 className={`text-2xl font-display font-bold tracking-tight italic transition-all duration-500 ${r.completed ? 'text-zenit-text-tertiary/40 line-through' : 'text-zenit-text-primary group-hover:text-zenit-scarlet'}`}>
-                        {r.title}
-                      </h3>
-                      {r.description && (
-                        <p className="text-xs text-zenit-text-tertiary font-medium opacity-60 leading-relaxed max-w-[240px]">{r.description}</p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                      <div className={`flex items-center space-x-2 px-4 py-2 rounded-xl border backdrop-blur-md transition-all ${r.completed ? 'bg-zenit-surface-2/30 border-zenit-border-primary/30' : 'bg-zenit-surface-2 border-zenit-border-primary'}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${categories.find(c => c.id === r.category)?.color} shadow-sm animate-pulse`} />
-                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${categories.find(c => c.id === r.category)?.color}`}>
-                          {categories.find(c => c.id === r.category)?.label}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 text-[10px] text-zenit-text-tertiary font-black uppercase tracking-widest opacity-40">
-                         {periods.find(p => p.id === r.period)?.icon}
-                         <span>{periods.find(p => p.id === r.period)?.label}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-center space-y-4">
-                    <button 
-                      onClick={() => toggleRoutine(r.id, r.completed)}
-                      className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all active:scale-90 border shadow-2xl ${r.completed ? 'bg-gradient-to-br from-zenit-scarlet to-zenit-crimson border-zenit-accent/20 text-white shadow-[0_5px_20px_rgba(255,0,0,0.3)]' : 'bg-zenit-surface-2 border-zenit-border-primary text-zenit-text-tertiary hover:border-zenit-scarlet hover:text-zenit-scarlet'}`}
-                    >
-                      <CheckCircle2 size={28} strokeWidth={r.completed ? 3 : 2} />
-                    </button>
-                    <button 
-                      onClick={() => deleteRoutine(r.id)}
-                      className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center text-zenit-text-tertiary/20 hover:text-zenit-scarlet hover:bg-zenit-scarlet/5 transition-all opacity-0 group-hover:opacity-100"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-               </div>
-            </div>
-          </motion.div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Add Modal (Bottom Sheet) */}
@@ -601,35 +579,37 @@ export const RoutineSystem: React.FC<{ t: any; userData: any }> = ({ t, userData
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Horário</label>
-                    <div className="relative">
-                      <Clock size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zenit-accent/50 pointer-events-none" />
-                      <input
-                        type="time"
-                        value={newTime}
-                        onChange={(e) => setNewTime(e.target.value)}
-                        className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl pl-12 pr-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/50 transition-all shadow-inner"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Janela</label>
-                    <div className="relative">
-                      <Activity size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zenit-accent/50 pointer-events-none" />
-                      <select
-                        value={newDuration}
-                        onChange={(e) => setNewDuration(e.target.value)}
-                        className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl pl-12 pr-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/50 transition-all appearance-none shadow-inner"
+                <div className="space-y-3">
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Ciclo do Protocolo</label>
+                  <div className="flex gap-2 p-1.5 bg-zenit-glass rounded-2xl border border-zenit-glass-border shadow-inner">
+                    {periods.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => setNewPeriod(p.id as any)}
+                        className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${newPeriod === p.id ? 'bg-zenit-accent/20 text-zenit-accent' : 'text-zenit-text-tertiary hover:text-zenit-text-secondary'}`}
                       >
-                        <option value="15min">15 min</option>
-                        <option value="30min">30 min</option>
-                        <option value="45min">45 min</option>
-                        <option value="1h">1 hora</option>
-                        <option value="2h">2 horas</option>
-                      </select>
-                    </div>
+                        {p.icon}
+                        <span>{p.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] text-zenit-text-tertiary font-black uppercase tracking-[0.3em] ml-1">Janela</label>
+                  <div className="relative">
+                    <Activity size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zenit-accent/50 pointer-events-none" />
+                    <select
+                      value={newDuration}
+                      onChange={(e) => setNewDuration(e.target.value)}
+                      className="w-full bg-zenit-surface-2 border border-zenit-border-primary rounded-2xl pl-12 pr-6 py-4 text-sm text-zenit-text-primary focus:outline-none focus:border-zenit-accent/50 transition-all appearance-none shadow-inner"
+                    >
+                      <option value="15min">15 min</option>
+                      <option value="30min">30 min</option>
+                      <option value="45min">45 min</option>
+                      <option value="1h">1 hora</option>
+                      <option value="2h">2 horas</option>
+                    </select>
                   </div>
                 </div>
 

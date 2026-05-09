@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useUser } from '../contexts/UserContext';
 import { NewProtocolModal } from './NewProtocolModal';
 
-export const Protocols: React.FC<{ t: any }> = ({ t }) => {
+export const Protocols: React.FC<{ t: any; onBack?: () => void }> = ({ t, onBack }) => {
   const { userData, refreshUserData } = useUser();
   const [protocols, setProtocols] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

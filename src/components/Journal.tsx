@@ -11,6 +11,7 @@ import { useGamification } from './GamificationContext';
 interface JournalProps {
   t: any;
   mode?: 'manual' | 'neural';
+  onBack?: () => void;
 }
 
 export const Journal: React.FC<JournalProps> = ({ t, mode = 'manual' }) => {

@@ -23,7 +23,7 @@ const categoryData = [
   { name: 'Finance', value: 10 },
 ];
 
-export const Stats: React.FC = () => {
+export const Stats: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { userData } = useUser();
   const tier = userData?.subscription_tier || 'basic';
   const hasAccess = TIER_LIMITS[tier]?.hasAdvancedAnalytics || false;

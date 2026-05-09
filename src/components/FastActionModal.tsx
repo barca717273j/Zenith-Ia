@@ -18,7 +18,7 @@ export const FastActionModal: React.FC<FastActionModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[110] flex items-start justify-center p-6 pt-24">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -28,9 +28,9 @@ export const FastActionModal: React.FC<FastActionModalProps> = ({
           />
           
           <motion.div 
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            initial={{ scale: 0.9, opacity: 0, y: -40 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            exit={{ scale: 0.9, opacity: 0, y: -40 }}
             className="relative w-full max-w-sm"
           >
             <div className="bg-zenit-surface-1 border border-zenit-border-primary rounded-[3rem] p-8 space-y-8 overflow-hidden relative shadow-2xl">

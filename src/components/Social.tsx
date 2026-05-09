@@ -21,6 +21,7 @@ import { ensureBucketExists } from '../services/storageService';
 
 interface SocialProps {
   t: any;
+  onBack: () => void;
 }
 
 interface Post {
@@ -58,7 +59,7 @@ interface Story {
 
 const NexusLogo = ({ size = 24 }: { size?: number }) => (
   <div className="relative group overflow-hidden" style={{ width: size, height: size }}>
-    <div className="absolute inset-0 bg-zenit-crimson/10 blur-[15px] rounded-full group-hover:bg-zenit-accent/20 transition-all duration-700" />
+    <div className="absolute inset-0 bg-zenit-accent/10 blur-[15px] rounded-full group-hover:bg-zenit-accent/20 transition-all duration-700" />
     <svg 
       viewBox="0 0 100 100" 
       fill="none" 
@@ -66,24 +67,26 @@ const NexusLogo = ({ size = 24 }: { size?: number }) => (
       style={{ width: '100%', height: '100%' }}
       className="relative z-10 transition-transform duration-700 group-hover:scale-110"
     >
+      {/* Stylized Futuristic Z */}
       <path 
-        d="M20 20L80 80M80 20L20 80" 
+        d="M25 30H75L25 70H75" 
         stroke="currentColor" 
         strokeWidth="12" 
         strokeLinecap="round" 
+        strokeLinejoin="round"
         className="text-zenit-accent drop-shadow-[0_0_8px_var(--accent-glow)]"
       />
       <circle 
         cx="50" 
         cy="50" 
         r="15" 
-        className="fill-zenit-crimson animate-pulse"
+        className="fill-zenit-crimson/30 animate-pulse"
       />
     </svg>
   </div>
 );
 
-export const Nexus: React.FC<SocialProps> = ({ t }) => {
+export const Social: React.FC<SocialProps> = ({ t, onBack }) => {
   const { userData, refreshUserData, checkLimit, incrementUsage } = useUser();
   const [activeTab, setActiveTab] = useState<'feed' | 'discover' | 'profile'>('feed');
   const [trendingTags, setTrendingTags] = useState<string[]>(['#ZenitElite', '#ProtocoloSicrano', '#NeuralMind', '#Performance']);
@@ -391,6 +394,18 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
     }
   };
 
+  const openNexusGallery = () => {
+    setImagePreview(null); // Clear preview first
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.onchange = (e: any) => {
+      handleImageChange(e);
+      setIsNexusModalOpen(true);
+    };
+    input.click();
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -438,6 +453,10 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
     <Profile 
       t={t} 
       targetUserId={selectedUserId || userData?.id} 
+      onBack={() => {
+        setSelectedUserId(null);
+        setActiveTab('feed');
+      }}
     />
   );
 
@@ -547,22 +566,26 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                   <ArrowLeft size={18} className="text-zenit-text-primary" />
                 </button>
               ) : (
-                <div className="flex items-center space-x-2 opacity-50">
-                  <div className="w-1.5 h-1.5 rounded-full bg-zenit-crimson animate-pulse" />
-                  <span className="text-[7px] font-black uppercase tracking-[0.4em] text-zenit-text-primary italic">Ativo</span>
-                </div>
+                <button 
+                  onClick={onBack}
+                  className="w-10 h-10 flex items-center justify-center bg-zenit-glass hover:bg-zenit-surface-2 rounded-xl transition-all active:scale-90 border border-zenit-glass-border"
+                >
+                  <ArrowLeft size={18} className="text-zenit-text-primary" />
+                </button>
               )}
             </div>
 
-            <div className="flex flex-col items-center group cursor-pointer" onClick={() => fetchPosts()}>
-              <div className="relative">
-                <div className="absolute inset-0 bg-zenit-accent/10 blur-2xl rounded-full group-hover:bg-zenit-accent/20 transition-colors" />
-                <NexusLogo size={56} />
+          <div className="flex flex-col items-center group cursor-pointer" onClick={() => fetchPosts()}>
+            <div className="relative">
+              <div className="absolute inset-0 bg-zenit-accent/10 blur-2xl rounded-full group-hover:bg-zenit-accent/20 transition-colors" />
+              <div className="w-16 h-16 rounded-full bg-zenit-surface-2 flex items-center justify-center border border-zenit-accent/30 shadow-[0_0_20px_var(--accent-glow)]">
+                <NexusLogo size={40} />
               </div>
-              <h1 className="text-2xl font-display font-black tracking-[0.5em] text-zenit-text-primary italic mt-2 ml-2">
-                NEXUS
-              </h1>
             </div>
+            <h1 className="text-2xl font-display font-black tracking-[0.5em] text-zenit-text-primary italic mt-2 ml-2">
+              NEXUS
+            </h1>
+          </div>
 
             <div className="flex items-center justify-end space-x-4 w-1/4">
                <button 
@@ -582,7 +605,7 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                     >
                       <button
                         onClick={() => {
-                          setIsNexusModalOpen(true);
+                          openNexusGallery();
                           setIsFabOpen(false);
                         }}
                         className="w-full flex items-center space-x-4 px-5 py-4 hover:bg-zenit-surface-2 rounded-2xl transition-all group"
@@ -671,22 +694,14 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
           <div className="flex px-6 pb-4 space-x-6 items-center overflow-x-auto scrollbar-hide">
             {/* Create Nexus - Discrete Action */}
             <div className="flex flex-col items-center space-y-3 flex-shrink-0">
-              <motion.label 
+              <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={openNexusGallery}
                 className="w-16 h-16 rounded-full flex items-center justify-center bg-zenit-surface-2 border border-zenit-border-primary hover:border-zenit-accent/40 transition-colors group shadow-sm cursor-pointer"
               >
-                <input 
-                  type="file" 
-                  accept="image/*,video/*" 
-                  className="hidden" 
-                  onChange={(e) => {
-                    handleImageChange(e);
-                    setIsNexusModalOpen(true);
-                  }} 
-                />
                 <Plus size={24} className="text-zenit-text-tertiary group-hover:text-zenit-accent transition-colors" />
-              </motion.label>
+              </motion.button>
               <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.4em] italic">Capturar</span>
             </div>
             
@@ -779,35 +794,31 @@ export const Nexus: React.FC<SocialProps> = ({ t }) => {
                     <img src={imagePreview} className="w-full h-full object-cover" />
                   )}
 
-                  {/* Top Control Bar - Elevated Crimson Buttons */}
-                  <div className="absolute top-12 inset-x-8 flex justify-between items-center z-50">
+                  {/* Top Control Bar - Premium Streamlined UI */}
+                  <div className="absolute top-12 left-8 right-8 flex justify-between items-center z-50">
                     <button 
                       onClick={() => setIsNexusModalOpen(false)}
-                      className="w-14 h-14 bg-black/60 backdrop-blur-3xl rounded-2xl flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-2xl"
+                      className="w-12 h-12 bg-black/60 backdrop-blur-2xl rounded-full flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-xl"
                     >
-                      <X size={24} />
+                      <X size={20} />
                     </button>
                     
                     <div className="flex items-center space-x-4">
                       <button 
-                        onClick={() => setNewNexusText(newNexusText ? '' : 'Diga algo...')}
-                        className={`px-8 h-14 backdrop-blur-3xl rounded-2xl flex items-center justify-center border font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 shadow-2xl space-x-2 italic ${newNexusText ? 'bg-zenit-crimson text-white border-zenit-crimson' : 'bg-black/60 text-white border-white/10'}`}
+                        onClick={() => setNewNexusText(newNexusText ? '' : 'ADICIONAR NEXUS...')}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center border transition-all active:scale-95 shadow-lg ${newNexusText ? 'bg-zenit-crimson text-white border-zenit-crimson' : 'bg-black/60 text-white border-white/10 backdrop-blur-2xl'}`}
+                        title="Texto"
                       >
-                        <Type size={16} />
-                        <span>Texto</span>
+                        <Type size={20} />
                       </button>
 
                       <button
                         onClick={handleCreateNexus}
                         disabled={isPublishing}
-                        className="px-8 h-14 bg-zenit-crimson text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_15px_30px_rgba(255,38,33,0.3)] transition-all active:scale-95 flex items-center justify-center space-x-2 border border-white/20 italic"
+                        className="px-10 py-4 bg-zenit-crimson text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] shadow-[0_15px_30px_rgba(227,28,37,0.3)] active:scale-95 disabled:opacity-50 border border-white/10 italic flex items-center space-x-3 transition-all hover:bg-zenit-accent group"
                       >
-                        {isPublishing ? <Loader2 className="animate-spin" size={16} /> : (
-                          <>
-                            <Zap size={16} />
-                            <span>Postar</span>
-                          </>
-                        )}
+                        <span>{isPublishing ? <Loader2 className="animate-spin" size={16} /> : 'Postar'}</span>
+                        {!isPublishing && <Send size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
                       </button>
                     </div>
                   </div>
@@ -977,10 +988,10 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
         {/* Cinematic Scanline Overlay */}
         <div className="absolute inset-x-0 top-0 h-1 z-30 bg-zenit-accent/20 blur-sm animate-scanline" />
 
-        {/* Neural Sync Progress */}
+        {/* Nexus Sync Progress */}
         <div className="absolute top-0 left-0 right-0 p-8 z-30 space-y-4">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.5em] italic">Preparando Transmissão...</span>
+            <span className="text-[7.5px] font-black text-zenit-text-tertiary uppercase tracking-[0.5em] italic">Progresso Nexus...</span>
             <span className="text-[7.5px] font-mono text-zenit-text-tertiary">{Math.floor(progress)}%</span>
           </div>
           <div className="h-[2px] w-full bg-zenit-surface-2 rounded-full overflow-hidden backdrop-blur-md">
@@ -991,7 +1002,7 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
           </div>
         </div>
 
-        {/* Neural Context Header */}
+        {/* Nexus Header */}
         <div className="absolute top-16 left-0 right-0 px-8 z-30 flex items-center justify-between">
           <div className="flex items-center space-x-5">
             <div className="w-12 h-12 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary p-0.5 backdrop-blur-xl shadow-lg">
@@ -1005,7 +1016,7 @@ const StoryViewer: React.FC<{ story: any; onClose: () => void }> = ({ story, onC
               <p className="text-xs font-black text-zenit-text-primary uppercase tracking-[0.2em] italic leading-none">{story.user?.display_name}</p>
               <div className="flex items-center space-x-2">
                  <div className="w-1 h-1 rounded-full bg-zenit-accent animate-pulse" />
-                 <p className="text-[7.5px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic">Transmissão Ativa</p>
+                 <p className="text-[7.5px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic">Nexus Ativo</p>
               </div>
             </div>
           </div>

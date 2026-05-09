@@ -930,7 +930,7 @@ export const translations = {
       overallProgress: 'Progresso Geral',
       lifeAreas: 'Áreas da Vida',
       areas: {
-        body: 'Corpo',
+        body: 'Exercício',
         mind: 'Mente',
         discipline: 'Disciplina',
         financial: 'Financeiro'
@@ -953,7 +953,7 @@ export const translations = {
       evolutionLevel: 'Nível de Evolução',
       nextMilestone: 'Próximo Marco',
       quotes: {
-        body: "Seu templo físico clama por movimento. A vitalidade é o combustível da ascensão.",
+        body: "Seu desempenho físico clama por movimento. O exercício é o combustível da ascensão.",
         mind: "A mente é um jardim que exige cultivo constante. Silencie o ruído, encontre o foco.",
         discipline: "A disciplina é a base de todo império pessoal. Retome o controle de sua rotina.",
         financial: "Sua liberdade futura depende da gestão presente. Organize seus recursos.",

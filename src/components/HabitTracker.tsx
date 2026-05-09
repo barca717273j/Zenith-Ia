@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Plus, Check, Flame, Trophy, Trash2, X, Sparkles, 
   Zap, Calendar, TrendingUp, Award, ChevronRight,
-  Target, Info, Star, Clock, Activity
+  Target, Info, Star, Clock, Activity, ArrowLeft
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useGamification } from './GamificationContext';
@@ -43,9 +43,10 @@ interface Achievement {
 
 interface HabitTrackerProps {
   t: any;
+  onBack: () => void;
 }
 
-export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
+export const HabitTracker: React.FC<HabitTrackerProps> = ({ t, onBack }) => {
   const { userData, checkLimit, incrementUsage } = useUser();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
@@ -322,17 +323,25 @@ export const HabitTracker: React.FC<HabitTrackerProps> = ({ t }) => {
   ];
 
   return (
-    <div className="flex flex-col gap-8 p-6 pb-56 max-w-2xl mx-auto min-h-screen">
+    <div className="flex flex-col gap-8 p-6 pb-56 max-w-2xl mx-auto min-h-screen pt-12">
       <header className="flex justify-between items-start mb-4">
-        <div className="space-y-3">
-          <h1 className="text-4xl sm:text-5xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary italic">
-            Neural <span className="text-zenit-accent font-black">Sync</span>
-          </h1>
-          <div className="flex items-center space-x-4">
-            <div className="h-1 w-12 bg-zenit-accent/40 rounded-full" />
-            <p className="text-zenit-text-tertiary text-[9px] font-black uppercase tracking-[0.4em] italic opacity-60">
-              {activeView === 'habits' ? `${habits.length}/${habitLimit} PROTOCOLS` : activeView === 'tasks' ? `${tasks.length} DIRECTIVES` : 'NEURAL ANALYSIS'}
-            </p>
+        <div className="flex items-center space-x-6">
+          <button 
+            onClick={onBack}
+            className="w-12 h-12 flex items-center justify-center bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl text-zenit-text-tertiary hover:text-white transition-all active:scale-95"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div className="space-y-3">
+            <h1 className="text-4xl sm:text-5xl font-bold font-display tracking-tighter uppercase leading-none text-zenit-text-primary italic">
+              Neural <span className="text-zenit-accent font-black">Sync</span>
+            </h1>
+            <div className="flex items-center space-x-4">
+              <div className="h-1 w-12 bg-zenit-accent/40 rounded-full" />
+              <p className="text-zenit-text-tertiary text-[9px] font-black uppercase tracking-[0.4em] italic opacity-60">
+                {activeView === 'habits' ? `${habits.length}/${habitLimit} PROTOCOLS` : activeView === 'tasks' ? `${tasks.length} DIRECTIVES` : 'NEURAL ANALYSIS'}
+              </p>
+            </div>
           </div>
         </div>
         <motion.button 

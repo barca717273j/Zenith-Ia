@@ -9,11 +9,12 @@ import { useUser } from '../contexts/UserContext';
 
 interface MentalGymProps {
   t: any;
+  onBack?: () => void;
 }
 
 type GymMode = 'menu' | 'memory' | 'focus' | 'logic' | 'tetris';
 
-export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
+export const MentalGym: React.FC<MentalGymProps> = ({ t, onBack }) => {
   const { userData } = useUser();
   const [mode, setMode] = useState<GymMode>('menu');
   const { addXP } = useGamification();
@@ -114,9 +115,17 @@ export const MentalGym: React.FC<MentalGymProps> = ({ t }) => {
   }
 
   return (
-    <div className="p-6 space-y-12 pb-56 max-w-4xl mx-auto min-h-screen">
+    <div className="p-6 space-y-12 pb-56 max-w-4xl mx-auto min-h-screen pt-12">
       <header className="space-y-6">
         <div className="flex items-center space-x-6">
+          {onBack && (
+            <button 
+              onClick={onBack}
+              className="w-12 h-12 flex items-center justify-center bg-zenit-surface-1 border border-zenit-border-primary rounded-2xl text-zenit-text-tertiary hover:text-zenit-text-primary transition-all active:scale-95"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          )}
           <div className="w-16 h-16 rounded-[2rem] bg-zenit-surface-1/40 backdrop-blur-xl border border-zenit-border-primary flex items-center justify-center text-zenit-scarlet shadow-2xl">
             <Brain size={32} />
           </div>
