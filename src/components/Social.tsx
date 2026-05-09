@@ -723,7 +723,7 @@ export const Social: React.FC<SocialProps> = ({ t, onBack }) => {
                   </div>
                 </div>
                 <span className="text-[8px] font-black text-zenit-text-tertiary uppercase tracking-[0.2em] italic truncate max-w-[64px]">
-                  {item.user?.display_name.split(' ')[0]}
+                  {item.user?.display_name?.split(' ')[0] || 'Usuário'}
                 </span>
               </motion.button>
             ))}
@@ -1124,12 +1124,12 @@ const PostCard: React.FC<{ post: Post; onLike: () => void; onViewProfile: () => 
           <div className="relative">
             <div className="w-14 h-14 rounded-2xl bg-zenit-surface-2 border border-zenit-border-primary group-hover:border-zenit-accent/40 transition-all duration-500 overflow-hidden flex items-center justify-center">
               <img 
-                src={post.user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user.username}`} 
+                src={post.user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user?.username || post.user_id}`} 
                 className="w-full h-full object-cover transition-all duration-700"
                 referrerPolicy="no-referrer"
               />
             </div>
-            {post.user.role === 'admin' && (
+            {post.user?.role === 'admin' && (
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-zenit-accent flex items-center justify-center rounded-lg border border-zenit-black shadow-lg">
                 <ShieldCheck size={10} className="text-white" />
               </div>
@@ -1137,12 +1137,12 @@ const PostCard: React.FC<{ post: Post; onLike: () => void; onViewProfile: () => 
           </div>
           <div className="text-left space-y-1">
             <h4 className="text-sm font-black uppercase tracking-[0.2em] text-zenit-text-primary italic leading-none">
-              {post.user.display_name}
+              {post.user?.display_name || 'Usuário Zenith'}
             </h4>
             <div className="flex items-center space-x-3">
-              <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic leading-none">@{post.user.username}</p>
+              <p className="text-[8px] text-zenit-text-tertiary font-black uppercase tracking-[0.4em] italic leading-none">@{post.user?.username || 'agente'}</p>
               <div className="w-1 h-3 bg-zenit-border-primary rounded-full" />
-              <p className="text-[8px] text-zenit-accent font-black uppercase tracking-[0.2em] italic leading-none">LVL {post.user.level}</p>
+              <p className="text-[8px] text-zenit-accent font-black uppercase tracking-[0.2em] italic leading-none">LVL {post.user?.level || 1}</p>
             </div>
           </div>
         </button>
